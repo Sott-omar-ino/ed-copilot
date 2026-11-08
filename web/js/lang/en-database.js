@@ -551,4 +551,6 @@ LANG.add({
   "Ordina per": "Sort by", "Distanza": "Distance", "Prezzo migliore": "Best price",
   "Disponibili": "Supply", "Paga": "Pays", "Richiesta": "Demand",
   "Armi e moduli": "Weapons & modules", "Compra una merce": "Buy a commodity",
+  "su": "on",
+  "Da {} · {} di {} · tipo di stazione, pad e pianeta secondo i dati della community: possono differire da quello che vedi in gioco": "From {} · {} of {} · station type, pads and planet from community data: they may differ from what you see in game",
 });

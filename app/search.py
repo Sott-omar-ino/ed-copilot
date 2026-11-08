@@ -141,7 +141,8 @@ def stations(q):
             "planetary": r.get("is_planetary"), "updated": (r.get("updated_at") if mode == "carrier" else r.get("market_updated_at") or r.get("updated_at")),
             "material_trader": r.get("material_trader"), "technology_broker": r.get("technology_broker"),
             "power": r.get("system_power"), "allegiance": r.get("allegiance"),
-            "carrier_name": r.get("carrier_name"),
+            "carrier_name": r.get("carrier_name"), "market_id": r.get("market_id"),
+            "pads": [r.get("large_pads") or 0, r.get("medium_pads") or 0, r.get("small_pads") or 0],
             "services": [x.get("name") for x in (r.get("services") or []) if x.get("name")] if mode == "carrier" else None,
         }
         item.update(KNOWN_FIXES.get((item["station"], item["system"]), {}))
@@ -169,7 +170,43 @@ def stations(q):
             item.update(price=m.get("price"), module=f"{m.get('class')}{m.get('rating')} {m.get('name')}"
                         + (f" ({m.get('weapon_mode')})" if m.get("weapon_mode") else ""))
         out.append(item)
+    _add_bodies(out)
     return {"reference": res.get("reference"), "count": res.get("count"), "results": out}
+
+
+_station_cache = {}  # market_id -> (quando, dettagli del corpo)
+
+
+def _station_body(market_id):
+    """Pianeta, gravità e coordinate di una stazione di superficie: l'elenco della ricerca non li contiene,
+    il dettaglio della singola stazione sì (cache di un giorno)."""
+    hit = _station_cache.get(market_id)
+    if hit and time.time() - hit[0] < 86400:
+        return hit[1]
+    req = urllib.request.Request(f"https://spansh.co.uk/api/station/{int(market_id)}",
+                                 headers={"User-Agent": spansh.USER_AGENT})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        rec = (json.loads(r.read().decode("utf-8")) or {}).get("record") or {}
+    info = {"body": rec.get("body_name"), "gravity": rec.get("body_gravity"),
+            "lat": rec.get("latitude"), "lon": rec.get("longitude")}
+    _station_cache[market_id] = (time.time(), info)
+    return info
+
+
+def _add_bodies(items, limit=12):
+    """Aggiunge il pianeta alle prime stazioni di superficie dei risultati (richieste in parallelo)."""
+    todo = [it for it in items if it.get("planetary") and it.get("market_id")][:limit]
+    if not todo:
+        return
+    from concurrent.futures import ThreadPoolExecutor
+
+    def one(it):
+        try:
+            it.update(_station_body(it["market_id"]))
+        except Exception:
+            pass
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        list(pool.map(one, todo))
 
 
 def trade_route(q):
