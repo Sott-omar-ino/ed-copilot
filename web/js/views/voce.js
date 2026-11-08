@@ -197,6 +197,7 @@ function voiceCommandsHelp() {
     ["", "“segna fatto …” o “completa …” (anche col numero: “segna fatto il 2”)"],
     ["Rapporti", "“rapporto nave”, “carburante”, “stato stiva”, “danni”, “prossimo salto”, “esobiologia”, “consigli”"],
     ["Rotta", "“copia destinazione”"],
+    ["Stazioni", "“base più vicina”, “stazione più vicina con riparazioni”, “material trader più vicino”, “broker tecnologico più vicino”… (risponde e copia il sistema)"],
     ["Nave", "“abbassa carrello”, “apri stiva”, “accendi luci”, “estrai armi”, “mappa galattica”… (vedi Controlli di bordo)"],
   ];
   return `<h3>Cosa puoi dire</h3>

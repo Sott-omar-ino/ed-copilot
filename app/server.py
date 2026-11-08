@@ -167,6 +167,50 @@ def _run_macro(q):
     return {"status": "ok" if done else "skipped", "played": phrase}
 
 
+# Servizi che si possono chiedere a voce ("stazione più vicina con ..."): nome Spansh -> come dirlo nella risposta.
+NEAREST_SERVICES = {
+    "Refuel": ("", ""), "Repair": ("con riparazioni", "with repairs"),
+    "Material Trader": ("con Material Trader", "with a Material Trader"),
+    "Technology Broker": ("con Technology Broker", "with a Technology Broker"),
+    "Interstellar Factors Contact": ("con Interstellar Factors", "with Interstellar Factors"),
+    "Universal Cartographics": ("con Universal Cartographics", "with Universal Cartographics"),
+    "Vista Genomics": ("con Vista Genomics", "with Vista Genomics"),
+    "Shipyard": ("con cantiere navale", "with a shipyard"), "Outfitting": ("con outfitting", "with outfitting"),
+    "Black Market": ("con mercato nero", "with a black market"),
+}
+
+
+def _nearest(q):
+    """Comando vocale "stazione più vicina": cerca, risponde a voce e copia il sistema negli appunti."""
+    service = q.get("service") if q.get("service") in NEAREST_SERVICES else "Refuel"
+    what_it, what_en = NEAREST_SERVICES[service]
+    try:
+        res = search.stations({"mode": "service", "service": service, "no_carriers": True})
+        best = (res.get("results") or [None])[0]
+    except Exception as exc:
+        best, err = None, str(exc)
+    else:
+        err = None
+    if not best:
+        text = pick(f"Non ho trovato stazioni {what_it} vicine." if not err else f"Ricerca non riuscita: {err}",
+                    f"I couldn't find a station {what_en} nearby." if not err else f"Search failed: {err}")
+    else:
+        here = best["system"] == search.current_system()
+        dist = best.get("distance") or 0
+        pad = "" if best.get("large_pad") else pick(" Attenzione: solo pad medi e piccoli.", " Note: medium and small pads only.")
+        where_it = "in questo sistema" if here else f"nel sistema {best['system']}, a {dist:.1f} anni luce".replace(".", ",")
+        where_en = "in this system" if here else f"in {best['system']}, {dist:.1f} light years away"
+        if not here:
+            subprocess.run(["clip.exe"], input=best["system"].encode("utf-16le"), check=False, creationflags=0x08000000)
+        copy_it = "" if here else " Ho copiato il sistema: incollalo nella mappa galattica."
+        copy_en = "" if here else " System copied: paste it in the galaxy map."
+        text = pick(f"La stazione più vicina {what_it} è {best['station']}, {where_it}.{pad}{copy_it}".replace("  ", " "),
+                    f"The nearest station {what_en} is {best['station']}, {where_en}.{pad}{copy_en}".replace("  ", " "))
+    if q.get("play") == "1":
+        voice.say(text, q.get("voice"), q.get("volume"))
+    return {"text": text, "station": best}
+
+
 def _copy_next(q):
     route = STATE.snapshot().get("route") or []
     nxt = route[0].get("StarSystem") if route else None
@@ -284,6 +328,7 @@ GET = {
     "/api/voice/ship_control": _ship_control,
     "/api/voice/macro": _run_macro,
     "/api/voice/copy-next": _copy_next,
+    "/api/voice/nearest": _nearest,
     "/api/remote_nav": lambda q: dict(REMOTE_NAV),
     "/api/lan": lambda q: {"enabled": bool(RUNTIME["lan_port"]), "url": companion_url()},
     "/api/settings": _settings,

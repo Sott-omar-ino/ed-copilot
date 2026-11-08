@@ -261,5 +261,7 @@ LANG.add({
   "Distanza minima colonia raggiunta: puoi procedere al nuovo campionamento genetico.": "Minimum colony distance reached: you can take the next genetic sample.",
   "\"Distanza minima colonia raggiunta: puoi procedere al nuovo campionamento genetico.\"": "\"Minimum colony distance reached: you can take the next genetic sample.\"",
   "Avviso vocale automatico a piedi quando ti allontani abbastanza per campionare il secondo o terzo stadio biologico.": "Automatic voice alert on foot once you're far enough to take the second or third sample.",
-
+  "Stazioni": "Stations",
+  "“base più vicina”, “stazione più vicina con riparazioni”, “material trader più vicino”, “broker tecnologico più vicino”… (risponde e copia il sistema)": "“nearest station”, “nearest station with repairs”, “nearest material trader”, “nearest technology broker”… (answers and copies the system)",
+  "Stazione più vicina": "Nearest station",
 });

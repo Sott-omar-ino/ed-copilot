@@ -384,6 +384,9 @@ const VOICE_GRAMMAR_EN = [
   { group: "Reports", report: "damage", desc: "Shield and hull integrity", help: 1,
     say: ["damage report", "hull status", "hull integrity", "shield status", "shields status", "fsd status", "fsd integrity", "damage"],
     exact: ["shields", "hull", "integrity"] },
+  { group: "Route", do: "nearest", desc: "Nearest station (optionally with a service: repairs, material trader…)", help: 1,
+    say: ["nearest station", "closest station", "nearest base", "nearest starport", "nearest material trader", "nearest technology broker",
+      "nearest interstellar factors", "nearest station with repairs", "where can i repair", "nearest shipyard", "nearest black market"] },
   { group: "Route", do: "copy", desc: "Copy destination to clipboard", help: 1,
     say: ["copy destination", "copy next system", "copy next jump", "copy route", "copy system"] },
   { group: "Reports", report: "route", desc: "Next jump on the route", help: 1,
@@ -1212,6 +1215,15 @@ const VOICE_ENGINE = {
       speakReport("route");
       return;
     }
+    // Stazione più vicina, anche con un servizio: "stazione più vicina con riparazioni", "material trader più vicino".
+    if (/(piu vicin[oa]|vicin[oa] a me|piu vicine)/.test(text) && /(base|stazion[ei]|porto|spazioporto|attracc\w*|material trader|mercante|broker|riparazion\w*|ripara\w*|rifornimento|carburante|cartograf\w*|genomics|interstellar|factors|cantiere|outfitting|equipaggiamento|mercato nero)/.test(text)) {
+      const svc = nearestServiceIt(text);
+      this._recordAction("Stazione più vicina", raw);
+      if (tr) tr.innerHTML = `<span style="color:var(--ok)">&#x2714; Stazione più vicina</span>`;
+      const v = ttsVoiceKey(), vol = SETTINGS.ttsVolume != null ? SETTINGS.ttsVolume : 100;
+      fetch(`/api/voice/nearest?play=1&service=${encodeURIComponent(svc)}&voice=${encodeURIComponent(v)}&volume=${vol}`).catch(() => {});
+      return;
+    }
     if (has("copia destinazione", "copia rotta", "copia sistema", "copia prossimo")) {
       this._recordAction("Copia destinazione negli appunti", raw);
       if (tr) tr.innerHTML = `<span style="color:var(--ok)">&#x2714; Copia rotta</span>`;
@@ -1300,6 +1312,11 @@ const VOICE_ENGINE = {
     }
     show(`<span style="color:var(--ok)">&#x2714; ${esc(g.desc)}</span>`);
     if (g.do === "copy") { fetch("/api/voice/copy-next?play=1").catch(() => {}); return; }
+    if (g.do === "nearest") {
+      const v = ttsVoiceKey(), vol = SETTINGS.ttsVolume != null ? SETTINGS.ttsVolume : 100;
+      fetch(`/api/voice/nearest?play=1&service=${encodeURIComponent(nearestServiceEn(text))}&voice=${encodeURIComponent(v)}&volume=${vol}`).catch(() => {});
+      return;
+    }
     speakReport(g.report);
   },
 
@@ -1396,6 +1413,23 @@ const VOICE_ENGINE = {
     }
   }
 };
+
+// Servizio chiesto a voce per "stazione più vicina" (nomi come in gamedata.SERVICES); senza servizio basta il rifornimento.
+function nearestServiceIt(text) {
+  const rules = [[/material trader|mercante di material/, "Material Trader"], [/broker|tecnologic/, "Technology Broker"],
+    [/interstellar|factors|taglie|multe/, "Interstellar Factors Contact"], [/cartograf|vendere i dati|dati esplorativi/, "Universal Cartographics"],
+    [/genomics|dati biologici|esobiologi/, "Vista Genomics"], [/cantiere|shipyard|comprare (una )?nave/, "Shipyard"],
+    [/outfitting|equipaggiamento|moduli/, "Outfitting"], [/mercato nero/, "Black Market"], [/ripara/, "Repair"],
+    [/rifornimento|carburante|benzina/, "Refuel"]];
+  return (rules.find(([re]) => re.test(text)) || [null, "Refuel"])[1];
+}
+function nearestServiceEn(text) {
+  const rules = [[/material trader/, "Material Trader"], [/broker/, "Technology Broker"], [/interstellar|factors|bount|fines/, "Interstellar Factors Contact"],
+    [/cartograph|sell (my )?data|exploration data/, "Universal Cartographics"], [/genomics|bio data|exobio/, "Vista Genomics"],
+    [/shipyard|buy a ship/, "Shipyard"], [/outfitting|modules/, "Outfitting"], [/black market/, "Black Market"], [/repair/, "Repair"],
+    [/refuel|fuel/, "Refuel"]];
+  return (rules.find(([re]) => re.test(text)) || [null, "Refuel"])[1];
+}
 
 // Distanza di modifica (Levenshtein): quante lettere vanno cambiate, aggiunte o tolte per passare da a a b.
 function editDistance(a, b) {
