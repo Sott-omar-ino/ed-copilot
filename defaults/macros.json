@@ -1,0 +1,92 @@
+[
+  {
+    "id": "docking_request",
+    "name": "Richiesta d'attracco",
+    "say": "Richiesta attracco; Chiedi attracco; Attracco; Permesso d'atterraggio",
+    "keys": [
+      "1",
+      "WAIT:250",
+      "E",
+      "E",
+      "SPACE",
+      "RIGHT",
+      "SPACE",
+      "1"
+    ],
+    "voice": "Richiesta d'atterraggio inviata alla stazione.",
+    "desc": "Apre il pannello contatti, richiede l'autorizzazione all'atterraggio e richiude il pannello."
+  },
+  {
+    "id": "pips_shields",
+    "name": "Massima energia scudi",
+    "say": "Massima energia scudi; Energia scudi; Tutto su scudi; Scudi al massimo",
+    "keys": [
+      "LEFT",
+      "LEFT",
+      "LEFT",
+      "LEFT"
+    ],
+    "voice": "Quattro tacche di energia trasferite ai sistemi di scudo.",
+    "desc": "Imposta 4 pips a SYS per ricarica e resistenza massima degli scudi."
+  },
+  {
+    "id": "pips_engines",
+    "name": "Massima velocita motori",
+    "say": "Massima velocita motori; Energia motori; Tutto sui motori; Motori al massimo",
+    "keys": [
+      "UP",
+      "UP",
+      "UP",
+      "UP"
+    ],
+    "voice": "Quattro tacche di energia trasferite ai propulsori.",
+    "desc": "Imposta 4 pips a ENG per velocita massima e ricarica boost istantanea."
+  },
+  {
+    "id": "pips_weapons",
+    "name": "Massima potenza armi",
+    "say": "Massima potenza armi; Energia armi; Tutto sulle armi; Armi al massimo",
+    "keys": [
+      "RIGHT",
+      "RIGHT",
+      "RIGHT",
+      "RIGHT"
+    ],
+    "voice": "Quattro tacche di energia trasferite ai condensatori delle armi.",
+    "desc": "Imposta 4 pips a WEP per ricarica immediata dei laser e armi energetiche."
+  },
+  {
+    "id": "pips_reset",
+    "name": "Bilancia energia condensatori",
+    "say": "Bilancia energia; Reset energia; Energia bilanciata; Reset condensatori",
+    "keys": [
+      "DOWN"
+    ],
+    "voice": "Distribuzione di energia bilanciata su tutti i sistemi.",
+    "desc": "Ripristina 2 pips equi su Sistemi, Motori e Armi."
+  },
+  {
+    "id": "heatsink",
+    "name": "Dissipatore termico",
+    "say": "Dissipatore termico; Lancia dissipatore; Espelli calore; Heat sink",
+    "keys": [
+      "V"
+    ],
+    "voice": "Dissipatore termico espulso. Temperatura in calo rapido.",
+    "desc": "Lancia una capsula dissipatrice per azzerare il surriscaldamento."
+  },
+  {
+    "id": "emergency_boost",
+    "name": "Fuga d'emergenza",
+    "say": "Fuga d'emergenza; Boost e fuga; Manovra evasiva; Allarme fuga",
+    "keys": [
+      "LEFT",
+      "LEFT",
+      "UP",
+      "UP",
+      "TAB"
+    ],
+    "voice": "Manovra di evasione e postbruciatore attivati.",
+    "desc": "Rinforza scudi e motori ed attiva immediatamente il postbruciatore per allontanarsi dal pericolo."
+  }
+]

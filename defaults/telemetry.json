@@ -1,0 +1,90 @@
+[
+  {
+    "id": "fuel_low",
+    "name": "Allarme Riserva Carburante Bassa (<25%)",
+    "metric": "fuel",
+    "condition": "lt",
+    "threshold": 25,
+    "unit": "%",
+    "enabled": true,
+    "voice": "Attenzione comandante: riserva di carburante inferiore al 25 percento. Cercare una stella scupabile o un carrier.",
+    "desc": "Avviso vocale automatico quando il carburante principale scende sotto la soglia di sicurezza."
+  },
+  {
+    "id": "unscoopable_star",
+    "name": "Allarme Stella di Salto Non Rifornibile",
+    "metric": "star_unscoopable",
+    "condition": "eq",
+    "threshold": 1,
+    "unit": "",
+    "enabled": true,
+    "voice": "Attenzione: la stella di arrivo non consente il rifornimento di carburante FSD.",
+    "desc": "Avvisa appena si salta verso stelle non scoopabili (nane brune L, T, Y o protostelle TTS)."
+  },
+  {
+    "id": "heat_high",
+    "name": "Allarme Surriscaldamento Termico (>80%)",
+    "metric": "heat",
+    "condition": "gt",
+    "threshold": 80,
+    "unit": "%",
+    "enabled": true,
+    "voice": "Allarme termico: temperatura scafo oltre la soglia di sicurezza. Valutare il lancio di un dissipatore.",
+    "desc": "Avviso vocale per prevenire danni ai moduli e alla cabina da surriscaldamento."
+  },
+  {
+    "id": "shield_collapse",
+    "name": "Allarme Collasso Scudi di Bordo",
+    "metric": "shields_down",
+    "condition": "eq",
+    "threshold": 1,
+    "unit": "",
+    "enabled": true,
+    "voice": "Allarme: scudi collassati! Corazza della nave esposta al fuoco.",
+    "desc": "Avvisa vocalmente nel momento esatto in cui gli scudi cedono."
+  },
+  {
+    "id": "hull_critical",
+    "name": "Allarme Integrita Scafo Critica (<50%)",
+    "metric": "hull",
+    "condition": "lt",
+    "threshold": 50,
+    "unit": "%",
+    "enabled": true,
+    "voice": "Danno strutturale grave: integrita scafo al di sotto del 50 percento.",
+    "desc": "Avvisa in caso di breccia o danno elevato alla corazza."
+  },
+  {
+    "id": "fsd_integrity",
+    "name": "Allarme Integrita Motore FSD (<80%)",
+    "metric": "fsd",
+    "condition": "lt",
+    "threshold": 80,
+    "unit": "%",
+    "enabled": true,
+    "voice": "Attenzione: integrita FSD sotto l 80 percento. Rischio malfunzionamento, riparare con AFMU.",
+    "desc": "Avviso preventivo per evitare interruzioni accidentali del frame shift drive durante i salti con getti di neutroni."
+  },
+  {
+    "id": "earth_like_world",
+    "name": "Rilevamento Pianeta Terrestre (ELW)",
+    "metric": "elw",
+    "condition": "eq",
+    "threshold": 1,
+    "unit": "",
+    "enabled": true,
+    "voice": "Pianeta di classe terrestre confermato nel sistema. Alto valore cartografico.",
+    "desc": "Avvisa alla scoperta di un Earth-Like World per massimizzare i crediti cartografici."
+  },
+  {
+    "id": "exobiology_distance",
+    "name": "Esobiologia: Distanza Minima Raggiunta",
+    "metric": "bio_distance",
+    "condition": "eq",
+    "threshold": 1,
+    "unit": "",
+    "enabled": true,
+    "voice": "Distanza minima colonia raggiunta: puoi procedere al nuovo campionamento genetico.",
+    "desc": "Avviso vocale automatico a piedi quando ti allontani abbastanza per campionare il secondo o terzo stadio biologico."
+  }
+]

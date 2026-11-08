@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>ED Copilot Overlay</title>
+<style>
+  /* Finestra sopra il gioco: l'app ne regola l'opacità (Impostazioni → Overlay). */
+  html, body { margin: 0; background: #0c0500; overflow: hidden; }
+  body { font: 13px/1.35 "Bahnschrift", "Segoe UI", sans-serif; color: #ffd9b0; user-select: none;
+         text-shadow: 0 0 3px #000, 0 0 6px #000; }
+  .box { margin: 0; padding: 8px 10px; border-left: 2px solid #ff8c00; min-height: 100vh; box-sizing: border-box; }
+  .unlocked .box { outline: 1px dashed rgba(255, 140, 0, .7); cursor: move; }
+  .row { display: flex; justify-content: space-between; gap: 12px; }
+  .lbl { color: #b9732e; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+  .big { font-size: 16px; color: #ffb247; font-weight: 600; }
+  .mono { font-family: "Cascadia Mono", Consolas, monospace; }
+  .ok { color: #9be36b; } .bad { color: #ff4930; } .gold { color: #ffd27a; }
+  .sec { margin-top: 6px; }
+  .bar { height: 4px; background: rgba(255, 140, 0, .18); margin-top: 3px; }
+  .bar i { display: block; height: 100%; background: #ff8c00; }
+  .hint { font-size: 10px; color: #b9732e; margin-top: 6px; }
+  .feed { font-size: 11px; color: #f5a55a; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+<div class="box pywebview-drag-region" id="box"><div class="lbl">ED Copilot</div><div id="c">In attesa del gioco…</div></div>
+<script src="/js/lang.js"></script>
+<script>
+"use strict";
+// Testi dell'overlay in inglese (vedi web/js/lang.js). La lingua è quella dell'app: allineata a /api/ui_lang qui sotto.
+LANG.add({
+  "In attesa del gioco…": "Waiting for the game…",
+  "Prossimo salto · {} rimanenti": "Next jump · {} left",
+  "Carburante": "Fuel",
+  "Esobiologia · campione {}/3": "Exobiology · sample {}/3",
+  "Distanza non ancora misurata": "Distance not measured yet",
+  "Puoi campionare": "You can sample",
+  "Allontanati ancora di {} m": "Move another {} m away",
+  "⚠ FSD al {}%": "⚠ FSD at {}%",
+  "Trascina per spostare · blocca dalle Impostazioni dell'app": "Drag to move · lock it from the app's Settings",
+  "ED Copilot non risponde": "ED Copilot isn't responding",
+});
+</script>
+<script>
+"use strict";
+const nativeFetch = window.fetch.bind(window);
+const api = p => nativeFetch(p, { headers: { "X-ED-Copilot": "1" } }).then(r => r.json());
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const SHOW = new URLSearchParams(location.search);
+document.body.classList.toggle("unlocked", SHOW.get("locked") !== "1");
+
+function render(s) {
+  const loc = s.location || {}, fuel = s.fuel || {}, route = s.route || [], bio = s.bio_current;
+  const parts = [`<div class="row"><span class="big">${esc(loc.system || "—")}</span><span class="mono">${loc.station ? esc(loc.station) : esc(loc.body || "")}</span></div>`];
+  if (route.length) {
+    const n = route[0];
+    parts.push(`<div class="sec"><div class="lbl">Prossimo salto · ${route.length} rimanenti</div>
+      <div class="row"><span>${esc(n.StarSystem)}</span><span class="mono ${n.scoopable ? "ok" : "bad"}">${esc(n.StarClass || "")} ${n.scoopable ? "scoop" : "no scoop"}</span></div></div>`);
+  }
+  if (fuel.cap && fuel.level != null) {
+    const pct = Math.round(fuel.level / fuel.cap * 100);
+    parts.push(`<div class="sec"><div class="row"><span class="lbl">Carburante</span><span class="mono ${pct < 25 ? "bad" : ""}">${pct}% · ${fuel.level.toFixed(1)} t</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`);
+  }
+  if (bio) {
+    const d = bio.distances?.length ? Math.min(...bio.distances) : null;
+    parts.push(`<div class="sec"><div class="lbl">Esobiologia · campione ${bio.step}/3</div>
+      <div class="row"><span>${esc(bio.species)}</span><span class="mono ${bio.far_enough ? "ok" : "bad"}">${d == null ? "—" : d + " m"} / ${bio.min_dist} m</span></div>
+      <div class="sub ${bio.far_enough ? "ok" : ""}" style="font-size:11px">${d == null ? "Distanza non ancora misurata" : bio.far_enough ? "Puoi campionare" : `Allontanati ancora di ${bio.min_dist - d} m`}</div></div>`);
+  }
+  if (s.fsd_health != null && s.fsd_health < 90) parts.push(`<div class="sec bad">⚠ FSD al ${s.fsd_health}%</div>`);
+  const feed = (s.feed || [])[0];
+  if (feed) parts.push(`<div class="feed">› ${esc(feed.text)}</div>`);
+  if (document.body.classList.contains("unlocked")) parts.push('<div class="hint">Trascina per spostare · blocca dalle Impostazioni dell\'app</div>');
+  document.getElementById("c").innerHTML = parts.join("");
+}
+
+async function tick() {
+  try { render(await api("/api/state")); } catch { document.getElementById("c").textContent = "ED Copilot non risponde"; }
+  setTimeout(tick, 1000);
+}
+tick();
+api("/api/ui_lang").then(r => LANG.sync(r.ui_lang)).catch(() => {});
+</script>
+</body>
+</html>

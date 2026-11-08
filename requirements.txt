@@ -1,0 +1,8 @@
+# Dipendenze per avviare ED Copilot dai sorgenti (l'eseguibile le contiene già tutte).
+pywebview>=5.0        # finestra nativa (usa Microsoft Edge WebView2, già presente in Windows 11)
+edge-tts>=6.1         # voce del copilota (voci neurali Microsoft, serve internet)
+faster-whisper>=1.0   # riconoscimento vocale locale
+qrcode[pil]>=7.4      # QR code per il companion del telefono
+cryptography>=42      # certificato HTTPS del companion (il microfono del telefono funziona solo su HTTPS)
+sounddevice>=0.4.6     # microfono del push-to-talk globale (cloche/manetta/tastiera anche mentre giochi)
+numpy>=1.24           # filtro rumori del microfono ed effetti della voce

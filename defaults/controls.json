@@ -1,0 +1,128 @@
+[
+  {
+    "id": "landing_gear",
+    "name": "Carrello di Atterraggio",
+    "say": "Carrello; Abbassa carrello; Alza carrello; Ritira carrello; Estrai carrello; Carrello giu; Carrello su",
+    "key": "L",
+    "voice": "Carrello di atterraggio commutato, Comandante.",
+    "desc": "Estrae o ritrae il carrello di atterraggio per manovre di docking o decollo.",
+    "builtIn": true
+  },
+  {
+    "id": "ship_lights",
+    "name": "Fari e Luci Nave",
+    "say": "Luci nave; Accendi luci; Spegni luci; Fari nave; Accendi fari; Spegni fari; Fari accesi",
+    "key": "INSERT",
+    "voice": "Illuminazione esterna nave commutata.",
+    "desc": "Attiva o disattiva i potenti fari anteriori di navigazione.",
+    "builtIn": true
+  },
+  {
+    "id": "cargo_scoop",
+    "name": "Boccaporto Stiva (Cargo Scoop)",
+    "say": "Portellone; Cargo scoop; Apri stiva; Chiudi stiva; Raccogli carico; Apri portellone; Chiudi portellone",
+    "key": "HOME",
+    "voice": "Boccaporto di carico commutato.",
+    "desc": "Apre o chiude il boccaporto per il recupero di carichi e materiali nello spazio.",
+    "builtIn": true
+  },
+  {
+    "id": "night_vision",
+    "name": "Visione Notturna",
+    "say": "Visione notturna; Attiva visione notturna; Spegni visione notturna; Night vision",
+    "key": "N",
+    "voice": "Sensori ottici in visione notturna commutati.",
+    "desc": "Attiva l amplificazione del visore per rilievi su anelli o pianeti in ombra.",
+    "builtIn": true
+  },
+  {
+    "id": "silent_running",
+    "name": "Navigazione Silenziosa",
+    "say": "Navigazione silenziosa; Silent running; Spegni emissioni; Modalita silenziosa",
+    "key": "DELETE",
+    "voice": "Navigazione silenziosa commutata. Monitorare attentamente il calore.",
+    "desc": "Chiude i radiatori per azzerare la traccia radar: la nave scalda rapidamente.",
+    "builtIn": true
+  },
+  {
+    "id": "fsd_jump",
+    "name": "Motore FSD / Salto Iperspazio",
+    "say": "Salta; Iperspazio; Motore FSD; Salto iperspazio; Attiva FSD; Supercruise",
+    "key": "J",
+    "voice": "Comando motore a distorsione FSD azionato.",
+    "desc": "Inizia la carica del Frame Shift Drive per il salto o per il supercruise.",
+    "builtIn": true
+  },
+  {
+    "id": "hardpoints",
+    "name": "Punti d Ancoraggio Armi",
+    "say": "Estrai armi; Ritira armi; Armi fuori; Armi dentro; Hardpoints; Sfodera armi; Rinfodera armi",
+    "key": "U",
+    "voice": "Punti d ancoraggio armamenti commutati.",
+    "desc": "Estrae o richiude le armi e gli strumenti montati sulla corazza.",
+    "builtIn": true
+  },
+  {
+    "id": "heatsink",
+    "name": "Lancia Dissipatore Termico",
+    "say": "Lancia dissipatore; Dissipatore termico; Espelli calore; Heat sink; Raffredda nave",
+    "key": "V",
+    "voice": "Dissipatore termico espulso. Temperatura in rapido calo.",
+    "desc": "Espelle una cartuccia di calore per azzerare istantaneamente il surriscaldamento.",
+    "builtIn": true
+  },
+  {
+    "id": "shield_cell",
+    "name": "Cella di Scudo (SCB)",
+    "say": "Cella di scudo; Cella scudo; Ricarica scudi; Attiva cella",
+    "key": "B",
+    "voice": "Cella di scudo attivata. Ricarica schermatura in corso.",
+    "desc": "Inietta una ricarica d energia rapida negli anelli degli scudi.",
+    "builtIn": true
+  },
+  {
+    "id": "chaff",
+    "name": "Lancia Chaff / Contromisure",
+    "say": "Lancia chaff; Contromisure; Chaff; Disturba puntamento",
+    "key": "C",
+    "voice": "Contromisure chaff disperse nello spazio.",
+    "desc": "Confonde i sistemi di mira cardanici e torrette dei vascelli nemici.",
+    "builtIn": true
+  },
+  {
+    "id": "stop_ship",
+    "name": "Arresto Nave / Manetta Zero",
+    "say": "Ferma nave; Arresta nave; Motori fermi; Velocita zero; Stop; Ferma tutto",
+    "key": "X",
+    "voice": "Propulsione azzerata. Nave in arresto.",
+    "desc": "Imposta immediatamente a zero la manetta di propulsione.",
+    "builtIn": true
+  },
+  {
+    "id": "throttle_75",
+    "name": "Manetta al 75% (Avvicinamento)",
+    "say": "Settantacinque; 75 percento; Velocita avvicinamento; Manetta 75; Avvicinamento perfetto",
+    "key": "7",
+    "voice": "Manetta impostata al settantacinque percento per avvicinamento ottimale.",
+    "desc": "Velocità perfetta della regola dei 7 secondi per l'approccio a stazioni e pianeti in supercruise.",
+    "builtIn": true
+  },
+  {
+    "id": "galmap",
+    "name": "Mappa Galattica",
+    "say": "Mappa galattica; Apri mappa; Galmap; Mappa galassia",
+    "key": "M",
+    "voice": "Mappa galattica proiettata.",
+    "desc": "Apre la cartografia stellare della Via Lattea.",
+    "builtIn": true
+  },
+  {
+    "id": "sysmap",
+    "name": "Mappa di Sistema",
+    "say": "Mappa di sistema; Mappa sistema; Sysmap; Mappa corpi",
+    "key": "COMMA",
+    "voice": "Mappa del sistema stellare aperta.",
+    "desc": "Apre la vista di sistema con pianeti, lune e stazioni orbitali.",
+    "builtIn": true
+  }
+]

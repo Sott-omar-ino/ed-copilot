@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>ED COMPANION // TOUCH DECK</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0c0500">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root {
+  --bg: #0c0500;
+  --bg-card: rgba(26, 12, 1, 0.9);
+  --accent: #ff8a1f;
+  --gold: #ffd36b;
+  --ok: #00e676;
+  --bad: #ff3344;
+  --dim: rgba(255, 138, 31, 0.35);
+  --text: #f0e6d6;
+  --mono: 'Share Tech Mono', 'Consolas', 'Courier New', monospace;
+  --sans: 'Saira', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  height: 100%;
+  overflow-x: hidden;
+  user-select: none;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  background-image: 
+    radial-gradient(ellipse at 50% -20%, rgba(255, 138, 31, 0.15), transparent 70%),
+    linear-gradient(rgba(255, 138, 31, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 138, 31, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 20px 20px, 20px 20px;
+}
+
+/* TOP TELEMETRY BAR */
+header.top-bar {
+  background: rgba(14, 6, 0, 0.95);
+  border-bottom: 2px solid var(--accent);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+.brand-title {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-family: var(--mono);
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid var(--ok);
+  color: var(--ok);
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 6px var(--ok);
+  animation: pulse 1.8s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* STATUS WIDGET */
+.status-bar {
+  padding: 8px 14px;
+  background: rgba(20, 8, 0, 0.6);
+  border-bottom: 1px solid var(--dim);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 12px;
+}
+.status-item {
+  display: flex;
+  flex-direction: column;
+}
+.status-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+.status-val {
+  font-family: var(--mono);
+  font-weight: bold;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* FUEL BAR */
+.fuel-box {
+  grid-column: span 2;
+  margin-top: 2px;
+}
+.fuel-track {
+  height: 6px;
+  background: #110500;
+  border: 1px solid var(--dim);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.fuel-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #ff8a1f, #ffd36b);
+  transition: width 0.3s;
+}
+
+/* PUSH TO TALK TACTICAL BUTTON */
+.ptt-container {
+  display: block;
+  padding: 10px 14px 4px 14px;
+  background: rgba(18, 7, 0, 0.85);
+  border-bottom: 1px solid rgba(255, 138, 31, 0.25);
+  animation: fadeInPtt 0.25s ease;
+}
+@keyframes fadeInPtt { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.mobile-ptt-btn {
+  width: 100%;
+  background: linear-gradient(180deg, #2b1100 0%, #150600 100%);
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  color: var(--gold);
+  padding: 12px 14px;
+  font-family: var(--sans);
+  cursor: pointer;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 0 10px rgba(255, 138, 31, 0.2), inset 0 0 8px rgba(0,0,0,0.8);
+  transition: all 0.12s ease;
+}
+.mobile-ptt-btn .ptt-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.mobile-ptt-btn .ptt-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #441a00;
+  border: 1px solid var(--accent);
+}
+.mobile-ptt-btn .ptt-hint {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: rgba(255, 211, 107, 0.7);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.mobile-ptt-btn.active-talking {
+  background: linear-gradient(180deg, #8a2500 0%, #471100 100%);
+  border-color: #ff3344;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 51, 68, 0.7), inset 0 0 12px rgba(255, 51, 68, 0.5);
+  transform: scale(0.98);
+}
+.mobile-ptt-btn.active-talking .ptt-led {
+  background: #ff3344;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px #ff3344;
+  animation: pulse 0.5s infinite;
+}
+
+.mobile-ptt-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ptt-notice {
+  margin-bottom: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--bad);
+  background: rgba(255, 51, 68, 0.1);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.45;
+  user-select: text;
+}
+.ptt-notice b { color: var(--gold); }
+.ptt-notice a { color: var(--gold); word-break: break-all; }
+.ptt-result {
+  margin: 6px 0 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.ptt-result-label { color: var(--dim); font-size: 10px; letter-spacing: 0.08em; margin-right: 4px; }
+#ptt-outcome.ok { color: var(--ok); }
+#ptt-outcome.bad { color: var(--bad); }
+
+/* TOAST BANNER */
+#deck-toast {
+  position: fixed;
+  top: 60px;
+  left: 14px;
+  right: 14px;
+  background: rgba(10, 5, 0, 0.95);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px 12px;
+  text-align: center;
+  border-radius: 2px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.8);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  z-index: 200;
+}
+#deck-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* CONTENT VIEWS */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px 80px 14px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 10px 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title::before {
+  content: "[ // ]";
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+/* GRID LAYOUTS */
+.touch-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.touch-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+/* TOUCH BUTTON STYLES (NO EMOJIS, HUD MILITARY DESIGN) */
+button.touch-btn {
+  background: var(--bg-card);
+  border: 1.5px solid var(--dim);
+  border-radius: 3px;
+  color: var(--text);
+  padding: 12px 8px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.5);
+  transition: transform 0.08s, border-color 0.12s, background 0.12s;
+  min-height: 70px;
+}
+button.touch-btn:active, button.touch-btn.active-tap {
+  transform: scale(0.96);
+  border-color: var(--gold);
+  background: rgba(255, 138, 31, 0.25);
+  box-shadow: 0 0 14px var(--accent);
+}
+button.touch-btn .btn-badge {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  border: 1px solid rgba(255, 211, 107, 0.4);
+  background: rgba(255, 138, 31, 0.15);
+  padding: 2px 6px;
+  border-radius: 2px;
+  line-height: 1.2;
+}
+button.touch-btn .btn-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+button.touch-btn .btn-sub {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--dim);
+  font-weight: normal;
+  text-transform: uppercase;
+}
+button.touch-btn.screen-active {
+  border-color: var(--gold);
+  background: rgba(255, 138, 31, 0.2);
+  color: var(--gold);
+  box-shadow: 0 0 10px rgba(255, 138, 31, 0.4);
+}
+button.touch-btn.danger {
+  border-color: rgba(255, 51, 68, 0.5);
+}
+button.touch-btn.danger .btn-badge {
+  color: var(--bad);
+  border-color: var(--bad);
+  background: rgba(255, 51, 68, 0.15);
+}
+button.touch-btn.danger:active {
+  border-color: var(--bad);
+  background: rgba(255, 51, 68, 0.25);
+  box-shadow: 0 0 14px var(--bad);
+}
+
+/* MACRO CARDS */
+.macro-card {
+  background: rgba(26, 12, 1, 0.85);
+  border: 1px solid var(--dim);
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.macro-card:active {
+  background: rgba(255, 138, 31, 0.2);
+  border-color: var(--gold);
+}
+.macro-info b {
+  font-size: 13px;
+  color: var(--gold);
+  font-family: var(--sans);
+}
+.macro-info div {
+  font-size: 10px;
+  color: var(--dim);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+.macro-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  border: 1px solid var(--dim);
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+/* BOTTOM FIXED NAV BAR */
+nav.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(14, 6, 0, 0.98);
+  border-top: 2px solid var(--accent);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+.nav-tab {
+  background: transparent;
+  border: none;
+  color: var(--dim);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+}
+.nav-tab.active {
+  color: var(--gold);
+  background: rgba(255, 138, 31, 0.12);
+  border-top: 2px solid var(--gold);
+}
+.nav-tab .tab-icon {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* === NOTIFICHE DAL PC (app/notify.py) === */
+#notify-box { margin: 0 14px 8px; border: 1px solid var(--dim); background: var(--bg-card); border-radius: 3px; }
+#notify-box summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer;
+  font-family: var(--mono); font-size: 11px; color: var(--gold); letter-spacing: .06em; }
+#notify-box summary::-webkit-details-marker { display: none; }
+#notify-box .nb-count { margin-left: auto; color: var(--accent); }
+#notify-box .nb-last { flex: 1; min-width: 0; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--sans); letter-spacing: 0; }
+#notify-box .nb-body { padding: 0 10px 10px; }
+#notify-box .nb-hint { font-size: 11px; color: var(--dim); line-height: 1.4; margin: 4px 0 8px; }
+#notify-box .nb-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+#notify-box .nb-actions button { background: rgba(255,138,31,0.12); border: 1px solid var(--accent); color: var(--gold);
+  font-family: var(--mono); font-size: 11px; padding: 5px 8px; border-radius: 3px; }
+#notify-list { max-height: 240px; overflow-y: auto; }
+.nb-item { border-left: 3px solid var(--accent); padding: 5px 8px; margin-bottom: 5px; background: rgba(0,0,0,0.35); }
+.nb-item b { font-size: 13px; } .nb-item div { font-size: 12px; color: var(--text); opacity: .85; }
+.nb-item time { float: right; font-family: var(--mono); font-size: 10px; color: var(--dim); }
+.nb-item.bad, #notify-pop.bad { border-color: var(--bad); } .nb-item.ok, #notify-pop.ok { border-color: var(--ok); }
+.nb-item.warn, #notify-pop.warn { border-color: var(--gold); }
+#notify-pop { position: fixed; top: 10px; left: 10px; right: 10px; z-index: 1000; background: rgba(12, 5, 0, 0.97);
+  border: 2px solid var(--accent); border-radius: 4px; padding: 12px 14px; box-shadow: 0 0 24px rgba(255,138,31,0.35);
+  transform: translateY(-140%); transition: transform .25s ease; }
+#notify-pop.show { transform: translateY(0); }
+#notify-pop b { display: block; font-size: 16px; color: var(--gold); }
+#notify-pop.bad b { color: var(--bad); }
+#notify-pop span { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="brand-title">
+    <span>&#x25c6;</span> COCKPIT TOUCH DECK
+  </div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button id="deck-voice-mode-badge" style="background:rgba(255,138,31,0.12);border:1px solid var(--accent);color:var(--gold);font-family:var(--mono);font-size:10px;padding:3px 7px;border-radius:3px;cursor:pointer;font-weight:700" title="Tocca per commutare la modalità vocale">[ PTT ]</button>
+    <div class="live-badge" id="live-indicator">
+      <span class="live-dot"></span> COLLEGATO
+    </div>
+  </div>
+</header>
+
+<div class="status-bar">
+  <div class="status-item">
+    <span class="status-label">Comandante &amp; Nave</span>
+    <span class="status-val" id="stat-cmdr-ship">Inizializzazione...</span>
+  </div>
+  <div class="status-item" style="text-align:right">
+    <span class="status-label">Sistema Stellare</span>
+    <span class="status-val" id="stat-system">---</span>
+  </div>
+  <div class="fuel-box">
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-bottom:2px">
+      <span>CARBURANTE NAVE</span>
+      <span id="stat-fuel-pct" class="mono" style="color:var(--gold)">100%</span>
+    </div>
+    <div class="fuel-track">
+      <div class="fuel-fill" id="stat-fuel-bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TACTICAL PUSH-TO-TALK BUTTON ON PHONE -->
+<div class="ptt-container" id="mobile-ptt-container">
+  <div class="ptt-notice" id="ptt-insecure" style="display:none"></div>
+  <button id="mobile-ptt-btn" class="mobile-ptt-btn" type="button">
+    <div class="ptt-header">
+      <span class="ptt-led"></span>
+      <span>[ PUSH TO TALK ]</span>
+    </div>
+    <div class="ptt-hint" id="ptt-status-text">TIENI PREMUTO PER PARLARE (MAX 8 S)</div>
+  </button>
+  <div class="ptt-result" id="ptt-result" style="display:none">
+    <div><span class="ptt-result-label">SENTITO</span> <span id="ptt-transcript">-</span></div>
+    <div><span class="ptt-result-label">ESITO</span> <span id="ptt-outcome">-</span></div>
+  </div>
+</div>
+
+<div id="deck-toast"></div>
+
+<!-- NOTIFICHE DAL PC -->
+<div id="notify-pop" role="alert"><b id="notify-pop-title"></b><span id="notify-pop-text"></span></div>
+<details id="notify-box">
+  <summary><span>&#x25c6; NOTIFICHE</span><span class="nb-last" id="notify-last">nessuna</span><span class="nb-count" id="notify-count"></span></summary>
+  <div class="nb-body">
+    <div class="nb-hint">Tieni la pagina aperta e lo schermo acceso: con la pagina in background o lo schermo
+      spento il browser rallenta o ferma gli aggiornamenti e le notifiche possono arrivare in ritardo o non arrivare.
+      Quali eventi ricevere si sceglie sul PC (Impostazioni &rsaquo; Generali &rsaquo; Notifiche sul telefono).</div>
+    <div class="nb-actions">
+      <button type="button" id="notify-perm">Attiva notifiche di sistema</button>
+      <button type="button" id="notify-sound">Suono: acceso</button>
+      <button type="button" id="notify-clear">Svuota elenco</button>
+    </div>
+    <div id="notify-list"></div>
+  </div>
+</details>
+
+<!-- MAIN VIEW CONTENT: SCREEN REMOTE -->
+<main id="tab-content-screens">
+  <div class="section-title">TELECOMANDO SCHERMI PC</div>
+  <div style="font-size:11px;color:var(--dim);margin-bottom:12px;line-height:1.4">
+    Tocca per commutare all'istante la vista attiva sul monitor del computer:
+  </div>
+
+  <div class="touch-grid-2">
+    <button class="touch-btn" data-remote-screen="overview">
+      <span class="btn-badge">[ NAV ]</span>
+      <span class="btn-name">Navigazione</span>
+      <span class="btn-sub">Mappa &amp; Telemetria</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="coriolis_station">
+      <span class="btn-badge">[ CANTIERE ]</span>
+      <span class="btn-name">Stazione Coriolis</span>
+      <span class="btn-sub">Costruzione &amp; Merci</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="wishlist">
+      <span class="btn-badge">[ WISHLIST ]</span>
+      <span class="btn-name">Sblocchi &amp; Liste</span>
+      <span class="btn-sub">Progetti &amp; Materiali</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="engineers">
+      <span class="btn-badge">[ INGEGNERI ]</span>
+      <span class="btn-name">Ingegneri</span>
+      <span class="btn-sub">G1-G5 &amp; Modifiche</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="fleet">
+      <span class="btn-badge">[ FLOTTA ]</span>
+      <span class="btn-name">Flotta &amp; Moduli</span>
+      <span class="btn-sub">Navi &amp; Allestimenti</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="search">
+      <span class="btn-badge">[ MERCI ]</span>
+      <span class="btn-name">Ricerca Merci</span>
+      <span class="btn-sub">Pad Large &amp; Prezzi</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="route">
+      <span class="btn-badge">[ ROTTA ]</span>
+      <span class="btn-name">Rotta Neutroni</span>
+      <span class="btn-sub">Plotter di rotta</span>
+    </button>
+
+    <button class="touch-btn" data-remote-screen="settings">
+      <span class="btn-badge">[ SETUP ]</span>
+      <span class="btn-name">Impostazioni</span>
+      <span class="btn-sub">Copilota &amp; Audio</span>
+    </button>
+  </div>
+</main>
+
+<!-- SHIP HARDWARE CONTROLS & MACROS (DIRECTINPUT) -->
+<main id="tab-content-macros" style="display:none">
+  <div class="section-title">CONTROLLI FISICI NAVE (DIRECTINPUT)</div>
+  <div style="font-size:11px;color:var(--dim);margin-bottom:12px;line-height:1.4">
+    Invia comandi hardware istantanei direttamente al cockpit:
+  </div>
+
+  <div class="touch-grid-2">
+    <button class="touch-btn" data-ship-ctrl="landing_gear">
+      <span class="btn-badge">[ GEAR ]</span>
+      <span class="btn-name">Carrello</span>
+      <span class="btn-sub">Landing Gear [ L ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="ship_lights">
+      <span class="btn-badge">[ LIGHTS ]</span>
+      <span class="btn-name">Luci Esterne</span>
+      <span class="btn-sub">Ship Lights [ INS ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="night_vision">
+      <span class="btn-badge">[ NV ]</span>
+      <span class="btn-name">Visione Notturna</span>
+      <span class="btn-sub">Night Vision [ N ]</span>
+    </button>
+
+    <button class="touch-btn danger" data-ship-ctrl="silent_running">
+      <span class="btn-badge">[ SILENT ]</span>
+      <span class="btn-name">Silenzio Radar</span>
+      <span class="btn-sub">Silent Running [ DEL ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="cargo_scoop">
+      <span class="btn-badge">[ CARGO ]</span>
+      <span class="btn-name">Stiva Cargo</span>
+      <span class="btn-sub">Cargo Scoop [ HOME ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="hardpoints">
+      <span class="btn-badge">[ ARMI ]</span>
+      <span class="btn-name">Estrai Armi</span>
+      <span class="btn-sub">Hardpoints [ U ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="chaff">
+      <span class="btn-badge">[ CHAFF ]</span>
+      <span class="btn-name">Lancio Chaff</span>
+      <span class="btn-sub">Contromisure [ C ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="heatsink">
+      <span class="btn-badge">[ HEAT ]</span>
+      <span class="btn-name">Dissipatore</span>
+      <span class="btn-sub">Heat Sink [ V ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="shield_cell">
+      <span class="btn-badge">[ CELL ]</span>
+      <span class="btn-name">Scudo Cella</span>
+      <span class="btn-sub">Shield Bank [ B ]</span>
+    </button>
+
+    <button class="touch-btn" data-ship-ctrl="docking_request">
+      <span class="btn-badge">[ DOCK ]</span>
+      <span class="btn-name">Chiedi Atterraggio</span>
+      <span class="btn-sub">Sequenza Docking</span>
+    </button>
+  </div>
+
+  <div class="section-title" style="margin-top:16px">DISTRIBUZIONE ENERGIA (PIPS)</div>
+  <div class="touch-grid-3">
+    <button class="touch-btn" data-ship-ctrl="pip_sys">
+      <span class="btn-badge">[ SYS ]</span>
+      <span class="btn-name">Scudi</span>
+      <span class="btn-sub">+4 Pips [ &#x25c4; ]</span>
+    </button>
+    <button class="touch-btn" data-ship-ctrl="pip_eng">
+      <span class="btn-badge">[ ENG ]</span>
+      <span class="btn-name">Motori</span>
+      <span class="btn-sub">+4 Pips [ &#x25b2; ]</span>
+    </button>
+    <button class="touch-btn" data-ship-ctrl="pip_wep">
+      <span class="btn-badge">[ WEP ]</span>
+      <span class="btn-name">Armi</span>
+      <span class="btn-sub">+4 Pips [ &#x25ba; ]</span>
+    </button>
+  </div>
+  <button class="touch-btn" data-ship-ctrl="pip_reset" style="width:100%;margin-top:8px;min-height:50px">
+    <span class="btn-badge">[ RESET ]</span>
+    <span class="btn-name">Bilancia Pips a 2-2-2 [ &#x25bc; ]</span>
+  </button>
+
+  <div class="section-title" style="margin-top:16px">SEQUENZE MACRO HARDWARE</div>
+  <div id="deck-macros-container">
+    <div style="font-size:11px;color:var(--dim);text-align:center;padding:12px">Caricamento macro configurate...</div>
+  </div>
+</main>
+
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav">
+  <button class="nav-tab active" data-nav-target="tab-content-screens">
+    <span class="tab-icon">[ 01 ]</span>
+    <span>SCHERMI PC</span>
+  </button>
+  <button class="nav-tab" data-nav-target="tab-content-macros">
+    <span class="tab-icon">[ 02 ]</span>
+    <span>CONTROLLI &amp; MACRO</span>
+  </button>
+</nav>
+
+<script>
+"use strict";
+// Lingua dell'interfaccia sul telefono (italiano / inglese). Il telefono non può caricare i file /js/ dell'app,
+// quindi il dizionario sta qui: stesso formato di web/js/lang.js ("{}" = parte variabile). La lingua è quella scelta
+// sul PC (GET /api/ui_lang) e resta salvata sul telefono per la volta successiva.
+const CLANG = (() => {
+  const EN = {
+    "Tocca per commutare la modalità vocale": "Tap to switch the voice mode",
+    "COLLEGATO": "CONNECTED",
+    "Comandante & Nave": "CMDR & Ship",
+    "Inizializzazione...": "Starting up...",
+    "Sistema Stellare": "Star system",
+    "CARBURANTE NAVE": "SHIP FUEL",
+    "TIENI PREMUTO PER PARLARE (MAX 8 S)": "HOLD TO TALK (MAX 8 S)",
+    "SENTITO": "HEARD",
+    "ESITO": "RESULT",
+    "◆ NOTIFICHE": "◆ NOTIFICATIONS",
+    "nessuna": "none",
+    "Tieni la pagina aperta e lo schermo acceso: con la pagina in background o lo schermo spento il browser rallenta o ferma gli aggiornamenti e le notifiche possono arrivare in ritardo o non arrivare. Quali eventi ricevere si sceglie sul PC (Impostazioni › Generali › Notifiche sul telefono).":
+      "Keep the page open and the screen on: with the page in the background or the screen off, the browser slows down or stops updates and notifications may arrive late or not at all. Which events you get is chosen on the PC (Settings › General › Phone notifications).",
+    "Attiva notifiche di sistema": "Enable system notifications",
+    "Suono: acceso": "Sound: on",
+    "Suono: spento": "Sound: off",
+    "Svuota elenco": "Clear list",
+    "TELECOMANDO SCHERMI PC": "PC SCREEN REMOTE",
+    "Tocca per commutare all'istante la vista attiva sul monitor del computer:": "Tap to instantly switch the view shown on the computer's monitor:",
+    "Navigazione": "Navigation",
+    "Mappa & Telemetria": "Map & Telemetry",
+    "[ CANTIERE ]": "[ CONSTRUCTION ]",
+    "Stazione Coriolis": "Coriolis Station",
+    "Costruzione & Merci": "Construction & Commodities",
+    "Sblocchi & Liste": "Unlocks & Lists",
+    "Progetti & Materiali": "Projects & Materials",
+    "[ INGEGNERI ]": "[ ENGINEERS ]",
+    "Ingegneri": "Engineers",
+    "G1-G5 & Modifiche": "G1-G5 & Modifications",
+    "[ FLOTTA ]": "[ FLEET ]",
+    "Flotta & Moduli": "Fleet & Modules",
+    "Navi & Allestimenti": "Ships & Loadouts",
+    "[ MERCI ]": "[ COMMODITIES ]",
+    "Ricerca Merci": "Commodity Search",
+    "Pad Large & Prezzi": "Large Pad & Prices",
+    "[ ROTTA ]": "[ ROUTE ]",
+    "Rotta Neutroni": "Neutron Route",
+    "Plotter di rotta": "Route plotter",
+    "Impostazioni": "Settings",
+    "Copilota & Audio": "Copilot & Audio",
+    "CONTROLLI FISICI NAVE (DIRECTINPUT)": "SHIP CONTROLS (DIRECTINPUT)",
+    "Invia comandi hardware istantanei direttamente al cockpit:": "Send instant key commands straight to the cockpit:",
+    "Carrello": "Landing Gear",
+    "Luci Esterne": "Ship Lights",
+    "Visione Notturna": "Night Vision",
+    "Silenzio Radar": "Silent Running",
+    "Stiva Cargo": "Cargo Scoop",
+    "[ ARMI ]": "[ WEAPONS ]",
+    "Estrai Armi": "Deploy Hardpoints",
+    "Lancio Chaff": "Launch Chaff",
+    "Contromisure [ C ]": "Countermeasures [ C ]",
+    "Dissipatore": "Heat Sink",
+    "Scudo Cella": "Shield Cell",
+    "Chiedi Atterraggio": "Request Docking",
+    "Sequenza Docking": "Docking sequence",
+    "DISTRIBUZIONE ENERGIA (PIPS)": "POWER DISTRIBUTION (PIPS)",
+    "Scudi": "Systems",
+    "Motori": "Engines",
+    "Armi": "Weapons",
+    "Bilancia Pips a 2-2-2 [ ▼ ]": "Balance pips to 2-2-2 [ ▼ ]",
+    "SEQUENZE MACRO HARDWARE": "MACRO SEQUENCES",
+    "Caricamento macro configurate...": "Loading configured macros...",
+    "SCHERMI PC": "PC SCREENS",
+    "CONTROLLI & MACRO": "CONTROLS & MACROS",
+    "Schermo PC: {}": "PC screen: {}",
+    "Errore comunicazione con il PC": "Couldn't reach the PC",
+    "Comando inviato alla nave": "Command sent to the ship",
+    "Errore invio comando DirectInput": "Couldn't send the key command",
+    "Nessuna macro personalizzata creata sul PC.": "No custom macros created on the PC.",
+    "Voce: {}": "Voice: {}",
+    "Sequenza di tasti": "Key sequence",
+    "[ ESEGUI ]": "[ RUN ]",
+    "Macro eseguita": "Macro run",
+    "Errore esecuzione macro": "Macro failed",
+    "Comandante": "CMDR",
+    "Nave": "Ship",
+    "{} // {}": "{} // {}",
+    "Sconosciuto": "Unknown",
+    "ACCESSO NEGATO: SCANSIONA DI NUOVO IL QR": "ACCESS DENIED: SCAN THE QR AGAIN",
+    "[ VOCE: OFF ]": "[ VOICE: OFF ]",
+    "[ PTT ATTIVO ]": "[ PTT ON ]",
+    "[ ASCOLTO ]": "[ LISTENING ]",
+    "Modalità Push-to-Talk attiva": "Push-to-Talk mode on",
+    "Modalità Ascolto Continuo attiva": "Continuous listening mode on",
+    "Errore cambio modalità vocale": "Couldn't change the voice mode",
+    "Comandi vocali non disponibili su questo indirizzo.": "Voice commands aren't available at this address.",
+    "Il telefono permette il microfono solo su una connessione sicura (HTTPS).": "The phone only allows the microphone on a secure connection (HTTPS).",
+    "1. Apri": "1. Open",
+    "2. Comparirà un avviso sul certificato: è normale, il certificato è creato da ED Copilot sul tuo PC.":
+      "2. A certificate warning will appear: that's normal, the certificate is created by ED Copilot on your PC.",
+    "Chrome/Android: tocca": "Chrome/Android: tap",
+    "Avanzate → Procedi su {} (non sicuro)": "Advanced → Proceed to {} (unsafe)",
+    "Safari/iPhone: tocca": "Safari/iPhone: tap",
+    "Mostra dettagli → visita questo sito web": "Show Details → visit this website",
+    "Basta farlo una volta. Se il link non si apre, nelle impostazioni dell'app sul PC verifica che l'accesso dal telefono usi HTTPS.":
+      "You only need to do this once. If the link doesn't open, check in the app's settings on the PC that phone access uses HTTPS.",
+    "Questo browser non supporta la registrazione audio.": "This browser doesn't support audio recording.",
+    "Aggiorna il browser o usa Chrome (Android) / Safari (iPhone).": "Update the browser or use Chrome (Android) / Safari (iPhone).",
+    "MICROFONO NON DISPONIBILE": "MICROPHONE UNAVAILABLE",
+    "ATTIVAZIONE MICROFONO...": "STARTING MICROPHONE...",
+    "Permesso microfono negato: consentilo nelle impostazioni del sito nel browser.": "Microphone permission denied: allow it in the browser's site settings.",
+    "Microfono non disponibile ({})": "Microphone unavailable ({})",
+    "errore": "error",
+    "Registrazione audio non supportata da questo browser.": "Audio recording isn't supported by this browser.",
+    "IN ASCOLTO... RILASCIA PER INVIARE": "LISTENING... RELEASE TO SEND",
+    "Troppo breve: tieni premuto mentre parli.": "Too short: keep holding while you speak.",
+    "TRASCRIZIONE SUL PC...": "TRANSCRIBING ON THE PC...",
+    "In elaborazione": "Processing",
+    "Accesso negato: scansiona di nuovo il QR code.": "Access denied: scan the QR code again.",
+    "Errore {}": "Error {}",
+    "(niente)": "(nothing)",
+    "Non ho capito, riprova parlando più vicino al telefono.": "I didn't catch that, try again closer to the phone.",
+    "Inviato al copilota...": "Sent to the copilot...",
+    "Errore di comunicazione con il PC": "Couldn't reach the PC",
+    "Non riconosciuto: \"{}\"": "Not recognised: \"{}\"",
+    "Ignorato (già eseguito o copilota in voce)": "Ignored (already run or copilot speaking)",
+    "Nessuna risposta dall'app sul PC (è aperta?)": "No answer from the app on the PC (is it open?)",
+    "Nessuna notifica per ora.": "No notifications yet.",
+    "Notifiche di sistema non disponibili": "System notifications unavailable",
+    "Notifiche di sistema: attive": "System notifications: on",
+    "Notifiche di sistema bloccate dal browser": "System notifications blocked by the browser",
+    "Questo browser non offre le notifiche di sistema qui": "This browser doesn't offer system notifications here",
+    "Notifiche di sistema attive (con la pagina aperta)": "System notifications on (while the page is open)",
+    "Permesso non concesso": "Permission not granted",
+    "Permesso non disponibile": "Permission unavailable",
+  };
+  const norm = s => s.replace(/\s+/g, " ").trim();
+  const exact = new Map(), patterns = [];
+  for (const [k, v] of Object.entries(EN)) {
+    const key = norm(k);
+    if (key.includes("{")) patterns.push({ re: new RegExp("^" + key.split("{}").map(p => p.replace(/[.*+?^$()|[\]\\]/g, "\\$&")).join("(.+?)") + "$", "s"), out: v });
+    else exact.set(key, v);
+  }
+  let lang = localStorage.getItem("edc_ui_lang") || "it";
+  function t(text) {
+    if (lang !== "en" || !text) return text;
+    const key = norm(text);
+    let out = exact.get(key);
+    if (out == null) for (const p of patterns) {
+      const m = key.match(p.re);
+      if (m) { let i = 0; const vals = m.slice(1).map(t); out = p.out.replace(/\{\}/g, () => vals[i++] ?? ""); break; }
+    }
+    if (out == null) return text;
+    return text.match(/^\s*/)[0] + out + text.match(/\s*$/)[0];
+  }
+  function walk(root) {
+    if (lang !== "en" || !root) return;
+    if (root.nodeType === 3) { const v = t(root.nodeValue); if (v !== root.nodeValue) root.nodeValue = v; return; }
+    if (root.nodeType !== 1 || root.closest("script, style")) return;
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) { const v = t(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; }
+    for (const el of [root, ...root.querySelectorAll("[title]")]) {
+      const old = el.getAttribute("title");
+      if (old) { const v = t(old); if (v !== old) el.setAttribute("title", v); }
+    }
+  }
+  const obs = new MutationObserver(list => list.forEach(m => m.type === "characterData" ? walk(m.target) : m.addedNodes.forEach(walk)));
+  function start() {
+    if (lang !== "en") return;
+    document.documentElement.lang = "en";
+    walk(document.body);
+    obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  }
+  // La lingua scelta sul PC vince: se cambia, la applico (verso l'italiano serve ricaricare la pagina).
+  function sync(serverLang) {
+    if (!["it", "en"].includes(serverLang) || serverLang === lang) return;
+    localStorage.setItem("edc_ui_lang", serverLang);
+    if (serverLang === "it") return location.reload();
+    lang = serverLang;
+    start();
+  }
+  return { t, start, sync };
+})();
+</script>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// Codice di accesso: arriva nell'indirizzo del QR (?t=...), poi resta salvato sul telefono.
+// Ogni chiamata alle API lo invia; senza codice il PC rifiuta i comandi.
+const ACCESS_TOKEN = (() => {
+  const fromUrl = new URLSearchParams(location.search).get("t");
+  if (fromUrl) {
+    localStorage.setItem("edc_token", fromUrl);
+    history.replaceState(null, "", location.pathname);
+  }
+  return localStorage.getItem("edc_token") || "";
+})();
+{
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = (input, init = {}) => {
+    const url = typeof input === "string" ? input : input.url;
+    if (url.startsWith("/api/")) {
+      const headers = new Headers(init.headers || {});
+      headers.set("X-ED-Token", ACCESS_TOKEN);
+      init = { ...init, headers };
+    }
+    return nativeFetch(input, init);
+  };
+}
+let _toastTimer = null;
+function showToast(msg) {
+  const t = $("deck-toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+function haptic(ms = 35) {
+  try {
+    if ("vibrate" in navigator) navigator.vibrate(ms);
+  } catch(e) {}
+}
+
+// 1. BOTTOM NAV SWITCHER
+document.querySelectorAll(".nav-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll("main").forEach(m => m.style.display = "none");
+    tab.classList.add("active");
+    const target = $(tab.dataset.navTarget);
+    if (target) target.style.display = "block";
+    haptic(25);
+  });
+});
+
+// 2. REMOTE PC NAVIGATION BUTTONS
+document.querySelectorAll("[data-remote-screen]").forEach(btn => {
+  const triggerRemote = (e) => {
+    if (e.type === "pointerdown") {
+      btn.dataset.pointerHandled = "1";
+    } else if (e.type === "click" && btn.dataset.pointerHandled === "1") {
+      btn.dataset.pointerHandled = "0";
+      return;
+    }
+    const view = btn.dataset.remoteScreen;
+    haptic(50);
+    btn.classList.add("active-tap");
+    setTimeout(() => btn.classList.remove("active-tap"), 200);
+
+    fetch("/api/remote_nav", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ view: view })
+    })
+    .then(r => r.json())
+    .then(() => {
+      showToast(`Schermo PC: ${view.toUpperCase()}`);
+      document.querySelectorAll("[data-remote-screen]").forEach(b => b.classList.remove("screen-active"));
+      btn.classList.add("screen-active");
+    })
+    .catch(() => showToast("Errore comunicazione con il PC"));
+  };
+  btn.addEventListener("pointerdown", triggerRemote, { passive: true });
+  btn.addEventListener("click", triggerRemote);
+});
+
+// 3. SHIP CONTROLS (DIRECTINPUT)
+document.querySelectorAll("[data-ship-ctrl]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const act = btn.dataset.shipCtrl;
+    haptic(act === "silent_running" ? [50, 40, 50] : 40);
+    btn.classList.add("active-tap");
+    setTimeout(() => btn.classList.remove("active-tap"), 200);
+
+    fetch(`/api/voice/ship_control?action=${encodeURIComponent(act)}`)
+      .then(r => r.json())
+      .then(res => {
+        showToast(res.played || res.message || "Comando inviato alla nave");
+      })
+      .catch(() => showToast("Errore invio comando DirectInput"));
+  });
+});
+
+// 4. LOAD & RENDER USER MACROS
+function loadDeckMacros() {
+  fetch("/api/macros")
+    .then(r => r.json())
+    .then(macros => {
+      const container = $("deck-macros-container");
+      if (!container) return;
+      if (!Array.isArray(macros) || macros.length === 0) {
+        container.innerHTML = `<div style="font-size:11px;color:var(--dim);text-align:center;padding:12px">Nessuna macro personalizzata creata sul PC.</div>`;
+        return;
+      }
+      container.innerHTML = macros.map(m => `
+        <div class="macro-card" data-macro-id="${encodeURIComponent(m.id || "")}">
+          <div class="macro-info">
+            <b>${esc(m.name || "Macro")}</b>
+            <div>${m.say ? "Voce: " + esc(m.say.split(";")[0]) : "Sequenza di tasti"}</div>
+          </div>
+          <div class="macro-badge">[ ESEGUI ]</div>
+        </div>
+      `).join("");
+
+      container.querySelectorAll(".macro-card").forEach(c => {
+        c.addEventListener("click", () => {
+          const mid = c.dataset.macroId;
+          haptic(45);
+          fetch(`/api/voice/macro?id=${mid}`)
+            .then(r => r.json())
+            .then(res => showToast(res.played || "Macro eseguita"))
+            .catch(() => showToast("Errore esecuzione macro"));
+        });
+      });
+    })
+    .catch(() => {});
+}
+
+// 5. STATUS & TELEMETRY LIVE POLLING + HEARTBEAT
+function pollDeckStatus() {
+  fetch("/api/state")
+    .then(r => {
+      if (r.status === 403) throw new Error("token");
+      return r.json();
+    })
+    .then(s => {
+      const cmdr = s.cmdr?.name ? "CMDR " + s.cmdr.name : "Comandante";
+      const ship = s.ship?.name?.trim() || s.ship?.type || "Nave";
+      $("stat-cmdr-ship").textContent = `${cmdr} // ${ship}`;
+      $("stat-system").textContent = s.location?.system || "Sconosciuto";
+
+      if (s.fuel && s.fuel.cap > 0 && s.fuel.level != null) {
+        const pct = Math.max(0, Math.min(100, Math.round((s.fuel.level / s.fuel.cap) * 100)));
+        $("stat-fuel-pct").textContent = `${pct}%`;
+        $("stat-fuel-bar").style.width = `${pct}%`;
+      }
+      $("live-indicator").innerHTML = `<span class="live-dot"></span> COLLEGATO`;
+      if (s.voice_config) {
+        applyVoiceConfig(s.voice_config);
+      }
+    })
+    .catch(err => {
+      const label = err.message === "token" ? "ACCESSO NEGATO: SCANSIONA DI NUOVO IL QR" : "OFFLINE";
+      $("live-indicator").innerHTML = `<span class="live-dot" style="background:var(--bad);box-shadow:0 0 6px var(--bad)"></span> ${label}`;
+    });
+}
+
+let _currentVoiceConfig = null;
+function applyVoiceConfig(cfg) {
+  if (!cfg) return;
+  _currentVoiceConfig = cfg;
+  const modeBadge = $("deck-voice-mode-badge");
+  const isPtt = (cfg.mode === "ptt");
+  const isEnabled = (cfg.enabled !== false);
+
+  if (modeBadge) {
+    if (!isEnabled) {
+      modeBadge.textContent = "[ VOCE: OFF ]";
+      modeBadge.style.color = "var(--dim)";
+      modeBadge.style.borderColor = "#441a00";
+    } else if (isPtt) {
+      modeBadge.textContent = "[ PTT ATTIVO ]";
+      modeBadge.style.color = "var(--gold)";
+      modeBadge.style.borderColor = "var(--accent)";
+    } else {
+      modeBadge.textContent = "[ ASCOLTO ]";
+      modeBadge.style.color = "var(--ok)";
+      modeBadge.style.borderColor = "var(--ok)";
+    }
+  }
+  // Il pulsante del telefono resta sempre visibile: dal telefono si parla sempre tenendo premuto,
+  // qualunque sia la modalità del microfono del PC.
+}
+
+// Tocco per commutare PTT / Continuo dal telefono
+const modeBadgeBtn = $("deck-voice-mode-badge");
+if (modeBadgeBtn) {
+  modeBadgeBtn.addEventListener("click", () => {
+    const cur = _currentVoiceConfig?.mode || "ptt";
+    const next = cur === "ptt" ? "continuous" : "ptt";
+    fetch("/api/voice/config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: next, enabled: true })
+    })
+    .then(r => r.json())
+    .then(res => {
+      applyVoiceConfig(res.config);
+      showToast(next === "ptt" ? "Modalità Push-to-Talk attiva" : "Modalità Ascolto Continuo attiva");
+    })
+    .catch(() => showToast("Errore cambio modalità vocale"));
+  });
+}
+
+// Initial fetch of voice config
+fetch("/api/voice/config")
+  .then(r => r.json())
+  .then(cfg => applyVoiceConfig(cfg))
+  .catch(() => {});
+
+setInterval(pollDeckStatus, 2500);
+pollDeckStatus();
+loadDeckMacros();
+
+// 6. VOCE DAL TELEFONO (tieni premuto -> registra -> il PC trascrive con Whisper ed esegue il comando)
+const PTT_MAX_MS = 8000;
+const PTT_IDLE_TEXT = "TIENI PREMUTO PER PARLARE (MAX 8 S)";
+const ptt = { state: "idle", rec: null, stream: null, chunks: [], timer: null, cancel: false, startedAt: 0 };
+
+function pttStatus(text) { const el = $("ptt-status-text"); if (el) el.textContent = text; }
+function pttShow(transcript, outcome, cls = "") {
+  $("ptt-result").style.display = "block";
+  if (transcript != null) $("ptt-transcript").textContent = transcript;
+  const o = $("ptt-outcome");
+  o.textContent = outcome;
+  o.className = cls;
+}
+
+function pickMime() {
+  if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+  return ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"]
+    .find(t => MediaRecorder.isTypeSupported(t)) || "";
+}
+
+function voiceUnavailableReason() {
+  if (!window.isSecureContext) return "insecure";
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) return "unsupported";
+  return "";
+}
+
+function setupVoiceNotice() {
+  const reason = voiceUnavailableReason();
+  const box = $("ptt-insecure");
+  const btn = $("mobile-ptt-btn");
+  if (!reason) return;
+  // Il codice di accesso è salvato per indirizzo: lo rimettiamo nel link https, altrimenti andrebbe perso.
+  const secureUrl = `https://${location.host}/companion?t=${encodeURIComponent(ACCESS_TOKEN)}`;
+  box.innerHTML = reason === "insecure"
+    ? `<b>Comandi vocali non disponibili su questo indirizzo.</b><br>
+       Il telefono permette il microfono solo su una connessione sicura (HTTPS).<br>
+       1. Apri <a href="${esc(secureUrl)}">${esc("https://" + location.host + "/companion")}</a><br>
+       2. Comparirà un avviso sul certificato: è normale, il certificato è creato da ED Copilot sul tuo PC.<br>
+       Chrome/Android: tocca <b>Avanzate → Procedi su ${esc(location.hostname)} (non sicuro)</b>.<br>
+       Safari/iPhone: tocca <b>Mostra dettagli → visita questo sito web</b>.<br>
+       Basta farlo una volta. Se il link non si apre, nelle impostazioni dell'app sul PC verifica che l'accesso dal telefono usi HTTPS.`
+    : `<b>Questo browser non supporta la registrazione audio.</b><br>Aggiorna il browser o usa Chrome (Android) / Safari (iPhone).`;
+  box.style.display = "block";
+  btn.disabled = true;
+  pttStatus("MICROFONO NON DISPONIBILE");
+}
+
+async function pttStart() {
+  if (ptt.state !== "idle" || voiceUnavailableReason()) return;
+  ptt.state = "starting";
+  ptt.cancel = false;
+  ptt.chunks = [];
+  haptic(50);
+  $("mobile-ptt-btn").classList.add("active-talking");
+  pttStatus("ATTIVAZIONE MICROFONO...");
+  try {
+    ptt.stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+  } catch (err) {
+    ptt.state = "idle";
+    $("mobile-ptt-btn").classList.remove("active-talking");
+    const denied = err && (err.name === "NotAllowedError" || err.name === "SecurityError");
+    pttStatus(PTT_IDLE_TEXT);
+    pttShow(null, denied ? "Permesso microfono negato: consentilo nelle impostazioni del sito nel browser."
+                         : `Microfono non disponibile (${err && err.name || "errore"})`, "bad");
+    return;
+  }
+  const mime = pickMime();
+  try {
+    ptt.rec = mime ? new MediaRecorder(ptt.stream, { mimeType: mime }) : new MediaRecorder(ptt.stream);
+  } catch (err) {
+    pttReleaseMic();
+    ptt.state = "idle";
+    $("mobile-ptt-btn").classList.remove("active-talking");
+    pttShow(null, "Registrazione audio non supportata da questo browser.", "bad");
+    return;
+  }
+  ptt.rec.ondataavailable = e => { if (e.data && e.data.size > 0) ptt.chunks.push(e.data); };
+  ptt.rec.onstop = pttSend;
+  ptt.rec.start();
+  ptt.startedAt = Date.now();
+  ptt.state = "recording";
+  pttStatus("IN ASCOLTO... RILASCIA PER INVIARE");
+  ptt.timer = setTimeout(pttStop, PTT_MAX_MS);
+  if (ptt.cancel) pttStop();  // il dito è stato alzato mentre il microfono si attivava
+}
+
+function pttStop() {
+  if (ptt.state === "starting") { ptt.cancel = true; return; }
+  if (ptt.state !== "recording") return;
+  ptt.state = "sending";
+  clearTimeout(ptt.timer);
+  haptic([30, 30]);
+  $("mobile-ptt-btn").classList.remove("active-talking");
+  try { ptt.rec.stop(); } catch (e) { pttSend(); }
+}
+
+function pttReleaseMic() {
+  try { ptt.stream && ptt.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+  ptt.stream = null;
+}
+
+async function pttSend() {
+  pttReleaseMic();
+  const type = (ptt.rec && ptt.rec.mimeType) || "audio/webm";
+  const blob = new Blob(ptt.chunks, { type });
+  ptt.chunks = [];
+  if (Date.now() - ptt.startedAt < 350 || blob.size < 1500) {
+    ptt.state = "idle";
+    pttStatus(PTT_IDLE_TEXT);
+    pttShow(null, "Troppo breve: tieni premuto mentre parli.", "bad");
+    return;
+  }
+  pttStatus("TRASCRIZIONE SUL PC...");
+  pttShow("...", "In elaborazione");
+  try {
+    const r = await fetch("/api/voice/remote", { method: "POST", headers: { "Content-Type": type.split(";")[0] }, body: blob });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 403) throw new Error("Accesso negato: scansiona di nuovo il QR code.");
+    if (!r.ok) throw new Error(data.error || `Errore ${r.status}`);
+    const text = (data.text || "").trim();
+    if (!text) {
+      pttShow("(niente)", "Non ho capito, riprova parlando più vicino al telefono.", "bad");
+    } else {
+      pttShow(`"${text}"`, "Inviato al copilota...");
+      haptic(30);
+      if (data.id) waitRemoteResult(data.id);
+    }
+  } catch (err) {
+    pttShow(null, err.message && !/fetch|network/i.test(err.message) ? err.message : "Errore di comunicazione con il PC", "bad");
+  } finally {
+    ptt.state = "idle";
+    pttStatus(PTT_IDLE_TEXT);
+  }
+}
+
+// L'esito lo decide l'app sul PC (che conosce controlli e macro): lo leggiamo da /api/state.
+let _resultWatch = 0;
+async function waitRemoteResult(id) {
+  const watch = ++_resultWatch;
+  const until = Date.now() + 9000;
+  while (Date.now() < until && watch === _resultWatch) {
+    await new Promise(res => setTimeout(res, 900));
+    try {
+      const s = await (await fetch("/api/state")).json();
+      const item = (s.remote_voice || []).find(i => i.id === id);
+      if (item && item.result) {
+        const unknown = /^non riconosciuto|^ignorato|^not recognised|^ignored/i.test(item.result);
+        pttShow(null, item.result, unknown ? "bad" : "ok");
+        if (!unknown) showToast(item.result);
+        return;
+      }
+    } catch (e) {}
+  }
+  if (watch === _resultWatch) pttShow(null, "Nessuna risposta dall'app sul PC (è aperta?)", "bad");
+}
+
+const pttEl = $("mobile-ptt-btn");
+if (pttEl) {
+  pttEl.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    try { pttEl.setPointerCapture(e.pointerId); } catch (err) {}
+    pttStart();
+  });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach(ev => pttEl.addEventListener(ev, () => pttStop()));
+  pttEl.addEventListener("contextmenu", e => e.preventDefault());  // niente menu con la pressione lunga
+  document.addEventListener("visibilitychange", () => { if (document.hidden) pttStop(); });
+}
+setupVoiceNotice();
+
+// 7. NOTIFICHE DAL PC: il telefono chiede le novità ogni 3 secondi (/api/notify/feed).
+const NOTIFY = { since: null, items: [], sound: localStorage.getItem("edc_notify_sound") !== "0", audio: null, popTimer: null };
+function notifyAudio() {
+  // I browser permettono l'audio solo dopo un tocco: il contesto si prepara al primo tocco sulla pagina.
+  if (!NOTIFY.audio) {
+    try { NOTIFY.audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+  }
+  if (NOTIFY.audio.state === "suspended") NOTIFY.audio.resume().catch(() => {});
+  return NOTIFY.audio;
+}
+document.addEventListener("pointerdown", () => notifyAudio(), { once: true });
+function notifyBeep(level) {
+  if (!NOTIFY.sound) return;
+  const ctx = notifyAudio();
+  if (!ctx || ctx.state !== "running") return;
+  const tones = level === "bad" ? [880, 660, 880] : level === "ok" ? [660, 990] : [740];
+  tones.forEach((f, i) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime + i * 0.16;
+    o.type = "square"; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.14);
+  });
+}
+const notifyCanSystem = () => window.isSecureContext && "Notification" in window;
+function notifySystem(it) {
+  if (!notifyCanSystem() || Notification.permission !== "granted" || !document.hidden) return;
+  try { new Notification(it.title, { body: it.text || "", tag: "edc-" + it.id, icon: "/favicon.svg" }); }
+  catch (e) { /* su Android Chrome serve un service worker: resta l'avviso nella pagina */ }
+}
+const notifyTime = t => new Date(t * 1000).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+function renderNotify() {
+  const list = $("notify-list");
+  if (!list) return;
+  const items = NOTIFY.items.slice().reverse();
+  list.innerHTML = items.length ? items.map(it => `<div class="nb-item ${esc(it.level)}"><time>${notifyTime(it.t)}</time><b>${esc(it.title)}</b>${it.text ? `<div>${esc(it.text)}</div>` : ""}</div>`).join("")
+    : '<div class="nb-hint">Nessuna notifica per ora.</div>';
+  $("notify-last").textContent = items.length ? items[0].title : "nessuna";
+  $("notify-count").textContent = items.length ? String(items.length) : "";
+  const perm = $("notify-perm");
+  if (!notifyCanSystem()) { perm.textContent = "Notifiche di sistema non disponibili"; perm.disabled = true; }
+  else if (Notification.permission === "granted") { perm.textContent = "Notifiche di sistema: attive"; perm.disabled = true; }
+  else if (Notification.permission === "denied") { perm.textContent = "Notifiche di sistema bloccate dal browser"; perm.disabled = true; }
+  $("notify-sound").textContent = "Suono: " + (NOTIFY.sound ? "acceso" : "spento");
+}
+function notifyPop(it) {
+  const pop = $("notify-pop");
+  $("notify-pop-title").textContent = it.title;
+  $("notify-pop-text").textContent = it.text || "";
+  pop.className = "show " + (it.level || "");
+  clearTimeout(NOTIFY.popTimer);
+  NOTIFY.popTimer = setTimeout(() => { pop.className = it.level || ""; }, 6000);
+}
+function pollNotify() {
+  const q = NOTIFY.since == null ? "" : "?since=" + NOTIFY.since;
+  fetch("/api/notify/feed" + q)
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => {
+      // Primo collegamento: lo storico recente compare nell'elenco senza suonare.
+      const fresh = d.initial ? [] : d.items;
+      NOTIFY.items = (d.initial ? d.items.slice() : NOTIFY.items.concat(d.items)).slice(-50);
+      NOTIFY.since = d.last;
+      if (fresh.length) {
+        const top = fresh.find(i => i.level === "bad") || fresh[fresh.length - 1];
+        notifyPop(top);
+        try { if ("vibrate" in navigator) navigator.vibrate(top.level === "bad" ? [200, 100, 200, 100, 300] : [120, 80, 120]); } catch (e) {}
+        notifyBeep(top.level);
+        fresh.forEach(notifySystem);
+      }
+      if (fresh.length || d.initial) renderNotify();
+    })
+    .catch(() => {});
+}
+$("notify-pop").addEventListener("click", () => { $("notify-pop").className = ""; });
+$("notify-perm").addEventListener("click", () => {
+  notifyAudio();
+  if (!notifyCanSystem()) return showToast("Questo browser non offre le notifiche di sistema qui");
+  Notification.requestPermission().then(p => {
+    showToast(p === "granted" ? "Notifiche di sistema attive (con la pagina aperta)" : "Permesso non concesso");
+    renderNotify();
+  }).catch(() => showToast("Permesso non disponibile"));
+});
+$("notify-sound").addEventListener("click", () => {
+  NOTIFY.sound = !NOTIFY.sound;
+  localStorage.setItem("edc_notify_sound", NOTIFY.sound ? "1" : "0");
+  if (NOTIFY.sound) { notifyAudio(); setTimeout(() => notifyBeep("info"), 50); }
+  renderNotify();
+});
+$("notify-clear").addEventListener("click", () => { NOTIFY.items = []; renderNotify(); });
+renderNotify();
+pollNotify();
+setInterval(pollNotify, 3000);
+
+// 8. LINGUA: parte subito con quella salvata sul telefono, poi si allinea a quella scelta sul PC.
+CLANG.start();
+fetch("/api/ui_lang").then(r => r.json()).then(d => CLANG.sync(d.ui_lang)).catch(() => {});
+document.addEventListener("visibilitychange", () => { if (!document.hidden) pollNotify(); });
+</script>
+</body>
+</html>

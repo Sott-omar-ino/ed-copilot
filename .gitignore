@@ -1,0 +1,16 @@
+# Dati personali dell'utente (chiavi, impostazioni, registro, cache)
+ED Copilot - dati/
+# Eseguibili e file di compilazione: l'exe si pubblica nelle release
+*.exe
+*.exe.old
+build/
+dist/
+*.spec
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+# Documenti di lavoro
+ED Copilot - Funzioni.pdf
+tools/AGENT_BRIEF.md

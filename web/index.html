@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>ED Copilot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Share+Tech+Mono&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="boot"><pre id="boot-text"></pre></div>
+
+<div class="app">
+  <header class="hud-top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 L30 16 L16 30 L2 16 Z" fill="none" stroke="#ff8a1f" stroke-width="1.5"/><path d="M16 8 L24 16 L16 24 L8 16 Z" fill="#ff8a1f" opacity=".85"/><circle cx="16" cy="16" r="2.2" fill="#040201"/></svg>
+      <div><b class="chroma">ED COPILOT</b><small>COCKPIT COMPANION</small></div>
+    </div>
+    <div class="telemetry">
+      <div class="tm"><span>Comandante</span><span id="h-cmdr">—</span></div>
+      <div class="tm"><span>Nave</span><span id="h-ship">—</span></div>
+      <div class="tm"><span>Posizione</span><span id="h-sys">—</span></div>
+      <div class="tm"><span>Crediti</span><span id="h-credits">—</span></div>
+      <div class="tm"><span>Carburante</span><span><span class="fuel" id="h-fuel"></span><b id="h-fuel-t" style="margin-left:6px">—</b></span></div>
+      <div class="tm opt"><span>Sessione</span><span id="h-session">—</span></div>
+    </div>
+    <div class="top-right">
+      <button id="btn-prop-voice" class="button small ghost" title="Attiva o disattiva il copilota vocale integrato" style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;font-size:11px;cursor:pointer">
+        <i class="live-dot" id="prop-voice-dot"></i><span id="prop-voice-label">Copilota Vocale: OFF</span>
+      </button>
+      <div class="tm"><span>Collegamento</span><span><i class="live-dot" id="h-dot"></i><b id="h-live" style="font-weight:600">—</b></span></div>
+      <div class="clock"><b id="clock">--:--:--</b><span id="date">—</span></div>
+    </div>
+  </header>
+  <div id="voice-hud-bar" class="voice-hud-bar" style="display:none">
+    <div class="vh-indicator"><i class="live-dot on"></i><b>COPILOTA VOCALE</b></div>
+    <div class="vh-meter-box" title="Livello del microfono">
+      <span>MIC</span>
+      <div class="vh-meter"><div class="vh-meter-fill" id="voice-meter-fill"></div></div>
+      <span id="vh-meter-pct">0%</span>
+    </div>
+    <div class="vh-speech"><span id="voice-hud-transcript">In ascolto…</span></div>
+    <div class="vh-actions">
+      <button class="small primary" id="btn-ptt-hud" style="display:none">Tieni premuto per parlare</button>
+      <button class="small" id="voice-mode-toggle-btn">Modalità</button>
+      <button class="small" id="btn-voice-settings">Configura</button>
+      <button class="small ghost" id="btn-voice-mute">Disattiva</button>
+    </div>
+  </div>
+
+  <nav class="nav hud-nav" id="nav"></nav>
+
+  <main class="hud-main" id="view"></main>
+
+  <footer class="ticker"><span class="label">COMUNICAZIONI</span><div class="ticker-window"><div class="track" id="ticker"></div></div></footer>
+</div>
+
+<div class="fx fx-scan"></div>
+<div class="fx fx-crt"></div>
+<div class="fx fx-vhs"></div>
+<div class="fx fx-flicker"></div>
+<div class="fx fx-noise"></div>
+<div class="fx fx-band"></div>
+<div id="toast"></div>
+<div id="suggest" role="listbox"></div>
+<script src="/js/lang.js"></script>
+<script src="/js/lang/en-core.js"></script>
+<script src="/js/lang/en-settings.js"></script>
+<script src="/js/lang/en-commander.js"></script>
+<script src="/js/lang/en-ship.js"></script>
+<script src="/js/lang/en-activities.js"></script>
+<script src="/js/lang/en-database.js"></script>
+<script src="/js/lang/en-voice.js"></script>
+<script src="/js/lang/en-extra.js"></script>
+<script src="/js/i18n.js"></script>
+<script src="/js/shipcalc.js"></script>
+<script src="/js/core.js"></script>
+<script src="/js/hud.js"></script>
+<script src="/js/tts.js"></script>
+<script src="/js/voice-engine.js"></script>
+<script src="/js/views/panoramica.js"></script>
+<script src="/js/views/comandante.js"></script>
+<script src="/js/views/rank.js"></script>
+<script src="/js/views/missioni.js"></script>
+<script src="/js/views/statistiche.js"></script>
+<script src="/js/views/diario.js"></script>
+<script src="/js/views/mappa.js"></script>
+<script src="/js/views/squadriglia.js"></script>
+<script src="/js/views/dafare.js"></script>
+<script src="/js/views/flotta.js"></script>
+<script src="/js/views/cantiere.js"></script>
+<script src="/js/views/carrier.js"></script>
+<script src="/js/views/rotte.js"></script>
+<script src="/js/views/avvisi.js"></script>
+<script src="/js/views/commercio.js"></script>
+<script src="/js/views/estrazione.js"></script>
+<script src="/js/views/combattimento.js"></script>
+<script src="/js/views/thargoid.js"></script>
+<script src="/js/views/aterra.js"></script>
+<script src="/js/views/colonizzazione.js"></script>
+<script src="/js/views/powerplay.js"></script>
+<script src="/js/views/colonia.js"></script>
+<script src="/js/views/fuelrats.js"></script>
+<script src="/js/views/bio.js"></script>
+<script src="/js/views/esplorazione.js"></script>
+<script src="/js/views/materiali.js"></script>
+<script src="/js/views/sblocchi.js"></script>
+<script src="/js/views/odyssey.js"></script>
+<script src="/js/views/ingegneri.js"></script>
+<script src="/js/views/trader.js"></script>
+<script src="/js/views/guardian.js"></script>
+<script src="/js/views/ricerca.js"></script>
+<script src="/js/views/luoghi.js"></script>
+<script src="/js/views/voce.js"></script>
+<script src="/js/views/ptt.js"></script>
+<script src="/js/views/invio.js"></script>
+<script src="/js/views/impostazioni.js"></script>
+<script src="/js/views/benvenuto.js"></script>
+<script src="/js/suggest.js"></script>
+<script src="/js/events.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
