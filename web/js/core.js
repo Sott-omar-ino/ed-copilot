@@ -163,7 +163,7 @@ function result(key, render, empty) {
 
 const NAV = [
   ["Comandante", [["overview", "Panoramica"], ["cmdr", "Profilo"], ["ranks", "Rank e reputazione"], ["missions", "Missioni", () => S?.missions.length], ["stats", "Statistiche"], ["diary", "Diario di bordo"], ["travelmap", "Mappa dei viaggi"], ["squadron", "Squadriglia"],
-    ["todo", "Da fare", () => TODOS.filter(t => !t.done).length + ADVICE.filter(a => !UI.dismissed.has(a.id) && a.prio <= 1).length]]],
+    ["todo", "Da fare", () => TODOS.filter(t => !t.done).length]  // solo le attività aperte, non i consigli del copilota]],
   ["Nave", [["fleet", "Flotta"], ["shipyard", "Cantiere navale"], ["onfoot", "Tute e armi"], ["carrier", "Fleet carrier"]]],
   ["Attività", [["route", "Rotte", () => routeState()?.left || 0], ["trade", "Commercio"], ["mining", "Estrazione"], ["combat", "Combattimento"], ["thargoid", "Thargoid & AX"], ["onfoot_missions", "Missioni a terra"],
     ["coriolis_station", "Colonizzazione"], ["exploration", "Esplorazione"], ["exobio", "Esobiologia"], ["powerplay", "Powerplay"],

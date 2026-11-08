@@ -72,16 +72,14 @@ def main():
         print("Compilazione non riuscita.")
         sys.exit(1)
     target = os.path.join(ROOT, NAME + ".exe")
-    try:
-        shutil.copy2(built, target)
-    except PermissionError:
-        # L'app è aperta: l'exe non si può sovrascrivere ma si può rinominare.
-        # La nuova versione cancella il ".old" al primo avvio.
-        old = target + ".old"
-        if os.path.exists(old):
-            os.remove(old)
-        os.replace(target, old)
-        shutil.copy2(built, target)
+    # Non si sostituisce un exe in esecuzione: PyInstaller rilegge i moduli dall'exe su disco quando servono, e con
+    # il file cambiato sotto i piedi gli import successivi falliscono ("Error -3 while decompressing data").
+    while True:
+        try:
+            shutil.copy2(built, target)
+            break
+        except PermissionError:
+            input(f"{NAME} è aperto: chiudilo e premi Invio per completare...")
     shutil.rmtree(work, ignore_errors=True)
     print(f"Fatto: {target} ({os.path.getsize(target) / 1_048_576:.0f} MB)")
 
