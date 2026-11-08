@@ -340,7 +340,16 @@ VIEWS.voice_commands = () => {
         ${noiseFilterPanel()}
       </div>`, { code: "MIC" });
 
+  const copilotOn = vcfg().copilot_on !== false;
+  const masterPanel = panel("Copilota vocale", dataRow(copilotOn ? "Acceso" : "Spento",
+      copilotOn ? "Comandi a voce (anche dalla cloche e dal telefono), avvisi parlati e briefing all'avvio."
+        : "Niente microfono, comandi vocali, avvisi parlati né briefing. Il resto dell'app funziona normalmente.",
+      `<button class="switch ${copilotOn ? "on" : ""}" data-copilot-master role="switch" aria-checked="${copilotOn}" aria-label="${esc(LANG.t("Copilota vocale"))}"><span></span><span></span></button>`),
+    { code: "VOICE" });
+  if (!copilotOn) return `<div class="col">${masterPanel}</div>`;
+
   return `<div class="col">
+    ${masterPanel}
     ${voiceHead}
 
     ${gameKeysPanel()}
@@ -622,4 +631,13 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-stt-model]");
   if (!b) return;
   saveVoiceCfg({ stt_model: b.dataset.sttModel }).then(() => { toast(LANG.t("Modello di riconoscimento cambiato: si carica in pochi secondi")); renderView(); });
+});
+
+// Interruttore generale del copilota vocale: spento = niente microfono, comandi, avvisi parlati né briefing.
+document.addEventListener("click", e => {
+  if (!e.target.closest("[data-copilot-master]")) return;
+  const on = vcfg().copilot_on === false;
+  if (!on && VOICE_ENGINE.active) VOICE_ENGINE.stop();
+  saveVoiceCfg({ copilot_on: on }).then(() => { VOICE_ENGINE.updateUI(); renderView(); });
+  toast(LANG.t(on ? "Copilota vocale acceso" : "Copilota vocale spento"));
 });

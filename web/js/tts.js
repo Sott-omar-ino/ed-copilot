@@ -181,6 +181,7 @@ function ttsVoiceKey(v) {
 // Parla con la voce scelta. opts: { voice, effect, amount, force } (per i pulsanti "Prova").
 function speak(text, opts = {}) {
   if (SETTINGS.tts === false && !opts.force) return;
+  if (S?.voice_config?.copilot_on === false && !opts.force) return;  // copilota vocale spento
   // Correzione fonetica italiana per TTS: "scoopabile" -> "scupabile" (in inglese "scoop" si legge già bene)
   if (voiceLang() === "it") text = text.replace(/scoopabil/gi, "scupabil").replace(/scoop/gi, "scup");
   // In inglese: i testi italiani noti ai dizionari (es. le frasi degli avvisi di fabbrica) si dicono tradotti;

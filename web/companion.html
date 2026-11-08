@@ -1192,7 +1192,7 @@ function pollState() {
 //    Si aggiorna da solo a ogni lettura dello stato.
 let VOICE = { cfg: null, mode: null };
 function voiceMode(cfg) {
-  if (!cfg || cfg.enabled !== true) return "off";
+  if (!cfg || cfg.enabled !== true || cfg.copilot_on === false) return "off";  // spento anche dall'interruttore generale
   return cfg.mode === "ptt" ? "ptt" : "continuous";
 }
 function applyVoiceConfig(cfg) {

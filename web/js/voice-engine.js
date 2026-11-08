@@ -496,6 +496,7 @@ const VOICE_ENGINE = {
   },
   
   start() {
+    if (S?.voice_config?.copilot_on === false) { this.updateUI(); return; }  // copilota spento nelle Impostazioni
     this.active = true;
     localStorage.setItem("ed_prop_voice", "true"); this.syncServerConfig();
     
@@ -1443,6 +1444,10 @@ const VOICE_ENGINE = {
     const pttBtn = $("btn-ptt-hud");
     const modeBtn = $("voice-mode-toggle-btn");
     
+    const off = S?.voice_config?.copilot_on === false;
+    const headBtn = $("btn-prop-voice");
+    if (headBtn) headBtn.style.display = off ? "none" : "";
+    if (off && bar) { bar.style.display = "none"; return; }
     if (dot) dot.className = "live-dot " + (this.active ? "on" : "");
     if (label) label.textContent = "Copilota Vocale: " + (this.active ? "ATTIVO" : "OFF");
     if (bar) bar.style.display = this.active ? "flex" : "none";

@@ -28,7 +28,9 @@ DEFAULT_CONFIG = {"enabled": False, "mode": "ptt", "ptt_key_code": "Space", "ptt
                   # Voce scelta con l'interfaccia in inglese ("" = predefinita inglese, vedi resolve_voice).
                   "voice_en": "",
                   # Modello di riconoscimento (faster-whisper): "tiny" veloce, "base" bilanciato, "small" preciso.
-                  "stt_model": "base"}
+                  "stt_model": "base",
+                  # Interruttore generale: False = niente microfono, comandi, avvisi parlati né briefing.
+                  "copilot_on": True}
 STT_MODELS = ("tiny", "base", "small")
 # Nomi brevi usati dalle versioni precedenti (restano validi). Le altre voci si indicano col nome edge-tts completo.
 VOICES = {"elsa": "it-IT-ElsaNeural", "diego": "it-IT-DiegoNeural",
@@ -349,11 +351,18 @@ def render_with_effect(mp3_path, cfg=None):
         return mp3_path
 
 
+def copilot_on():
+    """Il copilota vocale è acceso (interruttore generale nelle Impostazioni)."""
+    return load_config().get("copilot_on", True) is not False
+
+
 def say(text, voice_key=None, volume=None):
     """Parla dalle casse del PC, con l'effetto scelto. Restituisce subito; la sintesi avviene in background.
     È la strada di tutti gli avvisi del backend (avvisi prezzi, carburante, briefing, colonia...) e delle risposte
     ai comandi vocali (/api/voice/play, ship_control, macro)."""
     cfg = load_config()
+    if cfg.get("copilot_on", True) is False:
+        return text  # copilota spento: nessun avviso parlato
     voice_key = voice_key if voice_key and voice_key != "sapi" else cfg["voice"]
     volume = cfg["volume"] if volume in (None, "") else _clamp(volume, 0, 100, cfg["volume"])
 
@@ -511,6 +520,8 @@ def transcribe(data, content_type="", source="", floor_db=None):
         return ""
     if len(data) > MAX_UPLOAD:
         raise ValueError(pick("Audio troppo lungo", "Audio too long"))
+    if not copilot_on():
+        return ""
     model = whisper_model()
     if not model:
         return ""
@@ -570,7 +581,7 @@ def transcribe(data, content_type="", source="", floor_db=None):
 
 
 def preload_if_enabled():
-    if load_config().get("enabled"):
+    if load_config().get("enabled") and copilot_on():
         whisper_model()
 
 

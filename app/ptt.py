@@ -628,7 +628,7 @@ def _loop():
             learner = None
             cfg = load_config()
             b = cfg.get("binding")
-            if not cfg.get("enabled") or not b:
+            if not cfg.get("enabled") or not b or not voice.copilot_on():
                 if _rt["recording"]:
                     _stop_recording(discard=True)
                 _wake.wait(IDLE_INTERVAL)

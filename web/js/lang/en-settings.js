@@ -674,4 +674,8 @@ LANG.add({
   "Modello di riconoscimento cambiato: si carica in pochi secondi": "Recognition model changed: it loads in a few seconds",
   "Usa gli slot vuoti, oppure sostituisce un tasto che con la tua tastiera non si può premere: la cloche resta com'è. Prima viene fatta una copia del file. Poi riavvia il gioco.": "Uses empty slots, or replaces a key that can't be pressed with your keyboard layout: your stick stays as it is. A copy of the file is made first. Then restart the game.",
   "{}: non si può premere con il layout della tua tastiera": "{}: can't be pressed with your keyboard layout",
+  "Acceso": "On", "Spento": "Off",
+  "Comandi a voce (anche dalla cloche e dal telefono), avvisi parlati e briefing all'avvio.": "Voice commands (also from the stick and the phone), spoken alerts and startup briefing.",
+  "Niente microfono, comandi vocali, avvisi parlati né briefing. Il resto dell'app funziona normalmente.": "No microphone, voice commands, spoken alerts or briefing. The rest of the app works as usual.",
+  "Copilota vocale acceso": "Voice copilot on", "Copilota vocale spento": "Voice copilot off",
 });
