@@ -118,8 +118,17 @@ VIEWS.guardian = () => {
   const ready = d.unlocks.filter(u => u.ready && !u.done).length;
   const done = d.unlocks.filter(u => u.done).length;
 
-  const inv = `<div class="kv-grid">${d.inventory.map(i =>
-    `<div class="kv"><span>${esc(i.name)}</span><span class="${i.count ? "" : "muted"}">${num(i.count)}</span></div>`).join("")}</div>
+  // Materiali e dati raggruppati per tipo, in tabelle compatte: nome a sinistra, quantità a destra.
+  const invGroups = [
+    ["Materiali", i => !/Blueprint|Obelisk/.test(i.name), n => n.replace(/^Guardian /, "")],
+    ["Frammenti di blueprint", i => /Blueprint/.test(i.name), n => n.replace(/^Guardian /, "").replace(/ Blueprint Fragment$/, "")],
+    ["Dati degli obelischi", i => /Obelisk/.test(i.name), n => n.replace(/^Pattern /, "").replace(/ Obelisk Data$/, "")],
+  ];
+  const inv = `<div class="gd-inv">${invGroups.map(([title, match, label]) => {
+      const items = d.inventory.filter(match);
+      return items.length ? `<div class="subpanel"><h3>${esc(title)}</h3><table class="gd-inv-t"><tbody>${items.map(i =>
+        `<tr title="${esc(i.name)}"><td>${esc(label(i.name))}</td><td class="num ${i.count ? "gold" : "muted"}">${num(i.count)}</td></tr>`).join("")}</tbody></table></div>` : "";
+    }).join("")}</div>
     <div class="sub" style="margin-top:8px">Le commodity (HN Shock Mount, Reinforced Mounting Plate…) vengono contate solo nella stiva della nave attuale.</div>`;
 
   const finder = typeof renderActiveFinderHtml === "function" && UI.activeFinder?.broker === "Guardian" ? renderActiveFinderHtml() : "";

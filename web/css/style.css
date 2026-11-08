@@ -992,3 +992,10 @@ tr.cfg-editor-row td { background: rgba(63, 169, 255, .06) !important; white-spa
 .eng-next-txt { font-size: 12px; margin: 2px 0 3px; }
 .eng-check { margin: 4px 0; font-size: 12px; }
 .eng-check-row { display: flex; justify-content: space-between; gap: 8px; }
+
+/* --- Guardian: materiali e dati raggruppati ------------------------------------- */
+.gd-inv { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; align-items: start; }
+.gd-inv .subpanel { margin: 0; }
+.gd-inv-t { width: 100%; }
+.gd-inv-t td { padding: 3px 6px; white-space: nowrap; }
+.gd-inv-t td.num { width: 1%; font-variant-numeric: tabular-nums; font-weight: 700; }

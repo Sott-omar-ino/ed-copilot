@@ -537,4 +537,7 @@ LANG.add({
   "Visto negli ultimi": "Seen in the last",
   "1 giorno": "1 day", "7 giorni": "7 days", "30 giorni": "30 days", "sempre": "any time",
   "Munizioni": "Restock", "Barista": "Bartender",
+  "Materiali": "Materials",
+  "Frammenti di blueprint": "Blueprint fragments",
+  "Dati degli obelischi": "Obelisk data",
 });
