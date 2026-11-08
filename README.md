@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/logo.png" alt="ED Copilot" width="560"></p>
+
 # ED Copilot
 
 A free desktop companion for **Elite Dangerous** on Windows. It reads the journal files the game writes for
