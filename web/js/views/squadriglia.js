@@ -48,23 +48,24 @@ function sqCard(m, d) {
   const route = st.next_jump
     ? `${sys(st.next_jump)}${st.destination && st.destination !== st.next_jump ? ` <span class="sub">→ ${esc(st.destination)}</span>` : ""}`
     : null;
+  const contact = m.you || (m.host && d.role === "host") ? "adesso" : sqAgo(m.age);
+  const cell = (label, key, value, wrap) => `<div class="kv"><span>${label}</span><span class="sq-val${wrap ? " wrap" : ""}">${sqVal(st, key, value)}</span></div>`;
   return `<section class="panel sq-card ${m.online ? "" : "offline"}">
-    <div class="hd"><h2>${esc(st.name)}</h2><div class="aside">
-      ${m.host ? '<span class="tag solid">HOST</span>' : ""}${m.you ? '<span class="tag">TU</span>' : ""}
-      <span class="tag ${m.online ? "ok" : "bad"}">${m.online ? "ONLINE" : "OFFLINE"}</span></div></div>
+    <div class="hd"><h2 title="${esc(st.name)}">${esc(st.name)}</h2></div>
     <div class="bd">
-      <div class="kv-grid">
-        <div class="kv"><span>Nave</span><span>${sqVal(st, "ship", st.ship ? esc(st.ship) + (st.ship_name ? ` <span class="sub">${esc(st.ship_name)}</span>` : "") : null)}</span></div>
-        <div class="kv"><span>Sistema</span><span>${sqVal(st, "location", st.system ? sys(st.system) : null)}</span></div>
-        <div class="kv"><span>Attraccato a</span><span>${sqVal(st, "location", st.docked ? esc(st.station || "—") : "In volo")}</span></div>
-        <div class="kv"><span>Carburante</span><span>${sqVal(st, "fuel", fuel != null ? `${num(fuel)}%` : null)}</span></div>
-        <div class="kv"><span>Attività (stima)</span><span>${sqVal(st, "activity", act ? esc(act) : '<span class="muted">nessuna rilevata</span>')}</span></div>
-        <div class="kv"><span>Prossimo salto</span><span>${sqVal(st, "route", route || '<span class="muted">nessuna rotta</span>')}</span></div>
+      <div class="sq-tags">${m.host ? '<span class="tag solid">HOST</span>' : ""}${m.you ? '<span class="tag">TU</span>' : ""}
+        <span class="tag ${m.online ? "ok" : "bad"}">${m.online ? "ONLINE" : "OFFLINE"}</span>
+        <span class="sub">Ultimo contatto: ${contact}</span></div>
+      <div class="kv-grid sq-kv">
+        ${cell("Nave", "ship", st.ship ? esc(st.ship) + (st.ship_name ? ` <span class="sub">${esc(st.ship_name)}</span>` : "") : null)}
+        ${cell("Sistema", "location", st.system ? sys(st.system) : null, true)}
+        ${cell("Attraccato a", "location", st.docked ? `<span title="${esc(st.station || "")}">${esc(st.station || "—")}</span>` : "In volo")}
+        ${cell("Attività (stima)", "activity", act ? esc(act) : '<span class="muted">nessuna rilevata</span>')}
+        ${cell("Prossimo salto", "route", route || '<span class="muted">nessuna rotta</span>', true)}
+        ${st.jumps_left && !sqHidden(st, "route") ? cell("Salti rimasti", "route", num(st.jumps_left)) : ""}
       </div>
-      ${!sqHidden(st, "fuel") && fuel != null ? `<div style="margin-top:10px">${meter(fuel, fuel < 25 ? "bad" : "")}</div>` : ""}
-      ${st.jumps_left && !sqHidden(st, "route") ? `<div class="sub" style="margin-top:6px">${st.jumps_left} salti alla destinazione</div>` : ""}
-      <div class="sq-foot"><span class="sub">Ultimo contatto: ${m.you || (m.host && d.role === "host") ? "adesso" : sqAgo(m.age)}</span>
-        ${canKick ? `<button class="small danger" data-sq-kick="${esc(m.id)}" data-sq-name="${esc(st.name)}">Espelli</button>` : ""}</div>
+      ${!sqHidden(st, "fuel") && fuel != null ? `<div class="sq-fuel"><span>Carburante</span><b class="${fuel < 25 ? "bad" : ""}">${num(fuel)}%</b>${meter(fuel, fuel < 25 ? "bad" : "")}</div>` : ""}
+      ${canKick ? `<div class="sq-foot"><span></span><button class="small danger" data-sq-kick="${esc(m.id)}" data-sq-name="${esc(st.name)}">Espelli</button></div>` : ""}
     </div></section>`;
 }
 const SQ_ACT_LABEL = { mining: "Mining", combat: "Combattimento", exploring: "Esplorazione", exobiology: "Esobiologia",
@@ -193,7 +194,7 @@ VIEWS.squadron = () => {
   const d = r.data;
   let members = d.squad?.members || [];
   if (d.role === "none") members = [{ id: "me", you: true, online: true, age: 0, status: d.me }];
-  const cards = `<div class="cards" style="margin-top:18px">${members.map(m => sqCard(m, d)).join("")}</div>`;
+  const cards = `<div class="cards sq-cards" style="margin-top:18px">${members.map(m => sqCard(m, d)).join("")}</div>`;
   const inSquad = d.role !== "none";
   return `${sqConnectPanel(d)}
     ${!inSquad ? '<div class="eyebrow" style="margin-top:18px">Anteprima di ciò che vedrebbero gli altri</div>' : ""}${cards}

@@ -553,6 +553,7 @@ LANG.add({
   "+ Aggiungi": "+ Add",
   "Ignora": "Dismiss",
   "Aggiunto alle cose da fare": "Added to the to-do list",
+  "Salti rimasti": "Jumps left",
 });
 
 // Pattern generici (una sola parola fissa, es. "{} salti"): si aggiungono dopo che tutti i dizionari sono stati

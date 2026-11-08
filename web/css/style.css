@@ -999,3 +999,15 @@ tr.cfg-editor-row td { background: rgba(63, 169, 255, .06) !important; white-spa
 .gd-inv-t { width: 100%; }
 .gd-inv-t td { padding: 3px 6px; white-space: nowrap; }
 .gd-inv-t td.num { width: 1%; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+/* --- Squadriglia: schede dei comandanti ----------------------------------------- */
+.sq-cards { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+.sq-card .hd h2 { max-width: calc(100% - 30px); }
+.sq-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 12px; }
+.sq-tags .sub { margin-left: auto; }
+.sq-kv { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sq-card .kv > .sq-val { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+.sq-card .kv > .sq-val.wrap { white-space: normal; overflow: visible; }
+.sq-fuel { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 10px; margin-top: 12px; }
+.sq-fuel > span { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); }
+.sq-fuel .meter { margin: 0; }
