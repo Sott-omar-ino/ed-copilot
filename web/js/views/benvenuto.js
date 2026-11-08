@@ -35,7 +35,7 @@ function wzStepWelcome() {
       ed entra in gioco, poi l'app si aggiorna da sola.<div class="sub mono" style="margin-top:4px;word-break:break-all">${esc(dir)}</div></div>`;
   else status = `<div class="ok">✓ Journal trovato${j.files ? ` (${num(j.files)} file)` : ""}${events ? ` · Comandante <b class="gold">${esc(S.cmdr.name)}</b>` : ""}.</div>
       <div class="sub mono" style="margin-top:4px;word-break:break-all">${esc(dir)}</div>`;
-  return `<p class="wz-lead">ED Copilot è il tuo copilota per Elite Dangerous.</p>
+  return `<p class="wz-lead">Voidwatch ED è il tuo copilota per Elite Dangerous.</p>
     <ul class="wz-list">
       <li>Legge il journal del gioco e ti mostra in tempo reale nave, rotta, missioni, materiali ed esplorazione.</li>
       <li>Cerca stazioni, mercati e rotte e ti suggerisce cosa fare.</li>

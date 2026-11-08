@@ -1,6 +1,6 @@
 @echo off
-rem Avvia ED Copilot dai sorgenti (serve Python 3.10+). Per l'uso normale basta "ED Copilot.exe".
-title ED Copilot (sorgenti)
+rem Avvia Voidwatch ED dai sorgenti (serve Python 3.10+). Per l'uso normale basta "Voidwatch ED.exe".
+title Voidwatch ED (sorgenti)
 cd /d "%~dp0"
 
 where python >nul 2>nul

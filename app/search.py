@@ -125,8 +125,10 @@ def stations(q):
     if q.get("no_carriers", True) and mode != "carrier":
         filters["type"] = {"value": NON_CARRIER_TYPES}
 
+    # Con il montaggio il filtro finale è nostro: si chiedono più stazioni per averne abbastanza dopo il controllo.
+    size = 60 if mode == "module" and q.get("mount") else 25
     res = _search_json("https://spansh.co.uk/api/stations/search", {
-        "filters": filters, "sort": sort, "size": 25, "page": 0, "reference_system": ref}, ref)
+        "filters": filters, "sort": sort, "size": size, "page": 0, "reference_system": ref}, ref)
     if res.get("error"):
         raise ValueError(res["error"])
 
@@ -154,6 +156,18 @@ def stations(q):
             for s in r.get("ships", []):
                 if s.get("name") == q.get("ship"):
                     item["price"] = s.get("price")
+        elif mode == "module":
+            # Il servizio di ricerca filtra per nome, classe e rating ma non per montaggio (weapon_mode): il controllo
+            # completo si fa qui sui moduli in vendita, e si mostra il prezzo di quello che corrisponde.
+            want_cls, want_rat, want_mount = str(q.get("cls") or ""), (q.get("rating") or ""), (q.get("mount") or "")
+            match = [m for m in r.get("modules", []) if m.get("name") == q.get("module")
+                     and (not want_cls or str(m.get("class")) == want_cls) and (not want_rat or m.get("rating") == want_rat)
+                     and (not want_mount or m.get("weapon_mode") == want_mount)]
+            if not match:
+                continue
+            m = min(match, key=lambda x: x.get("price") or 0)
+            item.update(price=m.get("price"), module=f"{m.get('class')}{m.get('rating')} {m.get('name')}"
+                        + (f" ({m.get('weapon_mode')})" if m.get("weapon_mode") else ""))
         out.append(item)
     return {"reference": res.get("reference"), "count": res.get("count"), "results": out}
 

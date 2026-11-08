@@ -61,8 +61,8 @@ LANG.add({
   "Connessione non cifrata: dal telefono funzionano i pulsanti ma non il comando vocale.":
     "Unencrypted connection: buttons work from the phone but voice commands don't.",
   "Installa come app sul telefono": "Install as an app on your phone",
-  "Per avere il companion come app (icona sulla schermata Home, a schermo intero, senza la barra del browser) il telefono deve fidarsi del certificato di ED Copilot. Il certificato vale solo per gli indirizzi delle reti di casa: non può essere usato per nessun sito internet.":
-    "To have the companion as an app (Home Screen icon, full screen, no browser bar) the phone must trust ED Copilot's certificate. The certificate only works for home network addresses: it can't be used for any internet site.",
+  "Per avere il companion come app (icona sulla schermata Home, a schermo intero, senza la barra del browser) il telefono deve fidarsi del certificato di Voidwatch ED. Il certificato vale solo per gli indirizzi delle reti di casa: non può essere usato per nessun sito internet.":
+    "To have the companion as an app (Home Screen icon, full screen, no browser bar) the phone must trust Voidwatch ED's certificate. The certificate only works for home network addresses: it can't be used for any internet site.",
   "L'indirizzo di questo PC non è di una rete di casa: il telefono non potrà fidarsi del certificato e l'installazione come app non funzionerà.":
     "This PC's address isn't on a home network: the phone won't be able to trust the certificate and installing as an app won't work.",
   "QR code del certificato": "Certificate QR code",
@@ -126,8 +126,8 @@ LANG.add({
   "Chiave API di EDSM": "EDSM API key",
   "Dove trovo la chiave? (EDSM → Settings → API Key)": "Where do I find the key? (EDSM → Settings → API Key)",
   "Salva prima la chiave API nel pannello Inara.": "Save the API key in the Inara panel first.",
-  "Inara accetta gli aggiornamenti solo dalle app approvate dal suo autore: se l'errore parla del nome dell'applicazione, ED Copilot non è ancora nella lista. Gli eventi restano in coda fino a 30 giorni e partono quando cambi la chiave o riavvii l'app.":
-    "Inara only accepts updates from apps approved by its author: if the error mentions the application name, ED Copilot isn't on the list yet. Events stay queued for up to 30 days and are sent when you change the key or restart the app.",
+  "Inara accetta gli aggiornamenti solo dalle app approvate dal suo autore: se l'errore parla del nome dell'applicazione, Voidwatch ED non è ancora nella lista. Gli eventi restano in coda fino a 30 giorni e partono quando cambi la chiave o riavvii l'app.":
+    "Inara only accepts updates from apps approved by its author: if the error mentions the application name, Voidwatch ED isn't on the list yet. Events stay queued for up to 30 days and are sent when you change the key or restart the app.",
   "Invia a {}": "Send to {}",
   "Parte solo ciò che succede mentre l'app è aperta (non lo storico), mai dalle versioni beta o Legacy del gioco né quando sei nell'equipaggio di un altro comandante. Senza rete gli invii restano in coda e ripartono da soli.":
     "Only what happens while the app is open is sent (not your history), never from beta or Legacy versions of the game, nor while you're in another CMDR's crew. Without a connection, uploads stay queued and resume on their own.",
@@ -201,8 +201,8 @@ LANG.add({
     "Creates a zip in your Downloads folder with to-dos, macros, controls, alerts, logbook, saved builds and settings (including your Inara and EDSM API keys: keep it to yourself).",
   "Esporta": "Export",
   "Importa un backup": "Import a backup",
-  "Ripristina uno zip esportato da ED Copilot, anche da un altro PC. I dati attuali vengono prima copiati nella cartella cache.":
-    "Restores a zip exported by ED Copilot, even from another PC. Your current data is first copied to the cache folder.",
+  "Ripristina uno zip esportato da Voidwatch ED, anche da un altro PC. I dati attuali vengono prima copiati nella cartella cache.":
+    "Restores a zip exported by Voidwatch ED, even from another PC. Your current data is first copied to the cache folder.",
   "Importa": "Import",
   'Ripristino il backup "{}"? Le impostazioni attuali verranno sostituite (ne resta una copia).':
     'Restore the backup "{}"? Your current settings will be replaced (a copy is kept).',
@@ -235,10 +235,10 @@ LANG.add({
     "The first-run steps: journal, language, voice, keys, push-to-talk and optional features.",
   "Rivedi la guida iniziale": "Open the getting started guide",
   "Riconoscimenti": "Credits",
-  "ED Copilot è software libero e gratuito, distribuito con licenza GNU GPL versione 2 o successiva: puoi usarlo, studiarlo, modificarlo e ridistribuirlo alle stesse condizioni. Dettagli in LICENSE e THIRD_PARTY_NOTICES.md.":
-    "ED Copilot is free software, released under the GNU GPL version 2 or later: you can use, study, modify and redistribute it under the same terms. Details in LICENSE and THIRD_PARTY_NOTICES.md.",
-  "Elite Dangerous è un marchio di Frontier Developments plc. ED Copilot è un progetto amatoriale non ufficiale, non affiliato né approvato da Frontier.":
-    "Elite Dangerous is a trademark of Frontier Developments plc. ED Copilot is an unofficial fan project, not affiliated with or endorsed by Frontier.",
+  "Voidwatch ED è software libero e gratuito, distribuito con licenza GNU GPL versione 2 o successiva: puoi usarlo, studiarlo, modificarlo e ridistribuirlo alle stesse condizioni. Dettagli in LICENSE e THIRD_PARTY_NOTICES.md.":
+    "Voidwatch ED is free software, released under the GNU GPL version 2 or later: you can use, study, modify and redistribute it under the same terms. Details in LICENSE and THIRD_PARTY_NOTICES.md.",
+  "Elite Dangerous è un marchio di Frontier Developments plc. Voidwatch ED è un progetto amatoriale non ufficiale, non affiliato né approvato da Frontier.":
+    "Elite Dangerous is a trademark of Frontier Developments plc. Voidwatch ED is an unofficial fan project, not affiliated with or endorsed by Frontier.",
   "Dati delle navi e dei moduli: progetto Coriolis (EDCD, licenza MIT). Le ricerche online usano i servizi pubblici della community; i collegamenti sono in Luoghi utili.":
     "Ship and module data: Coriolis project (EDCD, MIT licence). Online searches use the community's public services; the links are in Useful places.",
   "Previsione delle specie in Esobiologia: regole del plugin EDMC-BioScan e dati di EDMC-ExploData di Jeremy Rimpo (Silarn, licenza GNU GPL v2), basate sulle ricerche della community (Deep Space Network, Canonn); regioni galattiche dalla mappa EliteDangerousRegionMap di Ben Peddell (klightspeed, licenza MIT).":
@@ -248,8 +248,8 @@ LANG.add({
   "L'app legge i journal che Elite Dangerous scrive mentre giochi. Avvia il gioco almeno una volta ed entra in partita: i dati arrivano da soli. Qui sotto vedi la cartella dei journal che l'app sta usando.":
     "The app reads the journals Elite Dangerous writes while you play. Start the game at least once and load into the game: the data comes in by itself. The journal folder the app is using is shown in this page.",
   "L'app modifica il gioco?": "Does the app modify the game?",
-  "No. Legge solo i file journal e di stato che il gioco scrive apposta per i programmi esterni. I comandi alla nave (voce, pulsanti, macro, telefono) premono i tasti della tastiera che hai assegnato nei controlli del gioco, come faresti tu. ED Copilot è un progetto non ufficiale, non di Frontier.":
-    "No. It only reads the journal and status files the game writes for third-party tools. Ship commands (voice, buttons, macros, phone) press the keyboard keys you assigned in the game's controls, just as you would. ED Copilot is an unofficial project, not made by Frontier.",
+  "No. Legge solo i file journal e di stato che il gioco scrive apposta per i programmi esterni. I comandi alla nave (voce, pulsanti, macro, telefono) premono i tasti della tastiera che hai assegnato nei controlli del gioco, come faresti tu. Voidwatch ED è un progetto non ufficiale, non di Frontier.":
+    "No. It only reads the journal and status files the game writes for third-party tools. Ship commands (voice, buttons, macros, phone) press the keyboard keys you assigned in the game's controls, just as you would. Voidwatch ED is an unofficial project, not made by Frontier.",
   "Un comando vocale non fa niente in gioco.": "A voice command does nothing in game.",
   "Il comando deve avere un tasto della tastiera assegnato nei controlli del gioco: in Impostazioni → Audio → Tasti del gioco vedi quali mancano e puoi aggiungerli in automatico. Il gioco deve essere aperto: prima di premere un tasto l'app lo porta in primo piano.":
     "The command needs a keyboard key assigned in the game's controls: in Settings → Audio → Game keys you can see which are missing and add them automatically. The game must be running: before pressing a key the app brings it to the front.",
@@ -586,7 +586,7 @@ LANG.add({
   "✓ Journal trovato ({} file).": "✓ Journal found ({} files).",
   "✓ Journal trovato · Comandante": "✓ Journal found · CMDR",
   "✓ Journal trovato.": "✓ Journal found.",
-  "ED Copilot è il tuo copilota per Elite Dangerous.": "ED Copilot is your copilot for Elite Dangerous.",
+  "Voidwatch ED è il tuo copilota per Elite Dangerous.": "Voidwatch ED is your copilot for Elite Dangerous.",
   "Legge il journal del gioco e ti mostra in tempo reale nave, rotta, missioni, materiali ed esplorazione.":
     "It reads the game journal and shows your ship, route, missions, materials and exploration in real time.",
   "Cerca stazioni, mercati e rotte e ti suggerisce cosa fare.": "It searches stations, markets and routes and suggests what to do.",

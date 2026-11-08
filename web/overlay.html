@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>ED Copilot Overlay</title>
+<title>Voidwatch ED Overlay</title>
 <style>
   /* Finestra sopra il gioco: l'app ne regola l'opacità (Impostazioni → Overlay). */
   html, body { margin: 0; background: #0c0500; overflow: hidden; }
@@ -24,7 +24,7 @@
 </style>
 </head>
 <body>
-<div class="box pywebview-drag-region" id="box"><div class="lbl">ED Copilot</div><div id="c">In attesa del gioco…</div></div>
+<div class="box pywebview-drag-region" id="box"><div class="lbl">Voidwatch ED</div><div id="c">In attesa del gioco…</div></div>
 <script src="/js/lang.js"></script>
 <script>
 "use strict";
@@ -39,7 +39,7 @@ LANG.add({
   "Allontanati ancora di {} m": "Move another {} m away",
   "⚠ FSD al {}%": "⚠ FSD at {}%",
   "Trascina per spostare · blocca dalle Impostazioni dell'app": "Drag to move · lock it from the app's Settings",
-  "ED Copilot non risponde": "ED Copilot isn't responding",
+  "Voidwatch ED non risponde": "Voidwatch ED isn't responding",
 });
 </script>
 <script>
@@ -76,7 +76,7 @@ function render(s) {
 }
 
 async function tick() {
-  try { render(await api("/api/state")); } catch { document.getElementById("c").textContent = "ED Copilot non risponde"; }
+  try { render(await api("/api/state")); } catch { document.getElementById("c").textContent = "Voidwatch ED non risponde"; }
   setTimeout(tick, 1000);
 }
 tick();

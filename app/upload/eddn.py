@@ -14,15 +14,16 @@ import os
 import re
 import time
 
-from .. import VERSION
+from .. import VERSION, paths
 from ..lang import pick
 from .outbox import Sender, backoff, post
 from .tracker import LOCATION_EVENTS, NOT_REAL_SYSTEMS
 
 UPLOAD_URL = "https://eddn.edcd.io:4430/upload/"
-SOFTWARE = "ED Copilot"
-# ED_COPILOT_EDDN_TEST=1: tutti i messaggi vanno agli schemi di prova (…/test), per provare l'invio senza sporcare i dati.
-TEST = os.environ.get("ED_COPILOT_EDDN_TEST") == "1"
+SOFTWARE = "Voidwatch ED"
+# VOIDWATCH_EDDN_TEST=1 (o il vecchio ED_COPILOT_EDDN_TEST): tutti i messaggi vanno agli schemi di prova (…/test), per
+# provare l'invio senza sporcare i dati.
+TEST = paths.env("EDDN_TEST") == "1"
 MAX_AGE = 3 * 86400
 NO_RETRY = (400, 413, 426)
 

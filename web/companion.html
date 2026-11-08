@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<title>ED Copilot · Companion</title>
+<title>Voidwatch ED · Companion</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!-- Niente user-scalable=no: lo zoom resta disponibile (accessibilità). Lo zoom accidentale si evita con
      touch-action: manipulation sui controlli e testi dei campi a 16px. -->
@@ -17,7 +17,7 @@
      dal server per il telefono (app/server.py, LAN_STATIC). Il manifest non contiene il codice di accesso. -->
 <link rel="manifest" href="/companion.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="ED Copilot">
+<meta name="apple-mobile-web-app-title" content="Voidwatch ED">
 <style>
 /* Font inclusi nell'app (web/fonts, licenza OFL): Saira con lo zero barrato, come l'app sul PC.
    Il server per il telefono serve solo questi file (app/server.py, LAN_STATIC). */
@@ -514,7 +514,7 @@ nav.tabs {
 <header class="top">
   <div class="brand">
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 L29 16 L16 29 L3 16 Z" fill="none" stroke="#140700" stroke-width="2.2"/><path d="M16 8 L24 16 L16 24 L8 16 Z" fill="#140700"/><circle cx="16" cy="16" r="2.2" fill="#ff8c00"/></svg>
-    <div><b>ED COPILOT</b><small>COMPANION</small></div>
+    <div><b>VOIDWATCH ED</b><small>COMPANION</small></div>
   </div>
   <div class="link" role="status" aria-live="polite"><i class="live-dot wait" id="link-dot"></i><span id="link-label">COLLEGAMENTO…</span></div>
 </header>
@@ -615,8 +615,8 @@ const CLANG = (() => {
     "ACCESSO NEGATO": "ACCESS DENIED",
     "Riprova": "Retry",
     "PC non raggiungibile": "Can't reach the PC",
-    "Controlla che ED Copilot sia aperto sul PC e che il telefono sia sulla stessa rete Wi-Fi. Riprovo da solo ogni pochi secondi.":
-      "Check that ED Copilot is open on the PC and that the phone is on the same Wi-Fi network. Retrying automatically every few seconds.",
+    "Controlla che Voidwatch ED sia aperto sul PC e che il telefono sia sulla stessa rete Wi-Fi. Riprovo da solo ogni pochi secondi.":
+      "Check that Voidwatch ED is open on the PC and that the phone is on the same Wi-Fi network. Retrying automatically every few seconds.",
     "Stato": "Status",
     "TELEMETRIA": "TELEMETRY",
     "Sistema": "System",
@@ -670,8 +670,8 @@ const CLANG = (() => {
     "Comandi vocali non disponibili su questo indirizzo.": "Voice commands aren't available at this address.",
     "Il telefono permette il microfono solo su una connessione sicura (HTTPS).": "The phone only allows the microphone on a secure connection (HTTPS).",
     "1. Apri": "1. Open",
-    "2. Comparirà un avviso sul certificato: è normale, il certificato è creato da ED Copilot sul tuo PC.":
-      "2. A certificate warning will appear: that's normal, the certificate is created by ED Copilot on your PC.",
+    "2. Comparirà un avviso sul certificato: è normale, il certificato è creato da Voidwatch ED sul tuo PC.":
+      "2. A certificate warning will appear: that's normal, the certificate is created by Voidwatch ED on your PC.",
     "Chrome/Android: tocca": "Chrome/Android: tap",
     "Avanzate → Procedi su {} (non sicuro)": "Advanced → Proceed to {} (unsafe)",
     "Safari/iPhone: tocca": "Safari/iPhone: tap",
@@ -769,8 +769,8 @@ const CLANG = (() => {
     "Per installare l'app serve la connessione cifrata (HTTPS): sul PC, in Impostazioni › Generali › Companion per il telefono, deve risultare attiva.":
       "Installing the app needs the encrypted connection (HTTPS): on the PC, in Settings › General › Phone companion, it must show as active.",
     "Controllo se il telefono si fida della connessione…": "Checking whether the phone trusts the connection…",
-    "Il telefono non si fida ancora del certificato creato da ED Copilot sul tuo PC, quindi non permette di installare l'app. Basta farlo una volta:":
-      "The phone doesn't trust the certificate ED Copilot created on your PC yet, so it won't let you install the app. You only need to do this once:",
+    "Il telefono non si fida ancora del certificato creato da Voidwatch ED sul tuo PC, quindi non permette di installare l'app. Basta farlo una volta:":
+      "The phone doesn't trust the certificate Voidwatch ED created on your PC yet, so it won't let you install the app. You only need to do this once:",
     "Il certificato vale solo per gli indirizzi delle reti di casa (192.168…, 10…, 172.16-31…, 100.64-127…): è limitato così al suo interno e non può essere usato per nessun sito internet.":
       "The certificate only works for home network addresses (192.168…, 10…, 172.16-31…, 100.64-127…): this limit is built into it, so it can't be used for any internet site.",
     "Scarica il certificato": "Download the certificate",
@@ -780,28 +780,28 @@ const CLANG = (() => {
       "Tap “Download the certificate”. If a security warning appears, continue. If the phone says CA certificates must be installed from Settings, that's fine: the file is in Downloads.",
     "Apri Impostazioni › Sicurezza e privacy › Altre impostazioni di sicurezza › Crittografia e credenziali › Installa un certificato › Certificato CA.":
       "Open Settings › Security & privacy › More security settings › Encryption & credentials › Install a certificate › CA certificate.",
-    "Conferma l'avviso e scegli il file ED-Copilot-CA.crt. Serve un blocco schermo (PIN, sequenza o password).":
-      "Confirm the warning and pick the file ED-Copilot-CA.crt. A screen lock (PIN, pattern or password) is required.",
+    "Conferma l'avviso e scegli il file Voidwatch-ED-CA.crt. Serve un blocco schermo (PIN, sequenza o password).":
+      "Confirm the warning and pick the file Voidwatch-ED-CA.crt. A screen lock (PIN, pattern or password) is required.",
     "I nomi dei menu cambiano con la marca e la versione: se non li trovi, cerca «certificato CA» nelle Impostazioni.":
       "Menu names change with brand and version: if you can't find them, search for “CA certificate” in Settings.",
     "Apri questa pagina in Safari e tocca «Scarica il certificato», poi «Consenti».":
       "Open this page in Safari and tap “Download the certificate”, then “Allow”.",
-    "Impostazioni › Generali › VPN e gestione dispositivi: tocca il profilo «ED Copilot - CA rete locale» e poi Installa.":
-      "Settings › General › VPN & Device Management: tap the “ED Copilot - CA rete locale” profile, then Install.",
-    "Impostazioni › Generali › Info › Impostazioni certificati attendibili: attiva l'attendibilità completa per «ED Copilot - CA rete locale».":
-      "Settings › General › About › Certificate Trust Settings: turn on full trust for “ED Copilot - CA rete locale”.",
+    "Impostazioni › Generali › VPN e gestione dispositivi: tocca il profilo «{} - CA rete locale» e poi Installa.":
+      "Settings › General › VPN & Device Management: tap the “{} - CA rete locale” profile, then Install.",
+    "Impostazioni › Generali › Info › Impostazioni certificati attendibili: attiva l'attendibilità completa per «{} - CA rete locale».":
+      "Settings › General › About › Certificate Trust Settings: turn on full trust for “{} - CA rete locale”.",
     "Poi chiudi questa scheda e riapri l'indirizzo del companion (o tocca «Ricontrolla»).":
       "Then close this tab and open the companion address again (or tap “Check again”).",
     "Ricontrolla": "Check again",
-    "App installata: aprila dall'icona ED Copilot sulla schermata Home.": "App installed: open it from the ED Copilot icon on your Home Screen.",
+    "App installata: aprila dall'icona Voidwatch ED sulla schermata Home.": "App installed: open it from the Voidwatch ED icon on your Home Screen.",
     "Il telefono si fida della connessione: puoi installare il companion come app.": "The phone trusts the connection: you can install the companion as an app.",
     "Installa app": "Install app",
     "Tocca «Copia codice di accesso»: l'app installata non vede la memoria di Safari e al primo avvio potrebbe chiederlo.":
       "Tap “Copy access code”: the installed app can't see Safari's storage and may ask for it the first time.",
     "Tocca Condividi (il quadrato con la freccia) › Aggiungi alla schermata Home › Aggiungi.":
       "Tap Share (the square with the arrow) › Add to Home Screen › Add.",
-    "Apri ED Copilot dalla schermata Home. Se chiede il codice di accesso, incollalo.":
-      "Open ED Copilot from the Home Screen. If it asks for the access code, paste it.",
+    "Apri Voidwatch ED dalla schermata Home. Se chiede il codice di accesso, incollalo.":
+      "Open Voidwatch ED from the Home Screen. If it asks for the access code, paste it.",
     "Copia codice di accesso": "Copy access code",
     "Codice copiato": "Code copied",
     "Copia non riuscita": "Copy failed",
@@ -809,7 +809,7 @@ const CLANG = (() => {
       "The “Install app” button appears here when the browser is ready, usually after a few seconds of using the page.",
     "In alternativa apri il menu del browser (⋮) e scegli «Installa app» o «Aggiungi a schermata Home».":
       "Or open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.",
-    "Certificato di ED Copilot": "ED Copilot certificate",
+    "Certificato di Voidwatch ED": "Voidwatch ED certificate",
     "Codice di accesso": "Access code",
     "Usa": "Use",
     "Codice non valido": "Invalid code",
@@ -939,7 +939,7 @@ function setLink(state) {
     $("conn-title").textContent = state === "denied" ? "ACCESSO NEGATO" : "PC non raggiungibile";
     $("conn-text").textContent = state === "denied"
       ? "Il codice di accesso manca o non è più valido. Inquadra di nuovo il QR code sul PC (Impostazioni › Generali › Companion per il telefono) oppure incolla qui il codice."
-      : "Controlla che ED Copilot sia aperto sul PC e che il telefono sia sulla stessa rete Wi-Fi. Riprovo da solo ogni pochi secondi.";
+      : "Controlla che Voidwatch ED sia aperto sul PC e che il telefono sia sulla stessa rete Wi-Fi. Riprovo da solo ogni pochi secondi.";
     $("conn-retry").hidden = state === "denied";
     $("code-form").hidden = state !== "denied";
     banner.hidden = false;
@@ -1254,7 +1254,7 @@ function setupVoiceNotice() {
     ? `<b>Comandi vocali non disponibili su questo indirizzo.</b><br>
        Il telefono permette il microfono solo su una connessione sicura (HTTPS).<br>
        1. Apri <a href="${esc(secureUrl)}">${esc("https://" + location.host + "/companion")}</a><br>
-       2. Comparirà un avviso sul certificato: è normale, il certificato è creato da ED Copilot sul tuo PC.<br>
+       2. Comparirà un avviso sul certificato: è normale, il certificato è creato da Voidwatch ED sul tuo PC.<br>
        Chrome/Android: tocca <b>Avanzate → Procedi su ${esc(location.hostname)} (non sicuro)</b>.<br>
        Safari/iPhone: tocca <b>Mostra dettagli → visita questo sito web</b>.<br>
        Basta farlo una volta. Se il link non si apre, nelle impostazioni dell'app sul PC verifica che l'accesso dal telefono usi HTTPS.`
@@ -1509,6 +1509,9 @@ function syncLang() { api("/api/ui_lang").then(d => CLANG.sync(d.ui_lang)).catch
 //       webkit.org/blog/10218): al primo avvio può chiedere il codice di accesso, per questo c'è "Copia codice".
 //     - Già aperta come app (display-mode standalone): la sezione non serve e resta nascosta.
 const INSTALL = { sw: "pending", prompt: null, installed: false, copied: false };
+// Nome dell'app scritto nel certificato (GET /api/ping, campo "ca"): una CA creata prima del cambio di nome si chiama
+// ancora «Voidwatch ED - CA rete locale» (non viene rigenerata), e il telefono mostra quel nome.
+let CA_APP_NAME = "Voidwatch ED";
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches
   || navigator.standalone === true;
@@ -1519,22 +1522,22 @@ function certStepsHtml() {
   const android = `<div class="inst-h">Android</div>` + installSteps([
     "Tocca «Scarica il certificato». Se compare l'avviso di sicurezza, prosegui. Se il telefono dice che i certificati CA si installano dalle Impostazioni, va bene: il file è nei Download.",
     "Apri Impostazioni › Sicurezza e privacy › Altre impostazioni di sicurezza › Crittografia e credenziali › Installa un certificato › Certificato CA.",
-    "Conferma l'avviso e scegli il file ED-Copilot-CA.crt. Serve un blocco schermo (PIN, sequenza o password).",
+    "Conferma l'avviso e scegli il file Voidwatch-ED-CA.crt. Serve un blocco schermo (PIN, sequenza o password).",
     "I nomi dei menu cambiano con la marca e la versione: se non li trovi, cerca «certificato CA» nelle Impostazioni.",
   ]);
   const ios = `<div class="inst-h">iPhone e iPad</div>` + installSteps([
     "Apri questa pagina in Safari e tocca «Scarica il certificato», poi «Consenti».",
-    "Impostazioni › Generali › VPN e gestione dispositivi: tocca il profilo «ED Copilot - CA rete locale» e poi Installa.",
-    "Impostazioni › Generali › Info › Impostazioni certificati attendibili: attiva l'attendibilità completa per «ED Copilot - CA rete locale».",
+    `Impostazioni › Generali › VPN e gestione dispositivi: tocca il profilo «${CA_APP_NAME} - CA rete locale» e poi Installa.`,
+    `Impostazioni › Generali › Info › Impostazioni certificati attendibili: attiva l'attendibilità completa per «${CA_APP_NAME} - CA rete locale».`,
   ]);
   return `<div class="inst-why">${esc(CLANG.t("Il certificato vale solo per gli indirizzi delle reti di casa (192.168…, 10…, 172.16-31…, 100.64-127…): è limitato così al suo interno e non può essere usato per nessun sito internet."))}</div>
-    <a class="btn" href="/companion-ca.crt" download="ED-Copilot-CA.crt" id="install-ca">${esc(CLANG.t("Scarica il certificato"))}</a>
+    <a class="btn" href="/companion-ca.crt" download="Voidwatch-ED-CA.crt" id="install-ca">${esc(CLANG.t("Scarica il certificato"))}</a>
     ${IS_IOS ? ios + android : android + ios}
     ${installSteps(["Poi chiudi questa scheda e riapri l'indirizzo del companion (o tocca «Ricontrolla»)."])}
     <div class="nb-actions"><button type="button" id="install-recheck">Ricontrolla</button></div>`;
 }
 function appStepsHtml() {
-  if (INSTALL.installed) return `<div class="inst-ok">${esc(CLANG.t("App installata: aprila dall'icona ED Copilot sulla schermata Home."))}</div>`;
+  if (INSTALL.installed) return `<div class="inst-ok">${esc(CLANG.t("App installata: aprila dall'icona Voidwatch ED sulla schermata Home."))}</div>`;
   if (INSTALL.prompt) {
     return `<p class="hint">${esc(CLANG.t("Il telefono si fida della connessione: puoi installare il companion come app."))}</p>
       <div class="nb-actions"><button type="button" class="primary" id="install-go">Installa app</button></div>`;
@@ -1543,7 +1546,7 @@ function appStepsHtml() {
     return installSteps([
       "Tocca «Copia codice di accesso»: l'app installata non vede la memoria di Safari e al primo avvio potrebbe chiederlo.",
       "Tocca Condividi (il quadrato con la freccia) › Aggiungi alla schermata Home › Aggiungi.",
-      "Apri ED Copilot dalla schermata Home. Se chiede il codice di accesso, incollalo.",
+      "Apri Voidwatch ED dalla schermata Home. Se chiede il codice di accesso, incollalo.",
     ]) + `<div class="nb-actions"><button type="button" id="install-copy">${INSTALL.copied ? "Codice copiato" : "Copia codice di accesso"}</button></div>`;
   }
   return installSteps([
@@ -1564,11 +1567,11 @@ function renderInstall() {
     body = `<p class="hint">${esc(CLANG.t("Controllo se il telefono si fida della connessione…"))}</p>`;
   } else if (INSTALL.sw !== "ok") {
     state = "certificato da installare";
-    body = `<p class="hint">${esc(CLANG.t("Il telefono non si fida ancora del certificato creato da ED Copilot sul tuo PC, quindi non permette di installare l'app. Basta farlo una volta:"))}</p>`
+    body = `<p class="hint">${esc(CLANG.t("Il telefono non si fida ancora del certificato creato da Voidwatch ED sul tuo PC, quindi non permette di installare l'app. Basta farlo una volta:"))}</p>`
       + certStepsHtml();
   } else {
     state = INSTALL.installed ? "installata" : "pronta";
-    body = appStepsHtml() + `<details class="sub-box"><summary>Certificato di ED Copilot</summary>${certStepsHtml()}</details>`;
+    body = appStepsHtml() + `<details class="sub-box"><summary>Certificato di Voidwatch ED</summary>${certStepsHtml()}</details>`;
   }
   $("install-state").textContent = state;
   $("install-body").innerHTML = body;
@@ -1610,6 +1613,7 @@ CLANG.start();
 renderNotify();
 $("code-input").placeholder = CLANG.t("Codice di accesso");
 renderInstall();
+api("/api/ping").then(d => { if (d && d.ca && d.ca !== CA_APP_NAME) { CA_APP_NAME = String(d.ca); renderInstall(); } }).catch(() => {});
 registerWorker();
 layoutBottom();
 api("/api/voice/config").then(applyVoiceConfig).catch(() => {});

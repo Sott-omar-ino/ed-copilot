@@ -2,7 +2,10 @@
 
 Sicurezza:
 - il server principale ascolta solo su 127.0.0.1; le API rispondono solo se la richiesta arriva dall'app
-  (intestazione X-ED-Copilot, che un sito esterno non può aggiungere) e con un Host locale (niente DNS rebinding);
+  (intestazione X-ED-Copilot, che un sito esterno non può aggiungere) e con un Host locale (niente DNS rebinding).
+  L'intestazione conserva il nome che l'app aveva prima di chiamarsi Voidwatch ED: non si vede da nessuna parte e la
+  usano l'interfaccia, l'overlay, il companion e main.py (anche una versione precedente che cerca quella già aperta),
+  quindi cambiarla romperebbe la compatibilità senza alcun vantaggio;
 - il companion per telefono usa un secondo server sulla rete locale, acceso solo se lo attivi nelle impostazioni,
   che accetta esclusivamente richieste con il codice segreto (contenuto nel QR) e solo per le API del companion.
 """
@@ -38,7 +41,8 @@ from . import bio_predict  # noqa: E402
 FEATURES += (bio_predict,)
 FEATURES += (mining,)
 
-APP_ID = "ed-copilot"
+# Risposta di /api/ping: main.py la usa per non aprire l'app due volte (riconosce anche "ed-copilot", il vecchio nome).
+APP_ID = "voidwatch-ed"
 MAX_JSON = 2 * 1024 * 1024
 CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
                  ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png",
@@ -368,7 +372,7 @@ def _settings(q):
     return {"inara": {"configured": inara.configured()}, "update": updater.status(), "overlay": overlay.status(),
             "discord": discord.status(),
             "lan": {**_lan_info(), "tls_available": tls.available()},
-            "version": updater.VERSION, "ui_lang": lang.current(), "data_dir": paths.DATA_DIR, "update_repo": cfg.get("update_repo") or updater.DEFAULT_REPO,
+            "version": updater.VERSION, "ui_lang": lang.current(), "data_dir": paths.DATA_DIR, "update_repo": updater.normalize_repo(cfg.get("update_repo")),
             # Guida al primo avvio (web/js/views/benvenuto.js): già vista? Il journal c'è?
             "welcome_seen": bool(cfg.get("welcome_seen")),
             "journal": {"dir": paths.JOURNAL_DIR, "found": os.path.isdir(paths.JOURNAL_DIR),
@@ -381,7 +385,9 @@ def _route_plot(tool):
 
 
 GET = {
-    "/api/ping": lambda q: {"app": APP_ID},
+    # "ca": nome dell'app nel certificato della CA, per le istruzioni del companion (le CA create prima del cambio di
+    # nome si chiamano ancora "ED Copilot - CA rete locale" e non vengono rigenerate).
+    "/api/ping": lambda q: {"app": APP_ID, "ca": tls.ca_app_name()},
     "/api/state": _state,
     "/api/static": _static,
     "/api/todos": lambda q: storage.TODOS.load(),
@@ -554,7 +560,7 @@ class Handler(BaseHTTPRequestHandler):
                     if not der:
                         return self._send(404, {"error": pick("non trovato", "not found")})
                     return self._send(200, der, "application/x-x509-ca-cert",
-                                      extra={"Content-Disposition": 'attachment; filename="ED-Copilot-CA.crt"'})
+                                      extra={"Content-Disposition": 'attachment; filename="Voidwatch-ED-CA.crt"'})
                 if path in GET:
                     return self._send(200, GET[path](q))
                 if path in BINARY_GET:
@@ -594,6 +600,9 @@ class Handler(BaseHTTPRequestHandler):
             self._send(400, {"error": str(exc)})
         except Exception as exc:
             print(f"[Server] {method} {path}: {exc!r}")
+            if "decompress" in str(exc):  # errore raro, non ancora riprodotto: serve sapere dove nasce
+                import traceback
+                print("".join(traceback.format_exc().splitlines(True)[-8:]))
             self._send(502, {"error": pick(f"Operazione non riuscita: {exc}", f"Operation failed: {exc}")})
 
     def do_GET(self):

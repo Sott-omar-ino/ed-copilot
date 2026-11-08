@@ -11,13 +11,13 @@ import threading
 import urllib.parse
 import urllib.request
 
-from . import coriolis, paths
+from . import VERSION, coriolis, paths
 from .gamedata import SHIP_NAMES
 
 CACHE_FILE = paths.cache_file("ship_images.json")
 API = "https://elite-dangerous.fandom.com/api.php"
 ALLOWED_HOST = "static.wikia.nocookie.net"
-UA = {"User-Agent": "ED-Helper/1.0 (local companion app)"}
+UA = {"User-Agent": f"Voidwatch-ED/{VERSION} (local companion app)"}
 _lock = threading.Lock()
 _cache = None
 

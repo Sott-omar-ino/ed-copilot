@@ -1,4 +1,4 @@
-"""Punto di avvio di ED Copilot (dai sorgenti: python run.py)."""
+"""Punto di avvio di Voidwatch ED (dai sorgenti: python run.py)."""
 
 from app.main import main
 

@@ -1,6 +1,6 @@
-<p align="center"><img src="docs/logo.png" alt="ED Copilot" width="560"></p>
+<p align="center"><img src="docs/logo.png" alt="Voidwatch ED" width="560"></p>
 
-# ED Copilot
+# Voidwatch ED
 
 A free desktop companion for **Elite Dangerous** on Windows. It reads the journal files the game writes for
 third-party tools and shows everything live while you play, with a voice copilot, an in-game overlay and a phone
@@ -10,10 +10,11 @@ companion. Interface in **English** and **Italian**.
 
 ## Download
 
-Get `ED Copilot.exe` from the [latest release](https://github.com/Sott-omar-ino/ed-copilot/releases/latest).
+Get `Voidwatch ED.exe` from the [latest release](https://github.com/Sott-omar-ino/voidwatch-ed/releases/latest).
 It's portable: no installation. Requirements: Windows 10/11 with Microsoft Edge WebView2 (already included in Windows 11).
 
-Your data stays in the `ED Copilot - dati` folder next to the exe. To move to another PC, copy the exe together with
+Your data stays in the `Voidwatch ED - dati` folder next to the exe (an old `ED Copilot - dati` folder is renamed
+automatically on first start). To move to another PC, copy the exe together with
 that folder (or use *Settings → General → Backup*).
 
 The exe is not code-signed yet, so Windows SmartScreen may warn you the first time ("More info → Run anyway").
@@ -70,7 +71,7 @@ If you spot something wrong, please open an issue.
 
 ## Feedback
 
-Open an [issue](https://github.com/Sott-omar-ino/ed-copilot/issues). For bugs, attach `registro.log` from the data
+Open an [issue](https://github.com/Sott-omar-ino/voidwatch-ed/issues). For bugs, attach `registro.log` from the data
 folder and describe what you were doing.
 
 ## Running from source
@@ -78,12 +79,12 @@ folder and describe what you were doing.
 ```
 pip install -r requirements.txt
 python run.py            # --browser to open in a browser, --headless for the server only
-python tools\build_exe.py  # builds ED Copilot.exe (needs pyinstaller)
+python tools\build_exe.py  # builds Voidwatch ED.exe (needs pyinstaller)
 ```
 
 ## License
 
 GNU GPL v2 or later — see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Elite Dangerous is a trademark of Frontier Developments plc. ED Copilot is an unofficial fan project, not affiliated
+Elite Dangerous is a trademark of Frontier Developments plc. Voidwatch ED is an unofficial fan project, not affiliated
 with or endorsed by Frontier Developments.

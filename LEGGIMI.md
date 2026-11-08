@@ -1,15 +1,17 @@
-# ED Copilot
+# Voidwatch ED
 
 Companion per Elite Dangerous: legge il journal del gioco in tempo reale e ti mostra sistema, flotta, materiali,
 ingegneri, missioni, statistiche, Powerplay, rotte (Spansh), commercio, estrazione, colonizzazione, un configuratore navi
 con lista della spesa dei materiali, un overlay da tenere sopra il gioco e un copilota vocale.
+Fino alla versione 6.0 si chiamava *ED Copilot*.
 
 ## Avvio
 
-Fai doppio clic su **`ED Copilot.exe`**. Si apre nella sua finestra (non nel browser). Non serve installare nulla:
+Fai doppio clic su **`Voidwatch ED.exe`**. Si apre nella sua finestra (non nel browser). Non serve installare nulla:
 serve solo Windows 10/11 con Microsoft Edge WebView2, già presente in Windows 11.
 
-È **portatile**: i tuoi dati stanno nella cartella **`ED Copilot - dati`** accanto all'eseguibile.
+È **portatile**: i tuoi dati stanno nella cartella **`Voidwatch ED - dati`** accanto all'eseguibile
+(una vecchia cartella `ED Copilot - dati` viene rinominata da sola al primo avvio).
 Per spostare l'app su un altro PC copia l'exe insieme a quella cartella.
 
 Se riapri l'exe mentre è già aperto, viene riportata in primo piano la finestra esistente.
@@ -71,19 +73,19 @@ i clic al gioco. In Elite usa la modalità video "Finestra senza bordi": lo sche
 
 ## Aggiornamenti
 
-Le nuove versioni arrivano dalle release di GitHub (github.com/Sott-omar-ino/ed-copilot); nelle **Impostazioni** puoi
+Le nuove versioni arrivano dalle release di GitHub (github.com/Sott-omar-ino/voidwatch-ed); nelle **Impostazioni** puoi
 indicare un altro repository.
-Una versione si installa solo se la release contiene `ED Copilot.exe` con la sua impronta SHA-256
+Una versione si installa solo se la release contiene `Voidwatch ED.exe` con la sua impronta SHA-256
 e solo quando premi "Installa": l'app si chiude e si riapre aggiornata.
 
 ## In caso di problemi
 
-L'app scrive un registro in `ED Copilot - dati\registro.log`.
+L'app scrive un registro in `Voidwatch ED - dati\registro.log`.
 
 ## Per sviluppatori
 
 ```
-ED Copilot.exe          l'app compilata (portatile)
+Voidwatch ED.exe        l'app compilata (portatile)
 Avvia dai sorgenti.bat  avvio dai sorgenti (installa le librerie al primo avvio)
 run.py                  punto di avvio
 app/                    server Python
@@ -112,12 +114,12 @@ tools/                  compilazione dell'exe, zip da condividere, test della fi
 
 - Avvio dai sorgenti: `pip install -r requirements.txt` e poi `python run.py`
   (`--browser` per aprire nel browser, `--headless` per il solo server).
-  Variabili utili per le prove: `ED_COPILOT_PORT` (porta iniziale, per non scontrarsi con l'exe aperto)
-  e `ED_COPILOT_DATA` (cartella dati alternativa).
+  Variabili utili per le prove: `VOIDWATCH_PORT` (porta iniziale, per non scontrarsi con l'exe aperto)
+  e `VOIDWATCH_DATA` (cartella dati alternativa); valgono ancora i vecchi nomi `ED_COPILOT_PORT` e `ED_COPILOT_DATA`.
 - Compilazione: `pip install pyinstaller` e poi `python tools\build_exe.py`.
 - Zip da condividere (solo exe e LEGGIMI, senza dati personali): `python tools\make_release_zip.py`.
 
 ## Licenza
 
 Software libero con licenza GNU GPL versione 2 o successiva (vedi `LICENSE` e `THIRD_PARTY_NOTICES.md`).
-Elite Dangerous è un marchio di Frontier Developments plc; ED Copilot è un progetto amatoriale non ufficiale.
+Elite Dangerous è un marchio di Frontier Developments plc; Voidwatch ED è un progetto amatoriale non ufficiale.

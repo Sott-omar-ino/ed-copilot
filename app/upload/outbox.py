@@ -18,7 +18,7 @@ DESTS = ("eddn", "edsm", "inara")
 QUEUE_FILE = paths.cache_file("invio_coda.json")
 MAX_ITEMS = {"eddn": 1000, "edsm": 5000, "inara": 2000}
 SAVE_EVERY = 3
-USER_AGENT = f"ED-Copilot/{VERSION}"
+USER_AGENT = f"Voidwatch-ED/{VERSION}"
 
 
 class Outbox:

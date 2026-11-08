@@ -86,7 +86,7 @@ function diarySettings(list) {
   // F10 = screenshot predefinito, salvato in BMP in Pictures\Frontier Developments\Elite Dangerous
   // (forums.frontier.co.uk/threads/where-does-it-store-ed-screenshots.534204).
   return `<div class="sub" style="margin-bottom:10px">Il gioco salva gli screenshot (F10) in BMP in <span class="mono">${esc(s.pictures_dir)}</span>.
-      ED Copilot li converte in PNG con il nome del sistema, del corpo e la data, e li collega alla cronologia.</div>
+      Voidwatch ED li converte in PNG con il nome del sistema, del corpo e la data, e li collega alla cronologia.</div>
     <form class="form" data-form="${f}" id="f-diary-shots">
       ${chk(f, "convert", s.convert, "Converti automaticamente i nuovi screenshot")}
       ${chk(f, "delete_bmp", s.delete_bmp, "Elimina il BMP originale dopo la conversione")}

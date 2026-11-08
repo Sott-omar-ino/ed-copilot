@@ -19,7 +19,7 @@ from .outbox import Sender, backoff, get_json, post
 API_URL = "https://www.edsm.net/api-journal-v1"
 DISCARD_URL = "https://www.edsm.net/api-journal-v1/discard"
 DISCARD_CACHE = paths.cache_file("edsm_scarti.json")
-SOFTWARE = "ED Copilot"
+SOFTWARE = "Voidwatch ED"
 BATCH_WAIT, BATCH_MAX = 15, 100
 LOCATION = ("FSDJump", "Location", "Docked", "CarrierJump")
 AUTH_ERRORS = (201, 202, 203, 204, 205)

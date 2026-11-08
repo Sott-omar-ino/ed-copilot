@@ -26,8 +26,8 @@ import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-_TMP = tempfile.mkdtemp(prefix="edc_tls_test_")
-os.environ["ED_COPILOT_DATA"] = os.path.join(_TMP, "data")  # app.paths crea le sue cartelle qui, non nei dati veri
+_TMP = tempfile.mkdtemp(prefix="voidwatch_tls_test_")
+os.environ["VOIDWATCH_DATA"] = os.path.join(_TMP, "data")  # app.paths crea le sue cartelle qui, non nei dati veri
 from app import tls  # noqa: E402
 
 from cryptography import x509  # noqa: E402
@@ -230,6 +230,23 @@ def main():
     check(verify_crypto(files, tls._load_cert(files["cert"]), "10.0.0.7")[0], "IP nuovo: catena valida")
     check(tls.ip_covered("192.168.0.10") and tls.ip_covered("100.64.0.1") and not tls.ip_covered("8.8.8.8")
           and not tls.ip_covered("127.0.0.1") and not tls.ip_covered("x"), "ip_covered")
+
+    # --- cambio di nome dell'app (ED Copilot -> Voidwatch ED): la CA già fidata dal telefono non si rigenera --------
+    renamed = folder("rename")
+    saved = tls.CN, tls.CA_CN, tls.CA_INT_CN
+    tls.CN, tls.CA_CN, tls.CA_INT_CN = "ED Copilot", "ED Copilot - CA rete locale", "ED Copilot - CA intermedia rete locale"
+    try:
+        tls.ensure_cert(LAN_IP, renamed)
+    finally:
+        tls.CN, tls.CA_CN, tls.CA_INT_CN = saved
+    fp_old_ca = tls.ca_fingerprint(renamed)
+    check(tls.ca_app_name(renamed) == "ED Copilot", "vecchia CA: ca_app_name legge il vecchio nome")
+    tls.ensure_cert(LAN_IP, renamed)
+    tls.ensure_cert("10.0.0.9", renamed)
+    check(tls.ca_fingerprint(renamed) == fp_old_ca, "nome nuovo: la vecchia CA 'ED Copilot' resta la stessa")
+    check(verify_crypto(tls._files(renamed), tls._load_cert(tls._files(renamed)["cert"]), "10.0.0.9")[0],
+          "nome nuovo: nuovo certificato del server firmato dalla vecchia intermedia, catena valida")
+    check(tls.ca_app_name(d) == "Voidwatch ED", "CA nuova: nome Voidwatch ED")
 
     # --- aggiornamento da una versione precedente (certificato autofirmato) --------------------------------------
     old = folder("upgrade")

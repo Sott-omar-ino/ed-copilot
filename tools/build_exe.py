@@ -1,4 +1,4 @@
-"""Compila ED Copilot in un unico eseguibile portatile: "ED Copilot.exe" nella radice del progetto.
+"""Compila Voidwatch ED in un unico eseguibile portatile: "Voidwatch ED.exe" nella radice del progetto.
 
 Uso:  python tools\\build_exe.py
 Richiede: pip install -r requirements.txt pyinstaller
@@ -12,11 +12,11 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NAME = "ED Copilot"
+NAME = "Voidwatch ED"
 
 
 def main():
-    work = tempfile.mkdtemp(prefix="edcopilot_build_")
+    work = tempfile.mkdtemp(prefix="voidwatch_build_")
     sep = os.pathsep
     data = [("web", "web"), ("defaults", "defaults"), ("assets", "assets"), (os.path.join("data", "catalog.json"), "data")]
     cmd = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",

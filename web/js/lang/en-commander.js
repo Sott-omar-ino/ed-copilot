@@ -336,7 +336,7 @@ LANG.add({
   "Ultima conversione: {} convertiti, {} saltati": "Last conversion: {} converted, {} skipped",
   "Ultima conversione: {} convertiti, {} saltati,": "Last conversion: {} converted, {} skipped,",
   "Il gioco salva gli screenshot (F10) in BMP in": "The game saves screenshots (F10) as BMP in",
-  ". ED Copilot li converte in PNG con il nome del sistema, del corpo e la data, e li collega alla cronologia.": ". ED Copilot converts them to PNG named after the system, body and date, and links them to the timeline.",
+  ". Voidwatch ED li converte in PNG con il nome del sistema, del corpo e la data, e li collega alla cronologia.": ". Voidwatch ED converts them to PNG named after the system, body and date, and links them to the timeline.",
   "Converti automaticamente i nuovi screenshot": "Automatically convert new screenshots",
   "Elimina il BMP originale dopo la conversione": "Delete the original BMP after conversion",
   "Cartella PNG": "PNG folder",
@@ -446,8 +446,8 @@ LANG.add({
   "Colonizzazione": "Colonisation",
   "Esobiologia": "Exobiology",
   "Estrazione": "Mining",
-  "Il server di rete del copilota è spento (forse hai disattivato l'accesso dal telefono): gli altri non possono raggiungerti.":
-    "The copilot's network server is off (maybe you turned off phone access): the others can't reach you.",
+  "Il server di rete dell'app è spento (forse hai disattivato l'accesso dal telefono): gli altri non possono raggiungerti.":
+    "The app's network server is off (maybe you turned off phone access): the others can't reach you.",
   "Riaccendi": "Turn back on",
   "Chiudi squadriglia": "Close the squad",
   "Indirizzo in rete locale": "Local network address",
@@ -468,10 +468,10 @@ LANG.add({
   "Esci dalla squadriglia": "Leave the squad",
   "Sei in una squadriglia": "You're in a squad",
   "MEMBRO": "MEMBER",
-  "Tu e i tuoi amici, ognuno con il suo copilota, vedete a vicenda nave, posizione, carburante e attività, con una lista di obiettivi comuni. Uno di voi ospita, gli altri entrano con indirizzo e codice. Massimo {} comandanti.":
-    "You and your friends, each with their own copilot, see each other's ship, location, fuel and activity, with a shared list of objectives. One of you hosts, the others join with an address and a code. Up to {} CMDRs.",
+  "Tu e i tuoi amici, ognuno con il suo Voidwatch ED, vedete a vicenda nave, posizione, carburante e attività, con una lista di obiettivi comuni. Uno di voi ospita, gli altri entrano con indirizzo e codice. Massimo {} comandanti.":
+    "You and your friends, each with their own Voidwatch ED, see each other's ship, location, fuel and activity, with a shared list of objectives. One of you hosts, the others join with an address and a code. Up to {} CMDRs.",
   "Ospita": "Host",
-  "Questo copilota apre la squadriglia sul suo server di rete cifrato e ti mostra il codice da dare agli amici.": "This copilot opens the squad on its encrypted network server and shows you the code to give your friends.",
+  "Questa app apre la squadriglia sul suo server di rete cifrato e ti mostra il codice da dare agli amici.": "This app opens the squad on its encrypted network server and shows you the code to give your friends.",
   "Ospita una squadriglia": "Host a squad",
   "Connessione cifrata non disponibile in questa installazione: non puoi ospitare.": "Encrypted connection not available in this installation: you can't host.",
   "Entra": "Join",
@@ -501,7 +501,7 @@ LANG.add({
   ": non c'è un server centrale, quindi il PC dell'host deve essere raggiungibile dagli altri. Due strade: inoltrare la porta {} (TCP) sul router dell'host verso questo PC e dare agli amici l'indirizzo pubblico, oppure usare una rete virtuale privata tra voi (come quelle che molti gruppi usano già per giocare): in quel caso si usa l'indirizzo dell'host in quella rete. Se nessuna delle due è possibile, la squadriglia via internet non funziona.":
     ": there's no central server, so the host's PC must be reachable by the others. Two ways: forward the port {} (TCP) on the host's router to this PC and give your friends the public address, or use a private virtual network between you (like the ones many groups already use to play): in that case you use the host's address on that network. If neither is possible, the squad won't work over the internet.",
   "del server di rete": "of the network server",
-  "Il firewall di Windows dell'host deve consentire le connessioni in entrata al copilota.": "The host's Windows firewall must allow incoming connections to the copilot.",
+  "Il firewall di Windows dell'host deve consentire le connessioni in entrata a Voidwatch ED.": "The host's Windows firewall must allow incoming connections to Voidwatch ED.",
   "Sicurezza": "Security",
   ": connessione cifrata, certificato verificato con l'impronta contenuta nel codice, limiti su richieste e dimensioni. Si scambiano solo i dati di stato qui sopra: nessun file, nessun comando.":
     ": encrypted connection, certificate checked against the fingerprint in the code, limits on requests and size. Only the status data above is exchanged: no files, no commands.",

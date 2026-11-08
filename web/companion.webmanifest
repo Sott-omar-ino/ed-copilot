@@ -1,8 +1,8 @@
 {
   "id": "/companion",
-  "name": "ED Copilot",
-  "short_name": "ED Copilot",
-  "description": "Companion di ED Copilot per Elite Dangerous: pulsantiera, telecomando e voce dal telefono.",
+  "name": "Voidwatch ED",
+  "short_name": "Voidwatch ED",
+  "description": "Companion di Voidwatch ED per Elite Dangerous: pulsantiera, telecomando e voce dal telefono.",
   "lang": "it",
   "start_url": "/companion",
   "scope": "/",

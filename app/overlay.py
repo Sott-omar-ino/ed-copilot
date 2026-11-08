@@ -10,7 +10,7 @@ import threading
 
 from .lang import pick
 
-TITLE = "ED Copilot Overlay"
+TITLE = "Voidwatch ED Overlay"   # come il <title> di web/overlay.html
 DEFAULTS = {"overlay_enabled": False, "overlay_locked": False, "overlay_x": 40, "overlay_y": 120,
             "overlay_w": 330, "overlay_h": 230, "overlay_opacity": 80}
 

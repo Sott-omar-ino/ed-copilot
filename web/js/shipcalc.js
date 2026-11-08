@@ -411,7 +411,7 @@
   }
 
   // ==========================================================================
-  // Codice di condivisione ED Copilot: la configurazione completa (anche le ingegnerie stimate), senza perdite.
+  // Codice di condivisione Voidwatch ED: la configurazione completa (anche le ingegnerie stimate), senza perdite.
   // Formato: "EDC1." + base64 URL-safe del JSON UTF-8.
   // ==========================================================================
   const CODE_PREFIX = "EDC1.";
@@ -445,10 +445,10 @@
   }
   function decodeCode(catalog, code) {
     code = String(code || "").replace(/\s+/g, "");
-    if (!code.startsWith(CODE_PREFIX)) throw new Error("Non è un codice ED Copilot");
+    if (!code.startsWith(CODE_PREFIX)) throw new Error("Non è un codice Voidwatch ED");
     if (code.length > 60000) throw new Error("Codice troppo lungo");
     let o;
-    try { o = JSON.parse(b64url.dec(code.slice(CODE_PREFIX.length))); } catch { throw new Error("Codice ED Copilot danneggiato"); }
+    try { o = JSON.parse(b64url.dec(code.slice(CODE_PREFIX.length))); } catch { throw new Error("Codice Voidwatch ED danneggiato"); }
     if (!o || o.v !== 1 || typeof o.s !== "string" || !Object.prototype.hasOwnProperty.call(catalog.ships, o.s))
       throw new Error("Nave del codice non trovata nel catalogo");
     const ship = catalog.ships[o.s];

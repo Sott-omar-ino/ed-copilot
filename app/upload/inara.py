@@ -13,13 +13,15 @@ import os
 import time
 from datetime import datetime, timezone
 
-from .. import VERSION
+from .. import VERSION, paths
 from ..lang import pick
 from .outbox import Sender, backoff, post
 
 ENDPOINT = "https://inara.cz/inapi/v1/"
-APP_NAME = "ED Copilot"
-DEV = os.environ.get("ED_COPILOT_INARA_DEV") == "1"   # isBeingDeveloped: per le prove su un account di test
+# Nome con cui Inara identifica l'app: deve essere nella sua lista delle app approvate. La richiesta era stata fatta con il
+# vecchio nome ("ED Copilot"); finché Inara non approva questo, risponde "no access allowed" e l'app lo spiega (not_approved).
+APP_NAME = "Voidwatch ED"
+DEV = paths.env("INARA_DEV") == "1"   # VOIDWATCH_INARA_DEV (o ED_COPILOT_INARA_DEV): isBeingDeveloped, prove su un account di test
 MIN_INTERVAL, BATCH_WAIT, BATCH_MAX = 45, 10, 200
 MAX_AGE = 30 * 86400                                   # Inara non accetta eventi più vecchi di 30 giorni
 RANK_NAMES = ("Combat", "Trade", "Explore", "Soldier", "Exobiologist", "Empire", "Federation", "CQC")

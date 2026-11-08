@@ -19,7 +19,7 @@ from collections import Counter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-os.environ.setdefault("ED_COPILOT_DATA", tempfile.mkdtemp(prefix="edcopilot-test-"))  # niente scritture nei dati veri
+os.environ.setdefault("VOIDWATCH_DATA", tempfile.mkdtemp(prefix="voidwatch-test-"))  # niente scritture nei dati veri
 
 from app import paths, upload                    # noqa: E402
 from app.upload import eddn, edsm, inara, outbox  # noqa: E402
@@ -130,7 +130,7 @@ def check_eddn(msgs, validators):
         for flag in eddn.FLAGS:
             check(flag not in m["message"] or isinstance(m["message"][flag], bool), f"{schema}: {flag} non booleano")
         h = m["header"]
-        check(h["softwareName"] == "ED Copilot" and h["softwareVersion"] and h["uploaderID"], f"{schema}: header incompleto")
+        check(h["softwareName"] == "Voidwatch ED" and h["softwareVersion"] and h["uploaderID"], f"{schema}: header incompleto")
         check(isinstance(h["gameversion"], str) and isinstance(h["gamebuild"], str), f"{schema}: gameversion/gamebuild")
         v = validators.get(ref.removesuffix("/test"))
         if v:
@@ -254,7 +254,7 @@ def check_senders():
     check(s.paused and "Invalid application name" in s.paused and box.count("inara") == 1,
           "Inara: rifiuto del gruppo -> pausa con il testo di Inara, eventi in coda")
     sent = json.loads(inara.post.calls[0][1])
-    check(sent["header"]["appName"] == "ED Copilot" and sent["header"]["commanderName"] == "Io", "Inara: header")
+    check(sent["header"]["appName"] == "Voidwatch ED" and sent["header"]["commanderName"] == "Io", "Inara: header")
 
     # coda persistente e sostituzioni
     path = os.path.join(tempfile.mkdtemp(), "coda.json")

@@ -97,7 +97,7 @@ VIEWS.fuelrats = () => {
   if (!r?.data) return panel("Fuel Rats", r?.error ? `<div class="bad">⚠ ${esc(r.error)}</div>` : '<div class="loading">CONTROLLO DEL CARBURANTE</div>');
   const d = r.data, cfg = d.config;
   const steps = `<ol class="fr-steps">${FR_STEPS.map(([t, x]) => `<li><b>${t}</b><div>${x}</div></li>`).join("")}</ol>
-    <div class="sub" style="margin-top:8px">Procedura di The Fuel Rats, tradotta e riassunta da ED Copilot. Il merito è tutto loro.</div>`;
+    <div class="sub" style="margin-top:8px">Procedura di The Fuel Rats, tradotta e riassunta da Voidwatch ED. Il merito è tutto loro.</div>`;
   const prevent = `<ul class="fr-tips">
       <li>Monta un <b>fuel scoop</b>: puoi rifornirti gratis dalle stelle di classe K, G, B, F, O, A, M (KGBFOAM).</li>
       <li>Tieni una scorta: rifornisciti prima dell'avviso di carburante basso del gioco (sotto il 25% del serbatoio).</li>

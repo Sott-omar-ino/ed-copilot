@@ -14,7 +14,7 @@ import threading
 import time
 import urllib.request
 
-from . import paths
+from . import VERSION, paths
 from .gamedata import _GRADES, BLUEPRINTS, ENGINEER_ALIASES, MATERIAL_GRADE
 
 # Il catalogo aggiornato sta nella cache dell'utente; quello incluso nel programma serve solo al primo avvio.
@@ -184,7 +184,7 @@ def _build(raw):
 
 
 def _download():
-    req = urllib.request.Request(SOURCE, headers={"User-Agent": "ED-Helper/1.0"})
+    req = urllib.request.Request(SOURCE, headers={"User-Agent": f"Voidwatch-ED/{VERSION}"})
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 

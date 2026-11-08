@@ -213,11 +213,11 @@ function sharePanel() {
       <h3>Condividi la build</h3>
       <div class="cfg-row">
         <button class="small primary" id="bs-copy-loadout" title="Evento Loadout del journal: lo leggono i configuratori e i siti della community">Copia la build (formato journal)</button>
-        <button class="small" id="bs-copy-code" title="Codice compatto che ED Copilot reimporta identico, ingegnerie comprese">Copia codice ED Copilot</button>
+        <button class="small" id="bs-copy-code" title="Codice compatto che Voidwatch ED reimporta identico, ingegnerie comprese">Copia codice Voidwatch ED</button>
       </div>
-      <div class="sub" style="margin-top:6px">Il formato journal porta moduli, slot, blueprint, grado ed effetto sperimentale; per una build pianificata i valori dei modificatori non ci sono (grado al tiro migliore). Il codice ED Copilot conserva tutto, ma lo legge solo ED Copilot.</div>
+      <div class="sub" style="margin-top:6px">Il formato journal porta moduli, slot, blueprint, grado ed effetto sperimentale; per una build pianificata i valori dei modificatori non ci sono (grado al tiro migliore). Il codice Voidwatch ED conserva tutto, ma lo legge solo Voidwatch ED.</div>
       <h3 style="margin-top:12px">Importa una build</h3>
-      <textarea id="bs-input" data-keep rows="3" maxlength="200000" spellcheck="false" placeholder="Incolla una build in formato journal (Loadout) o SLEF, un link di una build o un codice ED Copilot" style="width:100%;font-family:var(--mono, monospace);font-size:12px"></textarea>
+      <textarea id="bs-input" data-keep rows="3" maxlength="200000" spellcheck="false" placeholder="Incolla una build in formato journal (Loadout) o SLEF, un link di una build o un codice Voidwatch ED" style="width:100%;font-family:var(--mono, monospace);font-size:12px"></textarea>
       <div class="cfg-row" style="margin-top:6px">
         <button class="small primary" id="bs-import">Importa nel cantiere</button>
         ${m ? `<span class="${m.ok ? "ok" : "bad"}" style="font-size:12px">${esc(m.text)}</span>` : ""}
@@ -270,7 +270,7 @@ document.addEventListener("click", e => {
     const warn = [approx.length ? `nomi stimati per ${approx.length} slot` : "", skipped.length ? `${skipped.length} moduli senza simbolo esclusi` : ""].filter(Boolean).map(w => LANG.t(w));
     copyText(JSON.stringify(loadout, null, 2), LANG.t("Build copiata in formato journal") + (warn.length ? " (" + warn.join(", ") + ")" : ""));
   } else if (t.id === "bs-copy-code") {
-    copyText(ShipCalc.encodeCode(UI.cfg, UI.cfgName), "Codice ED Copilot copiato");
+    copyText(ShipCalc.encodeCode(UI.cfg, UI.cfgName), "Codice Voidwatch ED copiato");
   } else if (t.id === "bs-import") {
     const input = $("bs-input");
     shareImport(input?.value).then(r => {

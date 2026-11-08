@@ -7,9 +7,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from . import VERSION
 from .lang import pick
 
-USER_AGENT = "ED-Copilot/1.0 (local companion app)"
+USER_AGENT = f"Voidwatch-ED/{VERSION} (local companion app)"
 BASE = "https://spansh.co.uk/api/"
 
 

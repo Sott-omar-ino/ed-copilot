@@ -5,7 +5,7 @@ connessioni sicure (HTTPS). Fonti: MDN "Using Service Workers" ("Service workers
 for security reasons") e web.dev/articles/install-criteria ("Be served over HTTPS").
 
 Certificati (cartella cache/tls dei dati dell'app), creati una volta per PC:
-- CA RADICE "ED Copilot" (ca.crt): è il certificato che si installa e si rende attendibile sul telefono. La sua chiave
+- CA RADICE "Voidwatch ED" (ca.crt): è il certificato che si installa e si rende attendibile sul telefono. La sua chiave
   privata NON viene mai salvata: serve solo un istante per firmare la CA intermedia e poi viene buttata. Nessuno, nemmeno
   chi copiasse la cartella dei dati, può più usarla per firmare altro.
 - CA INTERMEDIA (ca-int.crt + ca-int.key): firma il certificato del server. Ha gli stessi vincoli della radice.
@@ -46,9 +46,12 @@ HANDSHAKE_TIMEOUT = 10  # secondi concessi al telefono per completare l'handshak
 VALID_DAYS = 825
 RENEW_DAYS = 30
 CA_DAYS = 3650          # CA radice e intermedia: 10 anni (rinnovarle vuol dire installare di nuovo il certificato)
-CN = "ED Copilot"
-CA_CN = "ED Copilot - CA rete locale"
-CA_INT_CN = "ED Copilot - CA intermedia rete locale"
+# Nomi usati SOLO per i certificati nuovi. Le CA create quando l'app si chiamava "ED Copilot" portano ancora quel nome:
+# _ca_ok e _cert_ok non guardano i nomi (solo file, vincoli, firme, chiavi e scadenze), quindi il cambio di nome non
+# rigenera nulla e i telefoni che si fidano già della vecchia CA continuano a funzionare.
+CN = "Voidwatch ED"
+CA_CN = f"{CN} - CA rete locale"
+CA_INT_CN = f"{CN} - CA intermedia rete locale"
 CA_PATH = "/companion-ca.crt"   # indirizzo pubblico (senza codice) del certificato della CA radice, solo la parte pubblica
 # Reti private ammesse dai vincoli (RFC 1918 + RFC 6598).
 PRIVATE_NETS = tuple(ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10"))
@@ -300,6 +303,29 @@ def ca_der(folder=None):
 def _hex(der):
     digest = hashlib.sha256(der).hexdigest().upper()
     return ":".join(digest[i:i + 2] for i in range(0, len(digest), 2))
+
+
+_ca_name_cache = {}
+
+
+def ca_app_name(folder=None):
+    """Nome dell'app scritto nella CA radice (campo Organization): "Voidwatch ED", oppure "ED Copilot" per una CA
+    creata da una versione precedente. Serve alle istruzioni del companion, che citano il nome del profilo."""
+    path = os.path.join(folder or paths.cache_file("tls"), "ca.crt")  # senza creare la cartella (come _files)
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return CN
+    if _ca_name_cache.get("key") != (path, mtime):
+        name = CN
+        try:
+            from cryptography.x509.oid import NameOID
+            attrs = _load_cert(path).subject.get_attributes_for_oid(NameOID.ORGANIZATION_NAME)
+            name = str(attrs[0].value) if attrs else CN
+        except Exception:
+            pass
+        _ca_name_cache.update(key=(path, mtime), name=name)
+    return _ca_name_cache["name"]
 
 
 def ca_fingerprint(folder=None):

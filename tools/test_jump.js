@@ -6,7 +6,7 @@
 // 2. Regressione sul journal: ogni evento Loadout diverso (sola lettura) deve dare lo stesso MaxJumpRange e UnladenMass
 //    che scrive il gioco. Cartella: argomento, oppure ED_JOURNAL_DIR, oppure quella standard; se manca la parte si salta.
 // 3. Preset del cantiere: fanno quello che dice la descrizione, su tutte le navi del catalogo.
-// 4. Andata e ritorno: Loadout -> configurazione -> Loadout -> configurazione e codice ED Copilot, stessi numeri.
+// 4. Andata e ritorno: Loadout -> configurazione -> Loadout -> configurazione e codice Voidwatch ED, stessi numeri.
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -48,7 +48,7 @@ console.log("1. Panther Clipper Mk II, build \"Salto massimo\" segnalata (riferi
   cfg.internal[1] = { id: id("sg", 7, "E") };
   cfg.internal[7] = { id: id("gfsb", 5, "H") };
   const r = SC.compute(catalog, cfg);
-  console.log(`   ED Copilot: max ${r.jump.max.toFixed(2)}  full ${r.jump.full.toFixed(2)}  laden ${r.jump.laden.toFixed(2)}  unladen ${r.unladen.toFixed(1)} t`);
+  console.log(`   Voidwatch ED: max ${r.jump.max.toFixed(2)}  full ${r.jump.full.toFixed(2)}  laden ${r.jump.laden.toFixed(2)}  unladen ${r.unladen.toFixed(1)} t`);
   console.log(`   EDSY      : max ${ref.max.toFixed(2)}  full ${ref.full.toFixed(2)}  laden ${ref.laden.toFixed(2)}  unladen ${ref.unladen.toFixed(1)} t`);
   ok(near(r.unladen, ref.unladen, 0.01), "massa a vuoto diversa da EDSY");
   ok(near(r.jump.max, ref.max, 0.005) && near(r.jump.full, ref.full, 0.005) && near(r.jump.laden, ref.laden, 0.005), "portata diversa da EDSY");
@@ -100,13 +100,13 @@ for (const e of loadouts) {
     ok(near(r.jump.max, e.MaxJumpRange, 0.01), `${tag}: salto ${r.jump.max.toFixed(3)} invece di ${e.MaxJumpRange.toFixed(3)}`);
     strict++;
   }
-  // 4. Andata e ritorno (formato journal e codice ED Copilot).
+  // 4. Andata e ritorno (formato journal e codice Voidwatch ED).
   const back = SC.toLoadout(catalog, cfg, { slotTable }).loadout;
   const cfg2 = SC.fromLoadout(catalog, back.Ship, back.Modules, slotTable);
   const r2 = SC.compute(catalog, cfg2);
   ok(near(r2.unladen, r.unladen, 1e-6) && near(r2.jump.max, r.jump.max, 1e-6), `${tag}: andata e ritorno del Loadout cambia i numeri`);
   const r3 = SC.compute(catalog, SC.decodeCode(catalog, SC.encodeCode(cfg, "x")).cfg);
-  ok(near(r3.unladen, r.unladen, 1e-6) && near(r3.jump.max, r.jump.max, 1e-6) && near(r3.cost, r.cost, 1e-6), `${tag}: codice ED Copilot cambia i numeri`);
+  ok(near(r3.unladen, r.unladen, 1e-6) && near(r3.jump.max, r.jump.max, 1e-6) && near(r3.cost, r.cost, 1e-6), `${tag}: codice Voidwatch ED cambia i numeri`);
 }
 if (loadouts.length) console.log(`   ${loadouts.length} Loadout: ${strict} confrontati con massa e salto del gioco, ${pre} prima del ribilanciamento, ${skipped} saltati`);
 

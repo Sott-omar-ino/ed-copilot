@@ -1,4 +1,4 @@
-# Dipendenze per avviare ED Copilot dai sorgenti (l'eseguibile le contiene già tutte).
+# Dipendenze per avviare Voidwatch ED dai sorgenti (l'eseguibile le contiene già tutte).
 pywebview>=5.0        # finestra nativa (usa Microsoft Edge WebView2, già presente in Windows 11)
 edge-tts>=6.1         # voce del copilota (voci neurali Microsoft, serve internet)
 faster-whisper>=1.0   # riconoscimento vocale locale

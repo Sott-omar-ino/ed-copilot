@@ -31,6 +31,9 @@ MIN_SECONDS = 0.3
 MAX_SECONDS = 15.0
 LEARN_TIMEOUT = 10.0
 POLL_INTERVAL = 1 / 60
+# Un pulsante della cloche letto 60 volte al secondo può "sparire" per un istante anche se lo tieni premuto:
+# la registrazione si chiude solo dopo questo tempo di rilascio continuo.
+RELEASE_GRACE = 0.25
 IDLE_INTERVAL = 0.5          # spento: il thread controlla solo se va riacceso
 ENUM_INTERVAL = 4.0          # ogni quanto cercare cloche collegate/scollegate
 SAMPLE_RATE = 16000
@@ -602,6 +605,7 @@ def _loop():
     was_pressed = False
     wait_release = False
     learner = None
+    last_down = 0.0
     while True:
         try:
             with _lock:
@@ -632,7 +636,12 @@ def _loop():
                 continue
             if b["type"] == "joy":
                 _refresh_joys()
-            pressed = binding_pressed(b)
+            raw = binding_pressed(b)
+            now = time.time()
+            if raw:
+                last_down = now
+            # Durante la registrazione un rilascio più breve di RELEASE_GRACE non la interrompe.
+            pressed = raw or (_rt["recording"] and now - last_down < RELEASE_GRACE)
             edge = pressed and not was_pressed
             was_pressed = pressed
             if wait_release:

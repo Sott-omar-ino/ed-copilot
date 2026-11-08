@@ -1003,7 +1003,7 @@ LANG.add({
   "{} Dati del carburante: in tempo reale.": "{} Fuel data: live.",
   "{} Dati del carburante: dall'ultimo evento del journal.": "{} Fuel data: from the last journal event.",
   "CONTROLLO DEL CARBURANTE": "CHECKING FUEL",
-  "Procedura di The Fuel Rats, tradotta e riassunta da ED Copilot. Il merito è tutto loro.": "Procedure by The Fuel Rats, summarised by ED Copilot from their official guidance. All credit goes to them.",
+  "Procedura di The Fuel Rats, tradotta e riassunta da Voidwatch ED. Il merito è tutto loro.": "Procedure by The Fuel Rats, summarised by Voidwatch ED from their official guidance. All credit goes to them.",
   "Monta un": "Fit a",
   "fuel scoop": "fuel scoop",
   ": puoi rifornirti gratis dalle stelle di classe K, G, B, F, O, A, M (KGBFOAM).": ": you can refuel for free from K, G, B, F, O, A, M class stars (KGBFOAM).",

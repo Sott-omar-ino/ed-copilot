@@ -36,7 +36,7 @@ def _downloads():
 def export(body):
     """Crea lo zip nella cartella Download e la apre in Esplora risorse."""
     ui = (body or {}).get("ui") or {}
-    name = f"ED Copilot backup {time.strftime('%Y-%m-%d %H-%M')}.zip"
+    name = f"Voidwatch ED backup {time.strftime('%Y-%m-%d %H-%M')}.zip"
     out = os.path.join(_downloads(), name)
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         for f in _user_files():
@@ -48,8 +48,8 @@ def export(body):
             else:
                 z.write(path, f)
         z.writestr(UI_FILE, json.dumps({k: v for k, v in ui.items() if isinstance(v, str)}, ensure_ascii=False))
-        z.writestr("LEGGIMI.txt", pick("Backup di ED Copilot. Per ripristinarlo: Impostazioni -> Backup -> Importa.\n",
-                                         "ED Copilot backup. To restore it: Settings -> Backup -> Import.\n"))
+        z.writestr("LEGGIMI.txt", pick("Backup di Voidwatch ED. Per ripristinarlo: Impostazioni -> Backup -> Importa.\n",
+                                         "Voidwatch ED backup. To restore it: Settings -> Backup -> Import.\n"))
     try:
         subprocess.Popen(["explorer", "/select,", out])
     except OSError:
@@ -64,10 +64,10 @@ def restore(raw):
     try:
         z = zipfile.ZipFile(io.BytesIO(raw))
     except zipfile.BadZipFile:
-        raise ValueError(pick("Non è uno zip di backup di ED Copilot", "Not an ED Copilot backup zip"))
+        raise ValueError(pick("Non è uno zip di backup di Voidwatch ED", "Not a Voidwatch ED backup zip"))
     names = [n for n in z.namelist() if n.endswith(".json") and "/" not in n and "\\" not in n and not n.startswith(".")]
     if UI_FILE not in names:
-        raise ValueError(pick("Non è uno zip di backup di ED Copilot", "Not an ED Copilot backup zip"))
+        raise ValueError(pick("Non è uno zip di backup di Voidwatch ED", "Not a Voidwatch ED backup zip"))
     data = {}
     for n in names:
         info = z.getinfo(n)

@@ -62,7 +62,7 @@ function installAppNote(lan) {
     ? `<div class="bad" style="margin:8px 0">L'indirizzo di questo PC non è di una rete di casa: il telefono non potrà fidarsi del certificato e l'installazione come app non funzionerà.</div>` : "";
   return `<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--hud-faint)">
     <div class="eyebrow">Installa come app sul telefono</div>
-    <div class="sub" style="margin:6px 0 10px">Per avere il companion come app (icona sulla schermata Home, a schermo intero, senza la barra del browser) il telefono deve fidarsi del certificato di ED Copilot. Il certificato vale solo per gli indirizzi delle reti di casa: non può essere usato per nessun sito internet.</div>
+    <div class="sub" style="margin:6px 0 10px">Per avere il companion come app (icona sulla schermata Home, a schermo intero, senza la barra del browser) il telefono deve fidarsi del certificato di Voidwatch ED. Il certificato vale solo per gli indirizzi delle reti di casa: non può essere usato per nessun sito internet.</div>
     ${warn}
     <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
       ${lan.ca_url ? `<div class="qr-box"><img src="/api/qrcode?for=ca&ts=${encodeURIComponent(lan.ca_url)}" width="140" height="140" alt="QR code del certificato"></div>` : ""}
@@ -141,7 +141,7 @@ function updatePanel(st) {
     ${l?.notes && u.available ? `<div class="sub" style="margin-top:8px;white-space:pre-wrap;max-height:120px;overflow:auto">${esc(l.notes)}</div>` : ""}
     ${dataRow("Controlla all'avvio", "Se c'è una nuova versione la vedi qui; l'installazione parte solo quando premi il pulsante.",
       switchBtn("update-auto", u.auto, "Controlla all'avvio"))}
-    <div class="sub" style="margin-top:6px">Una versione si installa solo se la release contiene <b>ED Copilot.exe</b> con la sua impronta SHA-256:
+    <div class="sub" style="margin-top:6px">Una versione si installa solo se la release contiene <b>Voidwatch ED.exe</b> con la sua impronta SHA-256:
       un file corrotto o alterato non viene mai eseguito.</div>`;
 }
 
@@ -162,7 +162,7 @@ function discordPanel(st) {
 function backupPanel() {
   return dataRow("Esporta i dati", "Crea uno zip nella cartella Download con cose da fare, macro, controlli, avvisi, diario, allestimenti salvati e impostazioni (comprese le chiavi API di Inara ed EDSM: tienilo per te).",
       '<button class="small" id="backup-export">Esporta</button>')
-    + dataRow("Importa un backup", "Ripristina uno zip esportato da ED Copilot, anche da un altro PC. I dati attuali vengono prima copiati nella cartella cache.",
+    + dataRow("Importa un backup", "Ripristina uno zip esportato da Voidwatch ED, anche da un altro PC. I dati attuali vengono prima copiati nella cartella cache.",
       '<label class="btn small" style="cursor:pointer">Importa<input type="file" id="backup-import" accept=".zip" hidden></label>');
 }
 
@@ -301,7 +301,7 @@ const FAQ = [
   ["La panoramica è vuota o i dati non si aggiornano.",
     "L'app legge i journal che Elite Dangerous scrive mentre giochi. Avvia il gioco almeno una volta ed entra in partita: i dati arrivano da soli. Qui sotto vedi la cartella dei journal che l'app sta usando."],
   ["L'app modifica il gioco?",
-    "No. Legge solo i file journal e di stato che il gioco scrive apposta per i programmi esterni. I comandi alla nave (voce, pulsanti, macro, telefono) premono i tasti della tastiera che hai assegnato nei controlli del gioco, come faresti tu. ED Copilot è un progetto non ufficiale, non di Frontier."],
+    "No. Legge solo i file journal e di stato che il gioco scrive apposta per i programmi esterni. I comandi alla nave (voce, pulsanti, macro, telefono) premono i tasti della tastiera che hai assegnato nei controlli del gioco, come faresti tu. Voidwatch ED è un progetto non ufficiale, non di Frontier."],
   ["Un comando vocale non fa niente in gioco.",
     "Il comando deve avere un tasto della tastiera assegnato nei controlli del gioco: in Impostazioni → Audio → Tasti del gioco vedi quali mancano e puoi aggiungerli in automatico. Il gioco deve essere aperto: prima di premere un tasto l'app lo porta in primo piano."],
   ["L'overlay non si vede sopra il gioco.",
@@ -327,7 +327,7 @@ VIEWS.info = () => {
   const st = UI.res.serverSettings?.data;
   const faq = FAQ.map(([q, a]) => `<details class="faq"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("");
   return settingsTabs("info") + `<div class="grid even"><div class="col">
-    ${panel("ED Copilot", `
+    ${panel("Voidwatch ED", `
       <p>Companion per Elite Dangerous: legge il journal del gioco in tempo reale e ti aiuta con nave, rotte, commercio,
         missioni, ingegneri ed esplorazione, con un copilota vocale e un overlay da tenere sopra il gioco.</p>
       <table><tbody>
@@ -339,9 +339,9 @@ VIEWS.info = () => {
       ${dataRow("Guida iniziale", "I passi del primo avvio: journal, lingua, voce, tasti, push-to-talk e funzioni facoltative.",
         '<button class="small" data-welcome-open>Rivedi la guida iniziale</button>')}`, { code: "INFO" })}
     ${panel("Riconoscimenti", `
-      <p class="sub">ED Copilot è software libero e gratuito, distribuito con licenza GNU GPL versione 2 o successiva:
+      <p class="sub">Voidwatch ED è software libero e gratuito, distribuito con licenza GNU GPL versione 2 o successiva:
         puoi usarlo, studiarlo, modificarlo e ridistribuirlo alle stesse condizioni. Dettagli in LICENSE e THIRD_PARTY_NOTICES.md.</p>
-      <p class="sub">Elite Dangerous è un marchio di Frontier Developments plc. ED Copilot è un progetto amatoriale non ufficiale,
+      <p class="sub">Elite Dangerous è un marchio di Frontier Developments plc. Voidwatch ED è un progetto amatoriale non ufficiale,
         non affiliato né approvato da Frontier.</p>
       <p class="sub">Dati delle navi e dei moduli: progetto Coriolis (EDCD, licenza MIT). Le ricerche online usano i servizi
         pubblici della community; i collegamenti sono in Luoghi utili.</p>

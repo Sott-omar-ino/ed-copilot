@@ -1,3 +1,3 @@
-"""ED Copilot: companion locale per Elite Dangerous."""
+"""Voidwatch ED: companion locale per Elite Dangerous."""
 
-VERSION = "6.0"
+VERSION = "7.0"

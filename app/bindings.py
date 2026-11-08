@@ -18,7 +18,7 @@ import time
 import winreg
 import xml.etree.ElementTree as ET
 
-from . import kblayout
+from . import kblayout, paths
 from .lang import pick
 
 BINDINGS_DIR = os.path.join(os.environ.get("LOCALAPPDATA", ""), "Frontier Developments", "Elite Dangerous",
@@ -275,8 +275,9 @@ def assign_missing(names=None):
     Modifica solo i file dell'utente, dopo averne fatto una copia di sicurezza. Il gioco legge i controlli
     all'avvio: va riavviato (o ricaricato il preset dalle Opzioni) per vedere i nuovi tasti.
     """
-    # Le copie di prova dell'app (cartella dati alternativa, ED_COPILOT_DATA) non devono mai toccare i controlli veri.
-    if os.environ.get("ED_COPILOT_DATA") and os.path.normcase(BINDINGS_DIR).startswith(
+    # Le copie di prova dell'app (cartella dati alternativa, VOIDWATCH_DATA o il vecchio ED_COPILOT_DATA) non devono
+    # mai toccare i controlli veri.
+    if paths.env("DATA") and os.path.normcase(BINDINGS_DIR).startswith(
             os.path.normcase(os.environ.get("LOCALAPPDATA", "") or "?")):
         return {"done": [], "skipped": [], "error": pick("Istanza di prova: i controlli del gioco non vengono modificati.",
                                                          "Test instance: the game controls are not modified.")}
@@ -332,7 +333,7 @@ def assign_missing(names=None):
             used[key] = [c["name"]]
             done.append({"name": c["name"], "label": label(c["name"]), "key": key.replace("Key_", "")})
         if any(d["name"] in {c["name"] for c in cmds} for d in done):
-            backup = f"{path}.edcopilot-{time.strftime('%Y%m%d-%H%M%S')}.backup"
+            backup = f"{path}.voidwatch-{time.strftime('%Y%m%d-%H%M%S')}.backup"
             shutil.copy2(path, backup)
             tmp = path + ".tmp"
             with open(tmp, "wb") as fh:

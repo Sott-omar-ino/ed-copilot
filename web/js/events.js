@@ -167,6 +167,8 @@ document.addEventListener("click", e => {
   else if (d.quick) {
     const [, preset] = QUICK[+d.quick];
     UI.forms.search = { ...formData("search"), trader: "", ...preset };
+    // Le ricerche che hanno bisogno di un nome (arma, merce) aprono solo il modulo giusto.
+    if ((preset.mode === "module" && !preset.module) || (preset.mode === "buy" && !preset.commodity)) { renderView(); return; }
     run("search", async () => ({ ...(await api("/api/search", UI.forms.search)), mode: preset.mode }));
   } else if (d.minesell) {
     run("mineSell", () => api("/api/search", { mode: "sell", commodity: d.minesell, sort: "price", max_dist: 150, no_carriers: true }));

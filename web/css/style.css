@@ -1,4 +1,4 @@
-/* ED Copilot: interfaccia nello stile dei pannelli del cockpit di Elite Dangerous, con texture VHS. */
+/* Voidwatch ED: interfaccia nello stile dei pannelli del cockpit di Elite Dangerous, con texture VHS. */
 :root {
   color-scheme: dark;
   --void: #030100;
@@ -93,8 +93,8 @@ header.hud-top { grid-column: 1 / -1; display: flex; align-items: stretch;
 .brand svg path:first-child { stroke: var(--ink); }
 .brand svg path:nth-child(2) { fill: var(--ink); }
 .brand svg circle { fill: var(--hud); }
-.brand b { font-size: 18px; letter-spacing: .16em; font-weight: 800; line-height: 1; }
-.brand small { display: block; font: 600 10px var(--ui); letter-spacing: .2em; margin-top: 3px; opacity: .75; }
+.brand b { font-size: 16px; letter-spacing: .12em; font-weight: 800; line-height: 1; white-space: nowrap; }
+.brand small { display: block; font: 600 8.5px var(--ui); letter-spacing: .11em; margin-top: 4px; opacity: .75; white-space: nowrap; }
 .telemetry { flex: 1; display: flex; flex-wrap: nowrap; overflow: hidden; align-items: center; gap: 4px 26px; padding: 8px 22px; min-width: 0; }
 .tm { display: flex; flex-direction: column; min-width: 0; flex: 0 1 auto; }
 .tm > span:first-child { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); font-weight: 700; }

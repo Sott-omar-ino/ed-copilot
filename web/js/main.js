@@ -72,7 +72,7 @@ async function tick() {
 }
 
 async function boot() {
-  const lines = ["ED COPILOT // COCKPIT COMPANION", "> COLLEGAMENTO AL JOURNAL ........", "> SINCRONIZZAZIONE TELEMETRIA ....",
+  const lines = ["VOIDWATCH ED // ELITE DANGEROUS COMPANION", "> COLLEGAMENTO AL JOURNAL ........", "> SINCRONIZZAZIONE TELEMETRIA ....",
     "> CARICAMENTO DATABASE GALATTICO ..", "> CALIBRAZIONE HUD OLOGRAFICO ....."].map(l => t(l));
   const pre = $("boot-text");
   if (!SETTINGS.boot || sessionStorage.getItem("booted") || matchMedia("(prefers-reduced-motion: reduce)").matches) {

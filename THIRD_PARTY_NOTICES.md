@@ -1,6 +1,6 @@
 # Licenses and third-party data
 
-ED Copilot is free software: you can redistribute it and/or modify it under the terms of the
+Voidwatch ED is free software: you can redistribute it and/or modify it under the terms of the
 **GNU General Public License, version 2 or (at your option) any later version** (see `LICENSE`).
 Copyright (c) 2026 Sott-omar-ino.
 
@@ -27,5 +27,5 @@ enables them. Links to these services are in the app's "Luoghi utili" (Useful pl
 
 ## Trademarks
 
-Elite Dangerous is a trademark of Frontier Developments plc. ED Copilot is an unofficial fan project, not affiliated
+Elite Dangerous is a trademark of Frontier Developments plc. Voidwatch ED is an unofficial fan project, not affiliated
 with or endorsed by Frontier Developments.

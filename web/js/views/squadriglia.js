@@ -1,9 +1,9 @@
 "use strict";
 
 // ============================================================================
-// SQUADRIGLIA: tu e i tuoi amici (ognuno con il suo copilota) vi vedete a vicenda
+// SQUADRIGLIA: tu e i tuoi amici (ognuno con la sua copia dell'app) vi vedete a vicenda
 // ============================================================================
-// Da pari a pari, senza server esterni (vedi app/squadron.py): un copilota ospita, gli altri entrano con
+// Da pari a pari, senza server esterni (vedi app/squadron.py): uno ospita, gli altri entrano con
 // indirizzo + codice. Lo stato arriva da /api/squadron/status, ricaricato ogni 2,5 s in UI.res.sq.
 // Tutto ciò che arriva dagli altri comandanti passa da esc() prima di finire nella pagina.
 
@@ -76,7 +76,7 @@ function sqConnectPanel(d) {
     const h = d.host || {};
     const online = (d.squad?.members || []).filter(m => m.online).length;
     const body = !h.running
-      ? `<div class="warnbox">Il server di rete del copilota è spento (forse hai disattivato l'accesso dal telefono):
+      ? `<div class="warnbox">Il server di rete dell'app è spento (forse hai disattivato l'accesso dal telefono):
           gli altri non possono raggiungerti.</div><div style="margin-top:10px"><button class="primary" data-sq-host="1">Riaccendi</button>
           <button data-sq-host="0">Chiudi squadriglia</button></div>`
       : `<div class="sq-info">
@@ -107,12 +107,12 @@ function sqConnectPanel(d) {
       <div style="margin-top:12px"><button class="danger" data-sq-leave>Esci dalla squadriglia</button></div>`, { code: "MEMBRO" });
   }
   const tls = d.tls_available;
-  return panel("Squadriglia", `${notice}<p>Tu e i tuoi amici, ognuno con il suo copilota, vedete a vicenda nave, posizione,
+  return panel("Squadriglia", `${notice}<p>Tu e i tuoi amici, ognuno con il suo Voidwatch ED, vedete a vicenda nave, posizione,
       carburante e attività, con una lista di obiettivi comuni. Uno di voi ospita, gli altri entrano con indirizzo e codice.
       Massimo ${d.max} comandanti.</p>
     <div class="grid even">
       <div class="subpanel"><h3>Ospita</h3>
-        <p class="sub">Questo copilota apre la squadriglia sul suo server di rete cifrato e ti mostra il codice da dare agli amici.</p>
+        <p class="sub">Questa app apre la squadriglia sul suo server di rete cifrato e ti mostra il codice da dare agli amici.</p>
         ${tls ? '<button class="primary" data-sq-host="1">Ospita una squadriglia</button>'
               : '<div class="warnbox">Connessione cifrata non disponibile in questa installazione: non puoi ospitare.</div>'}</div>
       <div class="subpanel"><h3>Entra</h3>
@@ -175,7 +175,7 @@ function sqHelp(d) {
         e dare agli amici l'indirizzo pubblico, oppure usare una rete virtuale privata tra voi (come quelle che molti
         gruppi usano già per giocare): in quel caso si usa l'indirizzo dell'host in quella rete. Se nessuna delle due è
         possibile, la squadriglia via internet non funziona.</li>
-      <li>Il firewall di Windows dell'host deve consentire le connessioni in entrata al copilota.</li>
+      <li>Il firewall di Windows dell'host deve consentire le connessioni in entrata a Voidwatch ED.</li>
       <li><b>Sicurezza</b>: connessione cifrata, certificato verificato con l'impronta contenuta nel codice, limiti su
         richieste e dimensioni. Si scambiano solo i dati di stato qui sopra: nessun file, nessun comando.</li>
       <li>L'attività è una <b>stima</b>: il tipo di eventi più frequente nel journal negli ultimi 10 minuti

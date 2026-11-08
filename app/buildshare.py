@@ -19,7 +19,7 @@ Formati verificati sul codice sorgente (novembre 2026):
   decodeModificationsStruct), src/app/utils/UtilityFunctions.js (fromUrlSafe), src/app/utils/UrlGenerators.js (outfitURL),
   src/app/Router.js (parser della query) e src/app/Coriolis.jsx (rotte /outfit/:ship/:code?).
 - EDSY, link https://edsy.org/#/L=<codice>: formato interno di EDSY. Il codice di EDSY è distribuito con licenza
-  Creative Commons BY-NC 4.0 (intestazione di https://edsy.org/edsy.js), incompatibile con la GPL di ED Copilot: il formato
+  Creative Commons BY-NC 4.0 (intestazione di https://edsy.org/edsy.js), incompatibile con la GPL di Voidwatch ED: il formato
   non si porta qui e il link viene rifiutato con un messaggio che indica di esportare la build in formato journal o SLEF.
 - SLEF (Ship Loadout Exchange Format, EDCD): [{"header": {...}, "data": Loadout}] oppure un solo {"header", "data"}.
   È anche il formato che si copia dalla pagina di una nave sui siti della community.
@@ -41,7 +41,7 @@ import urllib.parse
 import urllib.request
 import zlib
 
-from . import paths
+from . import VERSION, paths
 from .lang import pick
 from .gamedata import COSMETIC_SLOTS
 
@@ -337,9 +337,9 @@ def decode_text(text):
                     return _from_json(decode_blob(part[2:]), "edsy")
             if any(p.startswith("L=") for p in u.fragment.split("/")):
                 # Formato interno di EDSY (licenza CC BY-NC 4.0, vedi in testa): non si legge.
-                raise ValueError(pick("Questo link usa un formato interno del configuratore che ED Copilot non può leggere: "
+                raise ValueError(pick("Questo link usa un formato interno del configuratore che Voidwatch ED non può leggere: "
                                       "dal configuratore esporta la build in formato journal (Loadout) o SLEF e incollala qui",
-                                      "This link uses the builder's internal format, which ED Copilot can't read: export "
+                                      "This link uses the builder's internal format, which Voidwatch ED can't read: export "
                                       "the build from the builder in journal (Loadout) or SLEF format and paste it here"))
             raise ValueError(pick("Il link non contiene i dati della build", "The link doesn't contain the build data"))
         if _host_is(host, "inara.cz"):
@@ -353,9 +353,9 @@ def decode_text(text):
         raise
     except ValueError as exc:
         raise ValueError(pick("Testo non riconosciuto: incolla una build in formato journal (Loadout), "
-                              "un link di una build o un codice ED Copilot",
+                              "un link di una build o un codice Voidwatch ED",
                               "Text not recognised: paste a build in journal format (Loadout), "
-                              "a build link or an ED Copilot code")) from exc
+                              "a build link or a Voidwatch ED code")) from exc
     return _from_json(obj, "blob")
 
 
@@ -412,7 +412,7 @@ def _refresh_slots():
         pass
     global _slots
     try:
-        req = urllib.request.Request(SLOTS_SOURCE, headers={"User-Agent": "ED-Copilot/1.0"})
+        req = urllib.request.Request(SLOTS_SOURCE, headers={"User-Agent": f"Voidwatch-ED/{VERSION}"})
         with urllib.request.urlopen(req, timeout=30) as r:
             ships = compact_slots(json.loads(r.read(5_000_000)))
         if len(ships) < 30:

@@ -1,4 +1,6 @@
 # Dati personali dell'utente (chiavi, impostazioni, registro, cache)
+Voidwatch ED - dati/
+# (nome delle versioni precedenti: la cartella viene rinominata al primo avvio)
 ED Copilot - dati/
 # Eseguibili e file di compilazione: l'exe si pubblica nelle release
 *.exe
@@ -13,4 +15,5 @@ __pycache__/
 venv/
 # Documenti di lavoro
 ED Copilot - Funzioni.pdf
+Voidwatch ED - Funzioni.pdf
 tools/AGENT_BRIEF.md

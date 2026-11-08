@@ -16,7 +16,7 @@ from . import VERSION
 from .lang import pick
 
 ENDPOINT = "https://inara.cz/inapi/v1/"
-APP_NAME = "ED Copilot"
+APP_NAME = "Voidwatch ED"   # come in app/upload/inara.py: deve essere approvato da Inara
 PROFILE_TTL, CG_TTL, ERROR_RETRY = 3600, 600, 120
 
 _cache = {}
@@ -33,9 +33,9 @@ def configured():
 
 
 def not_approved():
-    return pick("Inara non ha ancora abilitato ED Copilot: ogni applicazione deve essere approvata dal gestore di Inara "
+    return pick("Inara non ha ancora abilitato Voidwatch ED: ogni applicazione deve essere approvata dal gestore di Inara "
                 "prima di poter usare la sua API. Nel frattempo gli obiettivi della comunità arrivano direttamente da Frontier.",
-                "Inara hasn't enabled ED Copilot yet: every application must be approved by Inara's admin "
+                "Inara hasn't enabled Voidwatch ED yet: every application must be approved by Inara's admin "
                 "before it can use their API. Meanwhile community goals come straight from Frontier.")
 
 
@@ -61,7 +61,7 @@ def _call(event, data=None):
         "eventName": event, "eventTimestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eventData": data if data is not None else []}]}
     req = urllib.request.Request(ENDPOINT, data=json.dumps(body).encode("utf-8"), method="POST",
-                                 headers={"Content-Type": "application/json", "User-Agent": f"ED-Copilot/{VERSION}"})
+                                 headers={"Content-Type": "application/json", "User-Agent": f"Voidwatch-ED/{VERSION}"})
     with urllib.request.urlopen(req, timeout=15) as r:
         res = json.loads(r.read().decode("utf-8"))
     head = res.get("header") or {}

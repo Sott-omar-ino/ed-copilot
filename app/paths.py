@@ -5,8 +5,12 @@ Due tipi di file:
   dentro l'eseguibile quando è compilato;
 - dati dell'utente (cose da fare, rotte, macro, impostazioni, cache): sempre in una cartella scrivibile.
 
-I dati stanno nella cartella "ED Copilot - dati" accanto all'eseguibile (o nella radice del progetto se si
+I dati stanno nella cartella "Voidwatch ED - dati" accanto all'eseguibile (o nella radice del progetto se si
 avvia dai sorgenti): copiando l'exe insieme alla cartella si porta via tutto. Se lì non si può scrivere si usa %APPDATA%.
+
+L'app si chiamava "ED Copilot": all'avvio la vecchia cartella "ED Copilot - dati" (o %APPDATA%\ED Copilot) viene
+rinominata con il nome nuovo. Se non si può (un file è ancora aperto, per esempio dalla vecchia versione che si sta
+chiudendo) si continua a usare la vecchia cartella e si riprova al prossimo avvio.
 """
 
 import os
@@ -23,6 +27,19 @@ WEB_DIR = os.path.join(BUNDLE_DIR, "web")
 DEFAULTS_DIR = os.path.join(BUNDLE_DIR, "defaults")
 SEED_DATA_DIR = os.path.join(BUNDLE_DIR, "data")
 ICON_FILE = os.path.join(BUNDLE_DIR, "assets", "app_icon.ico")
+
+APP_NAME = "Voidwatch ED"
+LEGACY_NAME = "ED Copilot"          # nome delle versioni fino alla 6.0
+DATA_FOLDER = f"{APP_NAME} - dati"
+LEGACY_DATA_FOLDER = f"{LEGACY_NAME} - dati"
+# Messaggi della migrazione: il registro (main._setup_logging) si apre dopo, quindi li stampa main.
+NOTES = []
+
+
+def env(name, default=None):
+    """Variabile d'ambiente per le prove: VOIDWATCH_<name>, oppure il vecchio ED_COPILOT_<name>."""
+    return os.environ.get("VOIDWATCH_" + name) or os.environ.get("ED_COPILOT_" + name) or default
+
 
 JOURNAL_DIR = os.environ.get(
     "ED_JOURNAL_DIR",
@@ -42,13 +59,45 @@ def _writable(path):
         return False
 
 
+def wait_previous_instance():
+    """Dopo un aggiornamento (--wait-pid) aspetta che la vecchia istanza sia chiusa: tiene aperti i file della cartella
+    dati (il registro), che altrimenti non si potrebbe rinominare."""
+    if "--wait-pid" not in sys.argv:
+        return
+    try:
+        import ctypes
+        pid = int(sys.argv[sys.argv.index("--wait-pid") + 1])
+        handle = ctypes.windll.kernel32.OpenProcess(0x00100000, False, pid)  # SYNCHRONIZE
+        if handle:
+            ctypes.windll.kernel32.WaitForSingleObject(handle, 15000)
+            ctypes.windll.kernel32.CloseHandle(handle)
+    except (ValueError, IndexError, OSError, AttributeError):
+        pass
+
+
+def migrate_folder(new, old):
+    """Rinomina la cartella del vecchio nome in quella nuova. Restituisce la cartella da usare: la nuova, oppure la
+    vecchia se non si è potuta rinominare (file bloccati)."""
+    if os.path.exists(new) or not os.path.isdir(old):
+        return new
+    try:
+        os.replace(old, new)
+        NOTES.append(f"[Dati] Cartella rinominata: {old} -> {new}")
+        return new
+    except OSError as exc:
+        NOTES.append(f"[Dati] Non riesco a rinominare {old} in {new} ({exc}): per ora uso la vecchia cartella")
+        return old
+
+
 def _pick_data_dir():
-    if os.environ.get("ED_COPILOT_DATA"):
-        return os.environ["ED_COPILOT_DATA"]
-    candidate = os.path.join(APP_DIR, "ED Copilot - dati")
+    if env("DATA"):
+        return env("DATA")
+    wait_previous_instance()
+    candidate = migrate_folder(os.path.join(APP_DIR, DATA_FOLDER), os.path.join(APP_DIR, LEGACY_DATA_FOLDER))
     if _writable(candidate):
         return candidate
-    return os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "ED Copilot")
+    roaming = os.environ.get("APPDATA", os.path.expanduser("~"))
+    return migrate_folder(os.path.join(roaming, APP_NAME), os.path.join(roaming, LEGACY_NAME))
 
 
 DATA_DIR = _pick_data_dir()
@@ -71,7 +120,7 @@ def default_file(name):
 
 def migrate_legacy_files():
     """Sposta i file delle versioni precedenti (salvati accanto al programma) nella cartella dati."""
-    if os.environ.get("ED_COPILOT_DATA"):
+    if env("DATA"):
         return
     moves = {
         "todo.json": user_file("todo.json"), "route.json": user_file("route.json"),

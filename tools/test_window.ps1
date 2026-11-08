@@ -2,14 +2,14 @@
 # Uso: powershell -File tools\test_window.ps1 [percorso dell'exe]   (senza argomenti prova i sorgenti con python run.py)
 param([string]$Exe = "")
 
-$env:ED_COPILOT_DATA = "$env:TEMP\edc_test_window"
+$env:VOIDWATCH_DATA = "$env:TEMPoidwatch_test_window"
 if ($Exe) { $p = Start-Process -FilePath $Exe -PassThru }
 else { $p = Start-Process pythonw -ArgumentList "run.py" -WorkingDirectory (Split-Path $PSScriptRoot) -PassThru }
 
 $win = $null
 for ($i = 0; $i -lt 40 -and -not $win; $i++) {
     Start-Sleep -Milliseconds 500
-    $win = Get-Process | Where-Object { $_.MainWindowTitle -eq "ED Copilot" } | Select-Object -First 1
+    $win = Get-Process | Where-Object { $_.MainWindowTitle -eq "Voidwatch ED" } | Select-Object -First 1
 }
 if (-not $win) { "ERRORE: finestra non comparsa"; Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue; exit 1 }
 "Finestra comparsa (processo $($win.Id), $($win.ProcessName))"
@@ -21,4 +21,4 @@ for ($i = 0; $i -lt 20; $i++) {
     if (-not (Get-Process -Id $p.Id -ErrorAction SilentlyContinue)) { "Finestra chiusa: il processo e terminato correttamente."; break }
 }
 if (Get-Process -Id $p.Id -ErrorAction SilentlyContinue) { "ATTENZIONE: il processo e ancora attivo dopo la chiusura"; Stop-Process -Id $p.Id -Force }
-Remove-Item $env:ED_COPILOT_DATA -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item $env:VOIDWATCH_DATA -Recurse -Force -ErrorAction SilentlyContinue

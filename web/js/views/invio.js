@@ -59,7 +59,7 @@ function uploadPanel(st) {
     } else if (dest === "inara") {
       if (d.enabled && !st.inara?.configured) extra = '<div class="sub bad" style="margin-top:4px">Salva prima la chiave API nel pannello Inara.</div>';
       if (d.paused) extra += `<div class="sub" style="margin-top:4px">Inara accetta gli aggiornamenti solo dalle app approvate dal suo autore:
-        se l'errore parla del nome dell'applicazione, ED Copilot non è ancora nella lista. Gli eventi restano in coda fino a 30 giorni
+        se l'errore parla del nome dell'applicazione, Voidwatch ED non è ancora nella lista. Gli eventi restano in coda fino a 30 giorni
         e partono quando cambi la chiave o riavvii l'app.</div>`;
     }
     return dataRow(`Invia a ${label}`, desc, uploadSwitch(dest, d.enabled, `Invia a ${label}`)) + uploadStatusLine(d) + extra;

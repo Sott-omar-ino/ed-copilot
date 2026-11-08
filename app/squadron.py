@@ -1,4 +1,4 @@
-"""Squadriglia: posizione, attività e obiettivi condivisi tra copiloti, senza server esterni.
+"""Squadriglia: posizione, attività e obiettivi condivisi tra le app dei comandanti, senza server esterni.
 
 Come funziona (da pari a pari):
 - un'istanza fa da HOST: le API /api/squad/* rispondono sul suo server di rete locale HTTPS (lo stesso del companion
@@ -343,7 +343,7 @@ def lan_request(method, path, headers, read, ip):
     srv = _server()
     cfg = _cfg()
     if cfg["role"] != "host" or not srv.RUNTIME.get("lan_https"):
-        return 503, {"error": pick("Nessuna squadriglia attiva su questo copilota", "No squad active on this copilot"), "reason": "closed"}
+        return 503, {"error": pick("Nessuna squadriglia attiva su questo PC", "No squad active on this PC"), "reason": "closed"}
     body = {}
     if method == "POST":
         try:
@@ -515,9 +515,9 @@ def _push_once():
             raise ValueError(out.get("error") or pick(f"errore {code}", f"error {code}"))
         _link.update(state=_clean_view(out), at=time.time(), ok_at=time.time(), error=None)
     except (OSError, http.client.HTTPException) as exc:  # ssl.SSLError è un OSError
-        _link.update(error=pick("Host non raggiungibile: forse ha chiuso la squadriglia o il copilota, oppure la rete non "
+        _link.update(error=pick("Host non raggiungibile: forse ha chiuso la squadriglia o l'app, oppure la rete non "
                                  f"lo consente ({exc.__class__.__name__})",
-                                 "Host unreachable: they may have closed the squad or the copilot, or the network "
+                                 "Host unreachable: they may have closed the squad or the app, or the network "
                                  f"doesn't allow it ({exc.__class__.__name__})"), at=time.time())
     except (ValueError, PinError) as exc:
         _link.update(error=str(exc) or exc.__class__.__name__, at=time.time())

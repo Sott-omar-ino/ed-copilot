@@ -1,4 +1,4 @@
-"""Avvio di ED Copilot: server locale + finestra nativa dell'applicazione (WebView2, niente browser).
+"""Avvio di Voidwatch ED: server locale + finestra nativa dell'applicazione (WebView2, niente browser).
 
 Opzioni:
   --browser   apre l'interfaccia nel browser invece che nella finestra dell'app (utile per lo sviluppo)
@@ -16,8 +16,10 @@ from . import paths
 from .lang import pick
 
 LOG_FILE = paths.user_file("registro.log")
-# ED_COPILOT_PORT: porta di partenza diversa (per provare i sorgenti mentre l'exe è aperto).
-_BASE_PORT = int(os.environ.get("ED_COPILOT_PORT") or 8765)
+# VOIDWATCH_PORT (o il vecchio ED_COPILOT_PORT): porta di partenza diversa (per provare i sorgenti mentre l'exe è aperto).
+_BASE_PORT = int(paths.env("PORT") or 8765)
+# Risposte di /api/ping che indicano l'app già aperta: anche una versione precedente, che si chiamava "ED Copilot".
+_APP_IDS = ("voidwatch-ed", "ed-copilot")
 PORTS = range(_BASE_PORT, _BASE_PORT + 11)
 
 
@@ -37,7 +39,7 @@ def _setup_logging():
 def _ping(port):
     try:
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/ping", timeout=0.6) as r:
-            return json.loads(r.read()).get("app") == "ed-copilot"
+            return json.loads(r.read()).get("app") in _APP_IDS
     except Exception:
         return False
 
@@ -48,6 +50,7 @@ def _already_running():
         if _ping(port):
             try:
                 req = urllib.request.Request(f"http://127.0.0.1:{port}/api/app/focus", data=b"{}", method="POST",
+                                             # X-ED-Copilot: intestazione interna, vecchio nome voluto (app/server.py)
                                              headers={"X-ED-Copilot": "1", "Content-Type": "application/json"})
                 urllib.request.urlopen(req, timeout=2).close()
             except Exception:
@@ -59,13 +62,15 @@ def _already_running():
 def _message(text):
     try:
         import ctypes
-        ctypes.windll.user32.MessageBoxW(None, text, "ED Copilot", 0x40)
+        ctypes.windll.user32.MessageBoxW(None, text, paths.APP_NAME, 0x40)
     except Exception:
         print(text)
 
 
 def main():
     _setup_logging()
+    for note in paths.NOTES:  # migrazione della cartella dati dal vecchio nome (app/paths.py)
+        print(note)
     from . import updater
     updater.cleanup_after_update()  # dopo un aggiornamento aspetta che la vecchia versione sia chiusa
     if _already_running():
@@ -83,8 +88,8 @@ def main():
         except OSError:
             continue
     if not port:
-        _message(pick(f"Impossibile avviare ED Copilot: le porte {PORTS[0]}-{PORTS[-1]} sono tutte occupate.",
-                      f"Can't start ED Copilot: ports {PORTS[0]}-{PORTS[-1]} are all in use."))
+        _message(pick(f"Impossibile avviare Voidwatch ED: le porte {PORTS[0]}-{PORTS[-1]} sono tutte occupate.",
+                      f"Can't start Voidwatch ED: ports {PORTS[0]}-{PORTS[-1]} are all in use."))
         return
 
     for task in (journal.watch, search.load_coords, coriolis.load, voice.preload_if_enabled, updater.check_on_start,
@@ -99,7 +104,7 @@ def main():
         server.start_lan()
 
     url = f"http://127.0.0.1:{port}/"
-    print(f"ED Copilot su {url}  (dati in {paths.DATA_DIR})")
+    print(f"Voidwatch ED su {url}  (dati in {paths.DATA_DIR})")
 
     if "--headless" in sys.argv:
         _wait_forever()
@@ -132,7 +137,7 @@ def _open_window(url, server):
     extra = os.environ.get("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "")
     if "--disable-background-timer-throttling" not in extra:
         os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = (extra + " " + flags).strip()
-    window = webview.create_window("ED Copilot", url, width=1520, height=940, min_size=(1000, 680),
+    window = webview.create_window(paths.APP_NAME, url, width=1520, height=940, min_size=(1000, 680),
                                    background_color="#030100", text_select=True, maximized=True)
 
     def focus():

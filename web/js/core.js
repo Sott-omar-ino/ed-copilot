@@ -15,7 +15,7 @@ const setText = (id, text) => { const el = $(id); if (el) el.textContent = text;
     const url = typeof input === "string" ? input : input.url;
     if (url.startsWith("/api/")) {
       const headers = new Headers(init.headers || {});
-      headers.set("X-ED-Copilot", "1");
+      headers.set("X-ED-Copilot", "1");  // vecchio nome dell'app, voluto: vedi app/server.py
       init = { ...init, headers };
     }
     return nativeFetch(input, init);

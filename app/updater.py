@@ -1,8 +1,10 @@
 """Aggiornamento automatico dell'exe dalle release di GitHub.
 
 La fonte è un repository GitHub ("utente/repo") impostato nelle Impostazioni. Una release è valida se contiene
-l'asset "ED Copilot.exe" con la sua impronta SHA-256 (quella che GitHub calcola da sé, oppure un file
-"ED Copilot.exe.sha256" allegato): senza impronta l'aggiornamento non viene installato.
+l'asset "Voidwatch ED.exe" con la sua impronta SHA-256 (quella che GitHub calcola da sé, oppure un file
+"Voidwatch ED.exe.sha256" allegato): senza impronta l'aggiornamento non viene installato. Si accetta anche il nome
+delle versioni precedenti ("ED Copilot.exe"). L'exe scaricato prende il posto di quello in uso con il suo nome attuale:
+chi aggiorna una vecchia copia continua ad avere "ED Copilot.exe", e va bene così.
 
 Installazione: il nuovo exe viene scaricato accanto a quello attuale, verificato, poi l'exe in uso viene rinominato
 (Windows lo permette anche mentre è in esecuzione), il nuovo prende il suo posto e si riavvia.
@@ -21,11 +23,15 @@ import urllib.request
 from . import VERSION, paths
 from .lang import pick
 
-DEFAULT_REPO = "Sott-omar-ino/ed-copilot"
+DEFAULT_REPO = "Sott-omar-ino/voidwatch-ed"
+# Il repository si chiamava così (GitHub reindirizza il vecchio nome): chi l'ha salvato nelle impostazioni passa al nuovo.
+LEGACY_REPOS = {"sott-omar-ino/ed-copilot"}
 
-ASSET = "ED Copilot.exe"
-# GitHub sostituisce gli spazi nei nomi dei file allegati con punti ("ED.Copilot.exe").
-ASSET_NAMES = {ASSET, ASSET.replace(" ", ".")}
+ASSET = "Voidwatch ED.exe"
+LEGACY_ASSET = "ED Copilot.exe"
+# GitHub sostituisce gli spazi nei nomi dei file allegati con punti ("Voidwatch.ED.exe").
+ASSET_NAMES = {n for a in (ASSET, LEGACY_ASSET) for n in (a, a.replace(" ", "."))}
+SHA_NAMES = {n + ".sha256" for n in ASSET_NAMES}
 _state = {"checked": None, "latest": None, "error": None, "progress": None, "busy": False}
 _lock = threading.Lock()
 
@@ -34,7 +40,29 @@ def _cfg():
     from .server import app_config
     cfg = app_config()
     # Repository ufficiale delle release: si può cambiare nelle impostazioni.
-    return {"repo": (cfg.get("update_repo") or DEFAULT_REPO).strip(), "auto": cfg.get("update_auto", True)}
+    return {"repo": normalize_repo(cfg.get("update_repo")), "auto": cfg.get("update_auto", True)}
+
+
+def normalize_repo(repo):
+    """Repository da usare: quello salvato, con il vecchio nome di quello ufficiale sostituito dal nuovo."""
+    repo = (repo or "").strip() or DEFAULT_REPO
+    return DEFAULT_REPO if repo.lower() in LEGACY_REPOS else repo
+
+
+def _plain(name):
+    return (name or "").replace(".", " ").lower()
+
+
+def pick_assets(assets):
+    """(exe, file .sha256) di una release. Il nome nuovo ha la precedenza su quello delle versioni precedenti; l'impronta
+    è quella con lo stesso nome dell'exe scelto."""
+    assets = [a for a in assets or [] if isinstance(a, dict)]
+    exes = sorted((a for a in assets if a.get("name") in ASSET_NAMES),
+                  key=lambda a: _plain(a["name"]) != _plain(ASSET))
+    exe = exes[0] if exes else None
+    sha = exe and next((a for a in assets if a.get("name") in SHA_NAMES
+                        and _plain(a["name"]) == _plain(exe["name"] + ".sha256")), None)
+    return exe, sha
 
 
 def _version_tuple(v):
@@ -42,7 +70,7 @@ def _version_tuple(v):
 
 
 def _get(url, timeout=15):
-    req = urllib.request.Request(url, headers={"User-Agent": f"ED-Copilot/{VERSION}",
+    req = urllib.request.Request(url, headers={"User-Agent": f"Voidwatch-ED/{VERSION}",
                                                "Accept": "application/vnd.github+json"})
     return urllib.request.urlopen(req, timeout=timeout)
 
@@ -56,8 +84,7 @@ def check():
     try:
         with _get(f"https://api.github.com/repos/{repo}/releases/latest") as r:
             rel = json.loads(r.read())
-        asset = next((a for a in rel.get("assets", []) if a.get("name") in ASSET_NAMES), None)
-        sha_asset = next((a for a in rel.get("assets", []) if a.get("name") in {n + ".sha256" for n in ASSET_NAMES}), None)
+        asset, sha_asset = pick_assets(rel.get("assets"))
         digest = (asset or {}).get("digest") or ""
         _state.update(error=None, checked=time.time(), latest={
             "version": rel.get("tag_name", "").lstrip("vV"), "name": rel.get("name"), "notes": (rel.get("body") or "")[:3000],
@@ -145,16 +172,7 @@ def _install(latest):
 
 def cleanup_after_update():
     """All'avvio: aspetta che la vecchia istanza sia chiusa e rimuove l'exe precedente."""
-    if "--wait-pid" in sys.argv:
-        try:
-            import ctypes
-            pid = int(sys.argv[sys.argv.index("--wait-pid") + 1])
-            handle = ctypes.windll.kernel32.OpenProcess(0x00100000, False, pid)  # SYNCHRONIZE
-            if handle:
-                ctypes.windll.kernel32.WaitForSingleObject(handle, 15000)
-                ctypes.windll.kernel32.CloseHandle(handle)
-        except (ValueError, IndexError, OSError):
-            pass
+    paths.wait_previous_instance()  # di solito è già successo in paths, prima di scegliere la cartella dati
     old = sys.executable + ".old"
     if paths.FROZEN and os.path.exists(old):
         try:
