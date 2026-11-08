@@ -7,19 +7,21 @@ function gameKeysPanel() {
   if (!UI.res.bindings) run("bindings", () => api("/api/bindings"));
   return panel("Tasti del gioco", result("bindings", b => {
     const missing = b.commands.filter(c => !c.token);
-    const fixable = missing.filter(c => c.free_slot && b.files[c.category]?.editable);
+    const fixable = missing.filter(c => (c.free_slot || c.bad_keyboard) && b.files[c.category]?.editable);
     const done = UI.res.bindingsFix?.data;
     return `<p class="sub">Preset in uso: generali <b>${esc(b.presets.general)}</b>, nave <b>${esc(b.presets.ship)}</b>.
       I comandi vocali, le macro e il telefono premono i tasti della <b>tastiera</b> assegnati qui sotto.
       Un comando assegnato solo alla cloche non si può premere dall'app.</p>
       ${missing.length ? `<div class="warnbox">⚠ ${missing.length} comandi non hanno un tasto della tastiera: dall'app non funzioneranno.
         ${fixable.length ? `<div style="margin-top:8px"><button class="primary" data-binds-fix>Aggiungi tasti liberi (${fixable.length})</button>
-        <span class="sub"> Usa solo gli slot vuoti: la cloche resta com'è. Prima viene fatta una copia del file. Poi riavvia il gioco.</span></div>` : ""}</div>` : '<div class="ok">✓ Tutti i comandi usati dall\'app hanno un tasto della tastiera.</div>'}
+        <span class="sub"> Usa gli slot vuoti, oppure sostituisce un tasto che con la tua tastiera non si può premere: la cloche resta com'è. Prima viene fatta una copia del file. Poi riavvia il gioco.</span></div>` : ""}</div>` : '<div class="ok">✓ Tutti i comandi usati dall\'app hanno un tasto della tastiera.</div>'}
       ${done ? `<div class="ok" style="margin-top:8px">✓ Aggiunti ${done.done.length} tasti${done.done.length ? ": " + done.done.map(d => `${esc(d.label)} = <b>${esc(d.key)}</b>`).join(", ") : ""}. Riavvia Elite Dangerous per caricarli.
         ${done.skipped.length ? `<div class="bad">Non modificati: ${done.skipped.map(s => `${esc(s.label)} (${esc(s.reason)})`).join(", ")}</div>` : ""}</div>` : ""}
       <table style="margin-top:10px"><thead><tr><th>Comando</th><th>Tastiera</th><th>Altri dispositivi</th></tr></thead><tbody>
       ${b.commands.map(c => `<tr><td>${esc(c.label)}<div class="sub mono">${esc(c.name)}</div></td>
-        <td>${c.token ? `<b class="mono gold">${esc(c.keyboard || c.token)}</b>` : '<span class="bad">nessun tasto</span>'}</td>
+        <td>${c.token ? `<b class="mono gold">${esc(c.keyboard || c.token)}</b>` : c.bad_keyboard
+          ? `<span class="bad">${esc(c.bad_keyboard.replace("Key_", ""))}: non si può premere con il layout della tua tastiera</span>`
+          : '<span class="bad">nessun tasto</span>'}</td>
         <td class="sub">${esc(c.other.join(", ")) || "—"}</td></tr>`).join("")}
       </tbody></table>
       <div class="sub" style="margin-top:6px">File: ${esc(b.files.ship.path || "non trovato")} <button class="small ghost" data-binds-reload>Rileggi</button></div>`;

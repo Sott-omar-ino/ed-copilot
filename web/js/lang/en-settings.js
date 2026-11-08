@@ -655,4 +655,6 @@ LANG.add({
   "Preciso": "Accurate",
   "Veloce: meno di 1 s ma sbaglia di più. Bilanciato: circa 1 s, consigliato. Preciso: capisce quasi tutto ma può richiedere diversi secondi per comando mentre giochi. Al primo uso il modello viene scaricato (da 75 a 480 MB).": "Fast: under 1 s but makes more mistakes. Balanced: about 1 s, recommended. Accurate: understands almost everything but can take several seconds per command while you play. The model is downloaded on first use (75 to 480 MB).",
   "Modello di riconoscimento cambiato: si carica in pochi secondi": "Recognition model changed: it loads in a few seconds",
+  "Usa gli slot vuoti, oppure sostituisce un tasto che con la tua tastiera non si può premere: la cloche resta com'è. Prima viene fatta una copia del file. Poi riavvia il gioco.": "Uses empty slots, or replaces a key that can't be pressed with your keyboard layout: your stick stays as it is. A copy of the file is made first. Then restart the game.",
+  "{}: non si può premere con il layout della tua tastiera": "{}: can't be pressed with your keyboard layout",
 });

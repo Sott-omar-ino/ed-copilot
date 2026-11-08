@@ -11,7 +11,7 @@ import threading
 import time
 from ctypes import wintypes
 
-from . import bindings, lang, paths, storage
+from . import bindings, kblayout, lang, paths, storage
 from .lang import pick
 from .journal import read_status
 
@@ -117,9 +117,18 @@ def focus_game():
         return False
 
 
+def _scan(part, hwnd=None):
+    """Scan code di un tasto: lettere e simboli secondo il layout del gioco (kblayout.py), gli altri dalla tabella."""
+    ch = kblayout.char_of(part)
+    if ch is not None:
+        return kblayout.scan_for(ch, hwnd)
+    return SCAN_CODES.get(part.upper())
+
+
 def valid(key):
-    k = str(key).strip().upper()
-    return k.startswith(("WAIT:", "@")) or all(p in SCAN_CODES for p in k.split("+"))
+    k = str(key).strip()
+    return k.upper().startswith(("WAIT:", "@")) or all(
+        p.upper() in SCAN_CODES or kblayout.char_of(p) is not None for p in k.split("+"))
 
 
 def resolve(key):
@@ -127,7 +136,7 @@ def resolve(key):
     k = str(key).strip()
     if k.startswith("@"):
         return bindings.token(k[1:])
-    return k.upper()
+    return k if k.upper().startswith("CHR_") else k.upper()
 
 
 def unbound(keys):
@@ -138,8 +147,10 @@ def unbound(keys):
 
 def press(key, hold=0.08):
     """Preme un tasto o una combinazione ("LSHIFT+J": i modificatori restano premuti)."""
-    parts = [SCAN_CODES.get(p) for p in str(key).strip().upper().split("+")]
+    hwnd = _ed_window()
+    parts = [_scan(p, hwnd) for p in str(key).strip().split("+")]
     if not parts or None in parts:
+        print(f"[Comandi] il tasto {key} non esiste con il layout della tastiera del gioco: non premuto")
         return False
     for scan, ext in parts:
         _send(scan, ext, False)

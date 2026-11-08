@@ -18,6 +18,7 @@ import time
 import winreg
 import xml.etree.ElementTree as ET
 
+from . import kblayout
 from .lang import pick
 
 BINDINGS_DIR = os.path.join(os.environ.get("LOCALAPPDATA", ""), "Frontier Developments", "Elite Dangerous",
@@ -114,7 +115,14 @@ def to_token(ed_key):
         return name
     if re.fullmatch(r"Numpad_[0-9]", name):
         return name.upper()
+    if len(name) == 1 and not name.isascii():
+        return "CHR_" + name  # tasti del layout locale, es. "Key_à" con la tastiera italiana (vedi kblayout.py)
     return None
+
+
+def usable(token):
+    """Il token esiste e si preme con un solo tasto nel layout della tastiera (vedi kblayout.reachable)."""
+    return bool(token) and all(kblayout.reachable(t) for t in token.split("+"))
 
 
 def _game_dirs():
@@ -206,8 +214,11 @@ def load():
     for name, (label, default) in USED.items():
         cat = "general" if name in GENERAL else "ship"
         slots = parsed[cat][0].get(name)
-        kb = next((s for s in slots or [] if s["device"] == "Keyboard" and to_token(s["key"])
+        kb = next((s for s in slots or [] if s["device"] == "Keyboard" and usable(to_token(s["key"]))
                    and all(to_token(m) for m in s["mods"])), None)
+        # Tasto assegnato ma impossibile da premere con questo layout (es. "Key_SemiColon" sulla tastiera italiana).
+        bad = next((s["key"] for s in slots or [] if s["device"] == "Keyboard" and s["key"] and not s["mods"]
+                    and not usable(to_token(s["key"]))), None)
         other = [s for s in slots or [] if s["device"] not in ("Keyboard", "{NoDevice}") and s["key"]]
         token = "+".join([to_token(m) for m in kb["mods"]] + [to_token(kb["key"])]) if kb else None
         commands[name] = {
@@ -215,6 +226,7 @@ def load():
             "keyboard": ("+".join(kb["mods"] + [kb["key"]]).replace("Key_", "") if kb else None),
             "other": [f"{s['device']} {s['key']}" for s in other],
             "free_slot": any(s["device"] == "{NoDevice}" for s in slots or []),
+            "bad_keyboard": bad if not kb else None,
             # File senza il comando (preset molto vecchio): usiamo il tasto predefinito del gioco.
             "missing": slots is None,
         }
@@ -247,7 +259,7 @@ def summary():
 def _pick_key(name, used, taken):
     default = USED.get(name, (None, None))[1]
     for k in ([default] if default else []) + SPARE_KEYS:
-        if k and k not in used and k not in taken and to_token(k):
+        if k and k not in used and k not in taken and usable(to_token(k)):
             return k
     return None
 
@@ -258,9 +270,14 @@ def assign_missing(names=None):
     Modifica solo i file dell'utente, dopo averne fatto una copia di sicurezza. Il gioco legge i controlli
     all'avvio: va riavviato (o ricaricato il preset dalle Opzioni) per vedere i nuovi tasti.
     """
+    # Le copie di prova dell'app (cartella dati alternativa, ED_COPILOT_DATA) non devono mai toccare i controlli veri.
+    if os.environ.get("ED_COPILOT_DATA") and os.path.normcase(BINDINGS_DIR).startswith(
+            os.path.normcase(os.environ.get("LOCALAPPDATA", "") or "?")):
+        return {"done": [], "skipped": [], "error": pick("Istanza di prova: i controlli del gioco non vengono modificati.",
+                                                         "Test instance: the game controls are not modified.")}
     data = load()
     todo = [c for c in data["commands"].values()
-            if not c["token"] and c["free_slot"] and (names is None or c["name"] in names)]
+            if not c["token"] and (c["free_slot"] or c.get("bad_keyboard")) and (names is None or c["name"] in names)]
     done, skipped = [], []
     by_file = {}
     for c in todo:
@@ -287,12 +304,21 @@ def assign_missing(names=None):
                 continue
             inner = block.group(2)
             # Meglio lo slot secondario: il primario di solito è la cloche.
+            placed = False
             for slot in ("Secondary", "Primary"):
                 pat = re.compile(rf'<{slot} Device="\{{NoDevice\}}" Key=""\s*/>')
                 if pat.search(inner):
                     inner = pat.sub(f'<{slot} Device="Keyboard" Key="{key}" />', inner, count=1)
+                    placed = True
                     break
-            else:
+            bad = c.get("bad_keyboard")
+            if not placed and bad:
+                # Nessuno slot vuoto: si sostituisce il tasto della tastiera che non si può premere con questo layout.
+                pat = re.compile(rf'<(Primary|Secondary) Device="Keyboard" Key="{re.escape(bad)}"\s*/>')
+                if pat.search(inner):
+                    inner = pat.sub(lambda m: f'<{m.group(1)} Device="Keyboard" Key="{key}" />', inner, count=1)
+                    placed = True
+            if not placed:
                 skipped.append({"name": c["name"], "label": label(c["name"]),
                                 "reason": pick("nessuno slot vuoto", "no empty slot")})
                 continue
