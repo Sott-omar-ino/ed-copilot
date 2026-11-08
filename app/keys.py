@@ -82,18 +82,37 @@ def _ed_window():
 
 
 def focus_game():
-    """Porta in primo piano la finestra di Elite. Restituisce True se è in primo piano."""
+    """Porta in primo piano la finestra di Elite. Restituisce True se è in primo piano.
+
+    Windows permette SetForegroundWindow solo in certe condizioni: ci si "aggancia" per un attimo al thread della
+    finestra in primo piano (AttachThreadInput), come fanno i programmi di macro, e si aspetta che il gioco arrivi
+    davvero davanti (in finestra senza bordi può servire qualche centinaio di millisecondi).
+    """
     try:
-        user32 = ctypes.windll.user32
+        user32, kernel32 = ctypes.windll.user32, ctypes.windll.kernel32
         hwnd = _ed_window()
         if not hwnd:
             return False
         if user32.GetForegroundWindow() == hwnd:
             return True
-        user32.ShowWindow(hwnd, 9)  # SW_RESTORE
-        user32.SetForegroundWindow(hwnd)
-        time.sleep(0.15)
-        return user32.GetForegroundWindow() == hwnd
+        if user32.IsIconic(hwnd):
+            user32.ShowWindow(hwnd, 9)  # SW_RESTORE solo se è ridotto a icona
+        fg = user32.GetForegroundWindow()
+        fg_thread = user32.GetWindowThreadProcessId(fg, None) if fg else 0
+        me = kernel32.GetCurrentThreadId()
+        attached = bool(fg_thread and fg_thread != me and user32.AttachThreadInput(me, fg_thread, True))
+        try:
+            user32.BringWindowToTop(hwnd)
+            user32.SetForegroundWindow(hwnd)
+        finally:
+            if attached:
+                user32.AttachThreadInput(me, fg_thread, False)
+        for _ in range(40):  # fino a 2 secondi
+            if user32.GetForegroundWindow() == hwnd:
+                time.sleep(0.15)  # il gioco deve anche "accorgersi" di essere davanti prima di ricevere i tasti
+                return True
+            time.sleep(0.05)
+        return False
     except Exception:
         return False
 
@@ -133,8 +152,11 @@ def press(key, hold=0.08):
 
 def run_sequence(keys, hold_ms=60, gap_ms=120):
     """Esegue una sequenza di tasti; "WAIT:ms" inserisce una pausa (max 5 secondi)."""
+    resolved = [resolve(k) or "?" for k in keys]
     if not focus_game():
+        print(f"[Comandi] {' '.join(resolved)}: Elite non è in primo piano, nessun tasto premuto")
         return False
+    print(f"[Comandi] tasti inviati a Elite: {' '.join(resolved)}")
     with _send_lock:
         for k in keys:
             k = resolve(k) or ""

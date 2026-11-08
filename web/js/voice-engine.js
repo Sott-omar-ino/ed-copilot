@@ -803,6 +803,15 @@ const VOICE_ENGINE = {
       if (!this.active) return;
       const p = NOISE_FILTER.params();
       const now = performance.now();
+      // Se la pagina viene rallentata (finestra dietro al gioco) il filtro non riesce a seguire la voce: lascia passare
+      // l'audio, che il server filtra comunque (noise_filter.py) prima del riconoscimento.
+      const late = st.lastTick && now - st.lastTick > 150;
+      st.lastTick = now;
+      if (late || st.bypassUntil > now) {
+        if (late) st.bypassUntil = now + 3000;
+        if (!st.open) { st.open = true; this.gateGain.gain.cancelScheduledValues(ctx.currentTime); this.gateGain.gain.setTargetAtTime(1, ctx.currentTime, 0.004); }
+        st.closeAt = now + 300;
+      }
       an.getFloatTimeDomainData(time);
       let sum = 0, zc = 0;
       for (let i = 0; i < time.length; i++) {
@@ -848,7 +857,7 @@ const VOICE_ENGINE = {
         st.closeAt = now + 300;  // coda: la porta resta aperta 300 ms dopo l'ultima voce
       } else if (st.open && active && st.qualifiedRun === st.runStart) {
         st.closeAt = now + 300;
-      } else if (st.open && now > st.closeAt) {
+      } else if (st.open && now > st.closeAt && !(st.bypassUntil > now)) {
         st.open = false;
         st.closedAt = now;
         // chiude quando anche l'audio ritardato è arrivato alla fine della voce
@@ -1044,7 +1053,7 @@ const VOICE_ENGINE = {
       return;
     }
     if (voiceLang() === "en") return this._dispatchEn(raw);
-    const text = raw.toLowerCase()
+    let text = raw.toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9\s]/g, " ")
       .replace(/\s+/g, " ")
@@ -1063,6 +1072,15 @@ const VOICE_ENGINE = {
     //    ("ricordami di abbassare il carrello" non deve abbassare il carrello).
     const todoCmd = TODO_VOICE.parse(raw);
     if (todoCmd) { this._todoCommand(todoCmd, raw); return; }
+
+    // Il riconoscimento sbaglia spesso di una o due lettere ("ricchiesta attrago", "mappagallattica"): se nessuna frase
+    // dei comandi compare esatta, si prende la frase più simile, solo se lo è davvero (vedi closestPhrase).
+    const known = [...CONTROLS, ...MACROS].flatMap(x => (x.say || "").split(";")).map(s => s.toLowerCase()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim()).filter(Boolean);
+    if (!known.some(p => saidPhrase(text, p))) {
+      const near = closestPhrase(text, known);
+      if (near) text = near;
+    }
 
     // 1. Match custom ship controls first
     for (const c of CONTROLS) {
@@ -1378,6 +1396,32 @@ const VOICE_ENGINE = {
     }
   }
 };
+
+// Distanza di modifica (Levenshtein): quante lettere vanno cambiate, aggiunte o tolte per passare da a a b.
+function editDistance(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+// Frase nota più simile a ciò che è stato detto, confrontando senza spazi ("mappa galattica" = "mappagalattica").
+// Solo frasi di almeno 7 lettere, somiglianza almeno 82% e un vincitore netto: meglio "non riconosciuto" che un
+// comando sbagliato.
+function closestPhrase(text, phrases) {
+  const said = text.replace(/\s/g, "");
+  if (said.length < 5) return null;
+  const scored = [...new Set(phrases)].map(p => {
+    const q = p.replace(/\s/g, "");
+    if (q.length < 7 || Math.abs(q.length - said.length) > Math.max(3, q.length * 0.3)) return null;
+    return { p, score: 1 - editDistance(said, q) / Math.max(said.length, q.length) };
+  }).filter(x => x && x.score >= 0.82).sort((a, b) => b.score - a.score);
+  if (!scored.length || (scored[1] && scored[0].score - scored[1].score < 0.05)) return null;
+  return scored[0].p;
+}
 
 // Vero se la frase compare intera, parola per parola, in ciò che è stato detto.
 function saidPhrase(text, phrase) {

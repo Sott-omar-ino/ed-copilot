@@ -649,4 +649,10 @@ LANG.add({
   "Inizia": "Start",
   "Avanti ▸": "Next ▸",
   "Microfono aggiornato": "Microphone updated",
+  "Precisione del riconoscimento": "Recognition accuracy",
+  "Veloce": "Fast",
+  "Bilanciato": "Balanced",
+  "Preciso": "Accurate",
+  "Veloce: meno di 1 s ma sbaglia di più. Bilanciato: circa 1 s, consigliato. Preciso: capisce quasi tutto ma può richiedere diversi secondi per comando mentre giochi. Al primo uso il modello viene scaricato (da 75 a 480 MB).": "Fast: under 1 s but makes more mistakes. Balanced: about 1 s, recommended. Accurate: understands almost everything but can take several seconds per command while you play. The model is downloaded on first use (75 to 480 MB).",
+  "Modello di riconoscimento cambiato: si carica in pochi secondi": "Recognition model changed: it loads in a few seconds",
 });

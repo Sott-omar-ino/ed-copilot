@@ -124,6 +124,14 @@ def _open_window(url, server):
     except ImportError:
         print("pywebview non installato: apro il browser.")
         return False
+    # Mentre si gioca la finestra dell'app sta dietro al gioco: senza questi argomenti WebView2 (Chromium) rallenta i
+    # timer della pagina a ~1 al secondo e il microfono del copilota (filtro rumori, ascolto continuo) smette di funzionare.
+    # (la variabile d'ambiente prevale sugli argomenti di pywebview: si ripete anche il suo --disable-features)
+    flags = ("--disable-features=ElasticOverscroll --disable-background-timer-throttling "
+             "--disable-backgrounding-occluded-windows --disable-renderer-backgrounding")
+    extra = os.environ.get("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "")
+    if "--disable-background-timer-throttling" not in extra:
+        os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = (extra + " " + flags).strip()
     window = webview.create_window("ED Copilot", url, width=1520, height=940, min_size=(1000, 680),
                                    background_color="#030100", text_select=True, maximized=True)
 

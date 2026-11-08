@@ -26,7 +26,10 @@ DEFAULT_CONFIG = {"enabled": False, "mode": "ptt", "ptt_key_code": "Space", "ptt
                   # Voce: velocità (%) e tono (Hz) di edge-tts, effetto (voice_fx.PRESETS) e quanto effetto (0-100).
                   "tts_rate": 0, "tts_pitch": 0, "tts_effect": "naturale", "tts_fx_amount": 70,
                   # Voce scelta con l'interfaccia in inglese ("" = predefinita inglese, vedi resolve_voice).
-                  "voice_en": ""}
+                  "voice_en": "",
+                  # Modello di riconoscimento (faster-whisper): "tiny" veloce, "base" bilanciato, "small" preciso.
+                  "stt_model": "base"}
+STT_MODELS = ("tiny", "base", "small")
 # Nomi brevi usati dalle versioni precedenti (restano validi). Le altre voci si indicano col nome edge-tts completo.
 VOICES = {"elsa": "it-IT-ElsaNeural", "diego": "it-IT-DiegoNeural",
           "isabella": "it-IT-IsabellaNeural", "giuseppe": "it-IT-GiuseppeNeural"}
@@ -81,6 +84,10 @@ def save_config(changes):
     cfg["tts_pitch"] = _clamp(cfg.get("tts_pitch"), -30, 30, 0)
     cfg["tts_effect"] = voice_fx.preset(cfg.get("tts_effect"))
     cfg["tts_fx_amount"] = _clamp(cfg.get("tts_fx_amount"), 0, 100, 70)
+    if cfg.get("stt_model") not in STT_MODELS:
+        cfg["stt_model"] = DEFAULT_CONFIG["stt_model"]
+    if cfg["stt_model"] != raw.get("stt_model"):
+        _reset_whisper()
     if not isinstance(cfg.get("voice"), str) or not (cfg["voice"] in VOICES or _VOICE_RE.match(cfg["voice"])):
         cfg["voice"] = "elsa"
     if not isinstance(cfg.get("voice_en"), str) or not (cfg["voice_en"] == "" or _VOICE_RE.match(cfg["voice_en"])):
@@ -389,22 +396,49 @@ _whisper = None
 _whisper_lock = threading.Lock()
 
 
+_whisper_name = None
+
+
+def _reset_whisper():
+    """Il modello cambia alla prossima trascrizione (viene caricato, e la prima volta scaricato, in background)."""
+    global _whisper, _whisper_name
+    with _whisper_lock:
+        _whisper, _whisper_name = None, None
+    if load_config().get("enabled"):
+        threading.Thread(target=whisper_model, daemon=True).start()
+
+
 def whisper_model():
-    global _whisper
+    global _whisper, _whisper_name
     with _whisper_lock:
         if _whisper is None:
+            name = load_config().get("stt_model") if load_config().get("stt_model") in STT_MODELS else "base"
             try:
                 for var in ("HF_HUB_DISABLE_PROGRESS_BARS", "HF_HUB_DISABLE_SYMLINKS_WARNING", "HF_HUB_DISABLE_TELEMETRY"):
                     os.environ.setdefault(var, "1")
-                # Il modello (circa 75 MB, scaricato al primo uso) resta nella cartella dati: l'app rimane portatile.
+                # Il modello (tiny ~75 MB, base ~145 MB, small ~480 MB, scaricato al primo uso) resta nella cartella
+                # dati: l'app rimane portatile.
                 os.environ.setdefault("HF_HOME", paths.cache_file("modelli"))
                 from faster_whisper import WhisperModel
-                _whisper = WhisperModel("tiny", device="cpu", compute_type="int8")
-                print("[Voce] Riconoscimento vocale pronto.")
+                print(f"[Voce] Carico il modello di riconoscimento \"{name}\" (la prima volta va scaricato)...")
+                _whisper = WhisperModel(name, device="cpu", compute_type="int8", cpu_threads=max(2, (os.cpu_count() or 4) // 2))
+                _whisper_name = name
+                print(f"[Voce] Riconoscimento vocale pronto (modello {name}).")
             except Exception as exc:
                 print(f"[Voce] Riconoscimento vocale non disponibile: {exc}")
                 _whisper = False
     return _whisper or None
+
+
+def _command_prompt():
+    """Suggerimento per Whisper (initial_prompt): poche parole chiave dei comandi, così i termini del gioco vengono
+    riconosciuti meglio. Breve apposta: un testo lungo rallenta molto la trascrizione (provato: 0,8 s contro 6 s)."""
+    words = []
+    for item in (storage.CONTROLS.load() or []) + (storage.MACROS.load() or []):
+        name = str(item.get("name") or "").strip()
+        if name and name.lower() not in (w.lower() for w in words):
+            words.append(name)
+    return (pick("Elite Dangerous: ", "Elite Dangerous: ") + ", ".join(words))[:260]
 
 
 _last_filter = {}
@@ -458,6 +492,7 @@ def transcribe(data, content_type="", source="", floor_db=None):
         # Poi il VAD di Whisper (Silero) toglie il resto del silenzio; i parametri seguono lo stesso cursore.
         # Lingua dell'interfaccia: Whisper (modello multilingue "tiny") trascrive in italiano o in inglese.
         segments, _ = model.transcribe(audio, language=lang.current(), beam_size=1, temperature=0.0, vad_filter=True,
+                                       initial_prompt=_command_prompt(), without_timestamps=True,
                                        vad_parameters=noise_filter.vad_parameters(strength),
                                        condition_on_previous_text=False)
         text = " ".join(s.text for s in segments).strip()

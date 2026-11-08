@@ -10,6 +10,7 @@ Sicurezza:
 import io
 import json
 import os
+import re
 import secrets
 import socket
 import subprocess
@@ -98,6 +99,16 @@ def static_file(path):
     if not full.startswith(os.path.normpath(paths.WEB_DIR) + os.sep) or not os.path.isfile(full):
         return None
     return full, CONTENT_TYPES[ext]
+
+
+# File statici che il server per il telefono (LAN) può servire: solo la pagina del companion, l'icona e i font Saira
+# (percorsi relativi a web/). Tutto il resto di web/ (script, fogli di stile, altre pagine) resta solo sul PC.
+LAN_STATIC = re.compile(r"(?:companion\.html|favicon\.svg|fonts/Saira-[A-Za-z0-9-]+\.woff2)")
+
+
+def lan_static_ok(full):
+    rel = os.path.relpath(full, paths.WEB_DIR).replace(os.sep, "/")
+    return bool(LAN_STATIC.fullmatch(rel))
 
 
 def _query(path):
@@ -422,7 +433,7 @@ class Handler(BaseHTTPRequestHandler):
                         return self._send(302, b"", extra={"Location": target, "Cache-Control": "max-age=86400"})
                     return self._send(404, {"error": pick("immagine non disponibile", "image not available")})
                 found = None if path.startswith("/api/") else static_file(path)
-                if found and (not self.lan or found[0].endswith(("companion.html", ".svg", ".ico", ".css"))):
+                if found and (not self.lan or lan_static_ok(found[0])):
                     with open(found[0], "rb") as f:
                         return self._send(200, f.read(), found[1])
                 return self._send(404, {"error": pick("non trovato", "not found")})

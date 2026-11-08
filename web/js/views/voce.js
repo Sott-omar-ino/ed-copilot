@@ -148,7 +148,15 @@ function noiseFilterPanel() {
     last.speech ? `voce tenuta (${dec(last.kept_ms / 1000)} s)` : "nessuna voce, non inviata al riconoscimento"}${
     last.dropped ? `, tagliati ${last.dropped} rumori` : ""}.` : "Nessuna registrazione analizzata dall'avvio.";
   const calRes = UI.nfCal;
+  const model = vcfg().stt_model || "base";
+  const models = [["tiny", "Veloce"], ["base", "Bilanciato"], ["small", "Preciso"]];
   return `<div class="subpanel vc-stack">
+    <label style="font-size:12px;font-weight:bold;color:var(--gold);margin:0">Precisione del riconoscimento</label>
+    <div class="seg-choice">${models.map(([v, l]) => `<button class="small ${model === v ? "primary" : ""}" data-stt-model="${v}">${l}</button>`).join("")}</div>
+    <div class="sub" style="font-size:11px">Veloce: meno di 1 s ma sbaglia di più. Bilanciato: circa 1 s, consigliato. Preciso: capisce quasi tutto
+      ma può richiedere diversi secondi per comando mentre giochi. Al primo uso il modello viene scaricato (da 75 a 480 MB).</div>
+  </div>
+  <div class="subpanel vc-stack">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <label style="font-size:12px;font-weight:bold;color:var(--gold);margin:0">Filtro rumori</label>
       <span id="nf-strength-val" class="mono gold" style="font-size:13px;font-weight:bold">${st}%</span>
@@ -603,3 +611,10 @@ VIEWS.voice_commands = () => {
 
   </div>`;
 };
+
+// Precisione del riconoscimento vocale (modello di faster-whisper, app/voice.py)
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-stt-model]");
+  if (!b) return;
+  saveVoiceCfg({ stt_model: b.dataset.sttModel }).then(() => { toast(LANG.t("Modello di riconoscimento cambiato: si carica in pochi secondi")); renderView(); });
+});
