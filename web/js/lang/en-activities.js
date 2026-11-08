@@ -1034,4 +1034,8 @@ LANG.add({
   "{} salti · {}": "{} jumps · {}",
   "{} salti": "{} jumps",
   "{} corpi": "{} bodies",
+  "Tempo ai comandi (stima)": "Time at the controls (estimate)",
+  "Tempo totale minimo": "Minimum total time",
+  "Più veloce in ore, ma devi essere ai comandi per tutto il viaggio.": "Faster in hours, but you have to be at the controls for the whole trip.",
+  "Più lento in ore, ma non serve essere ai comandi: tra un salto e l'altro puoi fare altro o uscire dal gioco, e porti con te navi e moduli.": "Slower in hours, but you don't need to be at the controls: between jumps you can do something else or log out, and your ships and modules come with you.",
 });

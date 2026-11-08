@@ -55,8 +55,9 @@ VIEWS.colonia = () => {
       Con la neutron highway ogni salto da una stella di neutroni vale ~4 volte la gittata (supercharge; l'FSD si danneggia un po' a ogni supercharge: porta un AFMU per ripararlo).</p>
     <div class="kv-grid">
       <div class="kv"><span>Salti (stima)</span><span>${ne ? "~" + num(ne.jumps) : "—"}</span></div>
-      <div class="kv"><span>Tempo (stima)</span><span>${ne ? "~" + colHours(ne.minutes) : "—"}</span><span class="sub">stima: ~75 s a salto</span></div>
+      <div class="kv"><span>Tempo ai comandi (stima)</span><span>${ne ? "~" + colHours(ne.minutes) : "—"}</span><span class="sub">stima: ~75 s a salto</span></div>
     </div>
+    <p class="sub" style="margin:6px 0 0">Più veloce in ore, ma devi essere ai comandi per tutto il viaggio.</p>
     <div style="margin-top:8px"><button class="primary small" data-col-plan="neutron">◆ Calcola rotta neutron</button>
       <button class="small ghost" data-col-plan="neutron" data-col-save="1" title="Calcola e imposta come rotta attiva (scheda Rotte)">Calcola e usa come rotta attiva</button></div>
     <div style="margin-top:8px">${colPlanBox("colPlanNeutron", p => `<div class="kv-grid">
@@ -73,8 +74,9 @@ VIEWS.colonia = () => {
     <div class="kv-grid">
       <div class="kv"><span>Salti</span><span>${(oc?.estimate || ce) ? "~" + num((oc?.estimate || ce).jumps) : "—"}</span></div>
       <div class="kv"><span>Tritium</span><span class="gold">${(oc?.estimate || ce) ? "~" + num((oc?.estimate || ce).tritium) + " t" : "—"}</span><span class="sub">${(oc?.estimate || ce)?.refills ? (oc?.estimate || ce).refills + " rifornimenti in viaggio" : ""}</span></div>
-      <div class="kv"><span>Tempo minimo</span><span>${(oc?.estimate || ce) ? "~" + colHours((oc?.estimate || ce).minutes) : "—"}</span><span class="sub">a 20 min a salto</span></div>
+      <div class="kv"><span>Tempo totale minimo</span><span>${(oc?.estimate || ce) ? "~" + colHours((oc?.estimate || ce).minutes) : "—"}</span><span class="sub">a 20 min a salto</span></div>
     </div>
+    <p class="sub" style="margin:6px 0 0">Più lento in ore, ma non serve essere ai comandi: tra un salto e l'altro puoi fare altro o uscire dal gioco, e porti con te navi e moduli.</p>
     <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
       <button class="primary small" data-col-plan="carrier">◆ Calcola rotta carrier</button>
       ${oc ? `<button class="small ghost" data-col-fc-plan="${esc(oc.system || "")}">Pianifica il viaggio del tuo carrier →</button>` : ""}
