@@ -42,13 +42,15 @@ APP_ID = "ed-copilot"
 MAX_JSON = 2 * 1024 * 1024
 CONTENT_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
                  ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png",
-                 ".ico": "image/x-icon", ".woff2": "font/woff2"}
+                 ".ico": "image/x-icon", ".woff2": "font/woff2",
+                 # Manifest dell'app per il telefono: MDN, Web app manifest ("Content-Type: application/manifest+json").
+                 ".webmanifest": "application/manifest+json"}
 
 APP_CONFIG_FILE = paths.user_file("app_config.json")
 _app_config_lock = threading.Lock()
 REMOTE_NAV = {"view": None, "ts": 0.0}
 RUNTIME = {"port": None, "lan_port": None, "lan_server": None, "on_focus": None,
-           "lan_https": False, "lan_fingerprint": None}
+           "lan_https": False, "lan_fingerprint": None, "lan_ca_fingerprint": None}
 # Siti che l'app può aprire nel browser (link "apri su Inara" ecc.).
 OPEN_HOSTS = ("inara.cz", "spansh.co.uk", "www.edsm.net", "edsm.net", "github.com", "coriolis.io", "edsy.org",
               "discord.gg", "www.reddit.com", "math.edomh.nl", "elite-dangerous.fandom.com",  # ultimi: scheda Colonia
@@ -88,6 +90,23 @@ def companion_url():
     return f"{scheme}://{local_ip()}:{RUNTIME['lan_port']}/companion?t={app_config()['lan_token']}"
 
 
+def ca_url():
+    """Indirizzo (senza codice) da cui il telefono scarica il certificato della CA, solo se il server è in HTTPS."""
+    if not (RUNTIME["lan_port"] and RUNTIME.get("lan_https")):
+        return None
+    return f"https://{local_ip()}:{RUNTIME['lan_port']}{tls.CA_PATH}"
+
+
+def _lan_info():
+    """Stato del server per il telefono, per l'interfaccia del PC (impostazioni e stato)."""
+    ip = local_ip()
+    return {"enabled": bool(RUNTIME["lan_port"]), "url": companion_url(), "https": bool(RUNTIME.get("lan_https")),
+            "fingerprint": RUNTIME.get("lan_fingerprint"), "ca_url": ca_url(),
+            "ca_fingerprint": RUNTIME.get("lan_ca_fingerprint") if RUNTIME.get("lan_https") else None,
+            # Fuori dalle reti private (vincoli della CA, app/tls.py) il telefono non potrà fidarsi del certificato.
+            "ip_private": tls.ip_covered(ip), "token": app_config()["lan_token"] if RUNTIME["lan_port"] else None}
+
+
 def static_file(path):
     """Solo file dentro web/ (anche sottocartelle), senza uscire dalla cartella."""
     name = {"/": "index.html", "": "index.html", "/companion": "companion.html", "/companion/": "companion.html"}.get(path)
@@ -101,9 +120,13 @@ def static_file(path):
     return full, CONTENT_TYPES[ext]
 
 
-# File statici che il server per il telefono (LAN) può servire: solo la pagina del companion, l'icona e i font Saira
-# (percorsi relativi a web/). Tutto il resto di web/ (script, fogli di stile, altre pagine) resta solo sul PC.
-LAN_STATIC = re.compile(r"(?:companion\.html|favicon\.svg|fonts/Saira-[A-Za-z0-9-]+\.woff2)")
+# File statici che il server per il telefono (LAN) può servire: solo la pagina del companion, l'icona, i font Saira e,
+# per installarla come app, il manifest, il service worker e le icone (percorsi relativi a web/). Tutto il resto di
+# web/ (script, fogli di stile, altre pagine) resta solo sul PC. Il service worker sta nella radice (/companion-sw.js)
+# perché il suo ambito massimo è la cartella in cui si trova (MDN, ServiceWorkerContainer.register: "A service worker
+# can't have a scope broader than its own location"), e deve coprire /companion.
+LAN_STATIC = re.compile(r"(?:companion\.html|favicon\.svg|fonts/Saira-[A-Za-z0-9-]+\.woff2|companion\.webmanifest"
+                        r"|companion-sw\.js|icons/(?:icon|maskable)-(?:192|512)\.png|icons/apple-touch-icon\.png)")
 
 
 def lan_static_ok(full):
@@ -129,8 +152,7 @@ def _state(q):
     snap = STATE.snapshot()
     snap["voice_config"] = voice.load_config()
     snap["remote_nav"] = dict(REMOTE_NAV)
-    snap["lan"] = {"enabled": bool(RUNTIME["lan_port"]), "url": companion_url(),
-                   "https": bool(RUNTIME.get("lan_https")), "fingerprint": RUNTIME.get("lan_fingerprint")}
+    snap["lan"] = {k: v for k, v in _lan_info().items() if k != "token"}
     snap["remote_voice"] = remote_voice.recent()
     snap["overlay"] = overlay.status()
     return snap
@@ -284,7 +306,8 @@ def _copy_next(q):
 
 
 def _qrcode(q):
-    url = companion_url()
+    # ?for=ca: QR per scaricare il certificato della CA sul telefono (Impostazioni › Generali › Companion).
+    url = ca_url() if q.get("for") == "ca" else companion_url()
     if not url:
         raise ValueError(pick("Accesso dal telefono non attivo", "Phone access is not enabled"))
     import qrcode
@@ -344,8 +367,7 @@ def _settings(q):
     cfg = app_config()
     return {"inara": {"configured": inara.configured()}, "update": updater.status(), "overlay": overlay.status(),
             "discord": discord.status(),
-            "lan": {"enabled": bool(RUNTIME["lan_port"]), "url": companion_url(), "https": bool(RUNTIME.get("lan_https")),
-                    "fingerprint": RUNTIME.get("lan_fingerprint"), "tls_available": tls.available()},
+            "lan": {**_lan_info(), "tls_available": tls.available()},
             "version": updater.VERSION, "ui_lang": lang.current(), "data_dir": paths.DATA_DIR, "update_repo": cfg.get("update_repo") or updater.DEFAULT_REPO,
             # Guida al primo avvio (web/js/views/benvenuto.js): già vista? Il journal c'è?
             "welcome_seen": bool(cfg.get("welcome_seen")),
@@ -521,6 +543,18 @@ class Handler(BaseHTTPRequestHandler):
             if method == "GET":
                 if path == "/" and self.lan:
                     return self._send(302, b"", extra={"Location": "/companion"})
+                if path == tls.CA_PATH and self.lan:
+                    # Certificato della CA per il telefono: dato pubblico, quindi senza codice; solo questo file, solo la
+                    # parte pubblica (la chiave della radice non esiste più, vedi app/tls.py). MIME application/x-x509-ca-cert:
+                    # è quello che Android associa ai .crt (platform/external/mime-support, mime.types) e che apre
+                    # l'installatore dei certificati (packages/apps/CertInstaller, AndroidManifest.xml). Dal browser,
+                    # da Android 11, i certificati CA si installano solo dalle Impostazioni (developer.android.com,
+                    # KeyChain.createInstallIntent: "CA certificates can only be installed via Settings").
+                    der = tls.ca_der() if RUNTIME.get("lan_https") else None
+                    if not der:
+                        return self._send(404, {"error": pick("non trovato", "not found")})
+                    return self._send(200, der, "application/x-x509-ca-cert",
+                                      extra={"Content-Disposition": 'attachment; filename="ED-Copilot-CA.crt"'})
                 if path in GET:
                     return self._send(200, GET[path](q))
                 if path in BINARY_GET:
@@ -600,7 +634,8 @@ def start_lan():
                 fp = tls.wrap(server, local_ip())
             except Exception as exc:
                 print(f"[TLS] HTTPS non disponibile, companion in HTTP: {exc!r}")
-        RUNTIME.update(lan_server=_serve(server), lan_port=port, lan_https=bool(fp), lan_fingerprint=fp)
+        RUNTIME.update(lan_server=_serve(server), lan_port=port, lan_https=bool(fp), lan_fingerprint=fp,
+                       lan_ca_fingerprint=getattr(server, "tls_ca_fingerprint", None) if fp else None)
         print(f"Companion per telefono attivo: {companion_url()}")
         return True
     return False
@@ -610,4 +645,4 @@ def stop_lan():
     server = RUNTIME.get("lan_server")
     if server:
         threading.Thread(target=lambda: (server.shutdown(), server.server_close()), daemon=True).start()
-    RUNTIME.update(lan_server=None, lan_port=None, lan_https=False, lan_fingerprint=None)
+    RUNTIME.update(lan_server=None, lan_port=None, lan_https=False, lan_fingerprint=None, lan_ca_fingerprint=None)

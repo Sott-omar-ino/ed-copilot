@@ -1,3 +1,3 @@
 """ED Copilot: companion locale per Elite Dangerous."""
 
-VERSION = "5.11"
+VERSION = "6.0"

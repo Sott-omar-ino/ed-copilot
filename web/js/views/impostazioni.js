@@ -50,7 +50,37 @@ function companionPanel() {
           ${lan.fingerprint ? `<div class="mono" style="font-size:10px;margin-top:4px;word-break:break-all">Impronta: ${esc(lan.fingerprint)}</div>` : ""}</div>`
           : '<div class="sub" style="margin-top:10px">Connessione non cifrata: dal telefono funzionano i pulsanti ma non il comando vocale.</div>'}
       </div>
-    </div>`;
+    </div>${lan.https ? installAppNote(lan) : ""}`;
+}
+
+// Installare il companion come app sul telefono (icona sulla schermata Home, a schermo intero): il telefono deve prima
+// fidarsi della piccola CA creata dall'app (app/tls.py), valida solo per gli indirizzi delle reti di casa.
+// Gli stessi passi, più dettagliati, sono nella sezione "Installa come app" della pagina del companion.
+function installAppNote(lan) {
+  const li = text => `<li style="margin-bottom:4px">${text}</li>`;
+  const warn = lan.ip_private === false
+    ? `<div class="bad" style="margin:8px 0">L'indirizzo di questo PC non è di una rete di casa: il telefono non potrà fidarsi del certificato e l'installazione come app non funzionerà.</div>` : "";
+  return `<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--hud-faint)">
+    <div class="eyebrow">Installa come app sul telefono</div>
+    <div class="sub" style="margin:6px 0 10px">Per avere il companion come app (icona sulla schermata Home, a schermo intero, senza la barra del browser) il telefono deve fidarsi del certificato di ED Copilot. Il certificato vale solo per gli indirizzi delle reti di casa: non può essere usato per nessun sito internet.</div>
+    ${warn}
+    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+      ${lan.ca_url ? `<div class="qr-box"><img src="/api/qrcode?for=ca&ts=${encodeURIComponent(lan.ca_url)}" width="140" height="140" alt="QR code del certificato"></div>` : ""}
+      <div style="flex:1;min-width:220px">
+        <div class="sub">Inquadra il QR per scaricare il certificato, poi:</div>
+        <ol class="sub" style="margin:6px 0 8px;padding-left:20px">
+          ${li("Android: Impostazioni › Sicurezza e privacy › Altre impostazioni di sicurezza › Crittografia e credenziali › Installa un certificato › Certificato CA (i nomi cambiano con la marca).")}
+          ${li("iPhone: Impostazioni › Generali › VPN e gestione dispositivi › installa il profilo; poi Generali › Info › Impostazioni certificati attendibili › attiva la fiducia completa.")}
+          ${li("Apri il companion: nella sezione «Installa come app» trovi il pulsante (Android) o i passi per Condividi › Aggiungi alla schermata Home (iPhone).")}
+        </ol>
+        ${lan.ca_url ? `<button class="small" data-copy="${esc(lan.ca_url)}">Copia l'indirizzo del certificato</button>` : ""}
+        ${lan.ca_fingerprint ? `<div class="sub" style="margin-top:8px">Impronta del certificato (SHA-256), da confrontare con quella mostrata dal telefono:</div>
+          <div class="mono" style="font-size:10px;margin-top:2px;word-break:break-all">${esc(lan.ca_fingerprint)}</div>` : ""}
+        ${lan.token ? `<div class="sub" style="margin-top:8px">Se l'app installata chiede il codice di accesso:</div>
+          <div class="mono" style="font-size:12px;margin-top:2px;word-break:break-all">${esc(lan.token)}</div>` : ""}
+      </div>
+    </div>
+  </div>`;
 }
 
 // Impostazioni lette dal server (Inara, overlay, aggiornamenti): caricate una volta, ricaricate dopo ogni modifica.

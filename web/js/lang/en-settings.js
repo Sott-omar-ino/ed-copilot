@@ -60,6 +60,23 @@ LANG.add({
   "Impronta: {}": "Fingerprint: {}",
   "Connessione non cifrata: dal telefono funzionano i pulsanti ma non il comando vocale.":
     "Unencrypted connection: buttons work from the phone but voice commands don't.",
+  "Installa come app sul telefono": "Install as an app on your phone",
+  "Per avere il companion come app (icona sulla schermata Home, a schermo intero, senza la barra del browser) il telefono deve fidarsi del certificato di ED Copilot. Il certificato vale solo per gli indirizzi delle reti di casa: non può essere usato per nessun sito internet.":
+    "To have the companion as an app (Home Screen icon, full screen, no browser bar) the phone must trust ED Copilot's certificate. The certificate only works for home network addresses: it can't be used for any internet site.",
+  "L'indirizzo di questo PC non è di una rete di casa: il telefono non potrà fidarsi del certificato e l'installazione come app non funzionerà.":
+    "This PC's address isn't on a home network: the phone won't be able to trust the certificate and installing as an app won't work.",
+  "QR code del certificato": "Certificate QR code",
+  "Inquadra il QR per scaricare il certificato, poi:": "Scan the QR to download the certificate, then:",
+  "Android: Impostazioni › Sicurezza e privacy › Altre impostazioni di sicurezza › Crittografia e credenziali › Installa un certificato › Certificato CA (i nomi cambiano con la marca).":
+    "Android: Settings › Security & privacy › More security settings › Encryption & credentials › Install a certificate › CA certificate (names vary by brand).",
+  "iPhone: Impostazioni › Generali › VPN e gestione dispositivi › installa il profilo; poi Generali › Info › Impostazioni certificati attendibili › attiva la fiducia completa.":
+    "iPhone: Settings › General › VPN & Device Management › install the profile; then General › About › Certificate Trust Settings › turn on full trust.",
+  "Apri il companion: nella sezione «Installa come app» trovi il pulsante (Android) o i passi per Condividi › Aggiungi alla schermata Home (iPhone).":
+    "Open the companion: in the “Install as app” section you'll find the button (Android) or the steps for Share › Add to Home Screen (iPhone).",
+  "Copia l'indirizzo del certificato": "Copy the certificate address",
+  "Impronta del certificato (SHA-256), da confrontare con quella mostrata dal telefono:":
+    "Certificate fingerprint (SHA-256), to compare with the one shown on the phone:",
+  "Se l'app installata chiede il codice di accesso:": "If the installed app asks for the access code:",
 
   // --- Generali: notifiche sul telefono ---
   "Notifiche sul telefono": "Phone notifications",

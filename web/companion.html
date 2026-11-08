@@ -13,6 +13,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Installazione come app (sezione "Installa come app" più sotto): manifest, icone e service worker sono serviti anche
+     dal server per il telefono (app/server.py, LAN_STATIC). Il manifest non contiene il codice di accesso. -->
+<link rel="manifest" href="/companion.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="ED Copilot">
 <style>
 /* Font inclusi nell'app (web/fonts, licenza OFL): Saira con lo zero barrato, come l'app sul PC.
    Il server per il telefono serve solo questi file (app/server.py, LAN_STATIC). */
@@ -325,6 +330,30 @@ details.panel[open] > summary { border-bottom: 1px solid var(--hud-line); margin
 .nb-item time { flex: none; font-size: 12px; font-weight: 700; color: var(--label); }
 .nb-item div.x { font-size: 13px; color: var(--text); opacity: .88; text-shadow: none; }
 
+/* --- installa come app ------------------------------------------------------------------- */
+.inst-steps { margin: 8px 0 12px; padding-left: 22px; font-size: 13px; line-height: 1.5; color: var(--text); text-shadow: none;
+  user-select: text; -webkit-user-select: text; }
+.inst-steps li { margin: 0 0 6px; padding-left: 2px; overflow-wrap: anywhere; }
+.inst-steps li::marker { color: var(--hud-hi); font-weight: 800; }
+.inst-h { margin: 14px 0 4px; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--hud-hi); }
+.inst-h:first-child { margin-top: 0; }
+.inst-ok { margin: 0 0 8px; padding: 8px 12px; border-left: 3px solid var(--ok); background: rgba(155, 227, 107, .08);
+  font-size: 13px; line-height: 1.5; color: var(--text); text-shadow: none; }
+.inst-why { margin: 0 0 8px; padding: 8px 12px; border-left: 3px solid var(--gold); background: rgba(255, 210, 122, .07);
+  font-size: 13px; line-height: 1.5; color: var(--text); text-shadow: none; text-wrap: pretty; }
+a.btn { display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none;
+  font: 800 12px var(--ui); letter-spacing: .08em; text-transform: uppercase; min-height: 44px; padding: 8px 12px;
+  background: var(--hud); color: var(--ink); border: 1px solid var(--hud); clip-path: var(--cut); touch-action: manipulation; }
+a.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; }
+details.sub-box { margin-top: 10px; border-top: 1px solid var(--hud-faint); padding-top: 6px; }
+details.sub-box > summary { cursor: pointer; min-height: 40px; display: flex; align-items: center; font-size: 12px; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--hud-hi); touch-action: manipulation; }
+/* Codice di accesso da incollare (app installata su iPhone: memoria separata da Safari) */
+.code-form { display: flex; gap: 8px; margin-top: 8px; }
+.code-form input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 10px; font-family: var(--ui); color: var(--text);
+  background: var(--inset); border: 1px solid var(--hud-line); }
+.code-form input:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
 /* --- pulsantiera ------------------------------------------------------------------------- */
 .tabpanel > .hint { margin: 0 2px 12px; }
 .section { margin: 18px 2px 10px; display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--label); }
@@ -491,7 +520,12 @@ nav.tabs {
 </header>
 
 <div class="banner" id="conn-banner" role="alert" hidden>
-  <div class="msg"><b id="conn-title"></b><span id="conn-text"></span></div>
+  <div class="msg"><b id="conn-title"></b><span id="conn-text"></span>
+    <form class="code-form" id="code-form" hidden>
+      <input id="code-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Codice di accesso" placeholder="Codice di accesso">
+      <button type="submit">Usa</button>
+    </form>
+  </div>
   <button type="button" id="conn-retry">Riprova</button>
 </div>
 
@@ -526,6 +560,11 @@ nav.tabs {
         </div>
         <div id="notify-list"></div>
       </div>
+    </details>
+
+    <details class="panel" id="install-box" hidden>
+      <summary><h2>Installa come app</h2><span class="nb-last" id="install-state"></span><span class="chev" aria-hidden="true"></span></summary>
+      <div class="bd" id="install-body"></div>
     </details>
   </div>
 
@@ -578,8 +617,6 @@ const CLANG = (() => {
     "PC non raggiungibile": "Can't reach the PC",
     "Controlla che ED Copilot sia aperto sul PC e che il telefono sia sulla stessa rete Wi-Fi. Riprovo da solo ogni pochi secondi.":
       "Check that ED Copilot is open on the PC and that the phone is on the same Wi-Fi network. Retrying automatically every few seconds.",
-    "Il codice di accesso manca o non è più valido. Inquadra di nuovo il QR code sul PC (Impostazioni › Generali › Companion per il telefono).":
-      "The access code is missing or no longer valid. Scan the QR code on the PC again (Settings › General › Phone companion).",
     "Stato": "Status",
     "TELEMETRIA": "TELEMETRY",
     "Sistema": "System",
@@ -722,6 +759,62 @@ const CLANG = (() => {
     "Estrai": "Deploy",
     "Ritira": "Retract",
     "Istruzioni qui sopra": "Instructions above",
+    // Installa come app
+    "Installa come app": "Install as app",
+    "controllo…": "checking…",
+    "certificato da installare": "certificate needed",
+    "pronta": "ready",
+    "installata": "installed",
+    "serve HTTPS": "needs HTTPS",
+    "Per installare l'app serve la connessione cifrata (HTTPS): sul PC, in Impostazioni › Generali › Companion per il telefono, deve risultare attiva.":
+      "Installing the app needs the encrypted connection (HTTPS): on the PC, in Settings › General › Phone companion, it must show as active.",
+    "Controllo se il telefono si fida della connessione…": "Checking whether the phone trusts the connection…",
+    "Il telefono non si fida ancora del certificato creato da ED Copilot sul tuo PC, quindi non permette di installare l'app. Basta farlo una volta:":
+      "The phone doesn't trust the certificate ED Copilot created on your PC yet, so it won't let you install the app. You only need to do this once:",
+    "Il certificato vale solo per gli indirizzi delle reti di casa (192.168…, 10…, 172.16-31…, 100.64-127…): è limitato così al suo interno e non può essere usato per nessun sito internet.":
+      "The certificate only works for home network addresses (192.168…, 10…, 172.16-31…, 100.64-127…): this limit is built into it, so it can't be used for any internet site.",
+    "Scarica il certificato": "Download the certificate",
+    "Android": "Android",
+    "iPhone e iPad": "iPhone and iPad",
+    "Tocca «Scarica il certificato». Se compare l'avviso di sicurezza, prosegui. Se il telefono dice che i certificati CA si installano dalle Impostazioni, va bene: il file è nei Download.":
+      "Tap “Download the certificate”. If a security warning appears, continue. If the phone says CA certificates must be installed from Settings, that's fine: the file is in Downloads.",
+    "Apri Impostazioni › Sicurezza e privacy › Altre impostazioni di sicurezza › Crittografia e credenziali › Installa un certificato › Certificato CA.":
+      "Open Settings › Security & privacy › More security settings › Encryption & credentials › Install a certificate › CA certificate.",
+    "Conferma l'avviso e scegli il file ED-Copilot-CA.crt. Serve un blocco schermo (PIN, sequenza o password).":
+      "Confirm the warning and pick the file ED-Copilot-CA.crt. A screen lock (PIN, pattern or password) is required.",
+    "I nomi dei menu cambiano con la marca e la versione: se non li trovi, cerca «certificato CA» nelle Impostazioni.":
+      "Menu names change with brand and version: if you can't find them, search for “CA certificate” in Settings.",
+    "Apri questa pagina in Safari e tocca «Scarica il certificato», poi «Consenti».":
+      "Open this page in Safari and tap “Download the certificate”, then “Allow”.",
+    "Impostazioni › Generali › VPN e gestione dispositivi: tocca il profilo «ED Copilot - CA rete locale» e poi Installa.":
+      "Settings › General › VPN & Device Management: tap the “ED Copilot - CA rete locale” profile, then Install.",
+    "Impostazioni › Generali › Info › Impostazioni certificati attendibili: attiva l'attendibilità completa per «ED Copilot - CA rete locale».":
+      "Settings › General › About › Certificate Trust Settings: turn on full trust for “ED Copilot - CA rete locale”.",
+    "Poi chiudi questa scheda e riapri l'indirizzo del companion (o tocca «Ricontrolla»).":
+      "Then close this tab and open the companion address again (or tap “Check again”).",
+    "Ricontrolla": "Check again",
+    "App installata: aprila dall'icona ED Copilot sulla schermata Home.": "App installed: open it from the ED Copilot icon on your Home Screen.",
+    "Il telefono si fida della connessione: puoi installare il companion come app.": "The phone trusts the connection: you can install the companion as an app.",
+    "Installa app": "Install app",
+    "Tocca «Copia codice di accesso»: l'app installata non vede la memoria di Safari e al primo avvio potrebbe chiederlo.":
+      "Tap “Copy access code”: the installed app can't see Safari's storage and may ask for it the first time.",
+    "Tocca Condividi (il quadrato con la freccia) › Aggiungi alla schermata Home › Aggiungi.":
+      "Tap Share (the square with the arrow) › Add to Home Screen › Add.",
+    "Apri ED Copilot dalla schermata Home. Se chiede il codice di accesso, incollalo.":
+      "Open ED Copilot from the Home Screen. If it asks for the access code, paste it.",
+    "Copia codice di accesso": "Copy access code",
+    "Codice copiato": "Code copied",
+    "Copia non riuscita": "Copy failed",
+    "Il pulsante «Installa app» compare qui quando il browser è pronto, di solito dopo qualche secondo di uso della pagina.":
+      "The “Install app” button appears here when the browser is ready, usually after a few seconds of using the page.",
+    "In alternativa apri il menu del browser (⋮) e scegli «Installa app» o «Aggiungi a schermata Home».":
+      "Or open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.",
+    "Certificato di ED Copilot": "ED Copilot certificate",
+    "Codice di accesso": "Access code",
+    "Usa": "Use",
+    "Codice non valido": "Invalid code",
+    "Il codice di accesso manca o non è più valido. Inquadra di nuovo il QR code sul PC (Impostazioni › Generali › Companion per il telefono) oppure incolla qui il codice.":
+      "The access code is missing or no longer valid. Scan the QR code on the PC again (Settings › General › Phone companion) or paste the code here.",
   };
   const norm = s => s.replace(/\s+/g, " ").trim();
   const exact = new Map(), patterns = [];
@@ -845,15 +938,27 @@ function setLink(state) {
   if (state === "offline" || state === "denied") {
     $("conn-title").textContent = state === "denied" ? "ACCESSO NEGATO" : "PC non raggiungibile";
     $("conn-text").textContent = state === "denied"
-      ? "Il codice di accesso manca o non è più valido. Inquadra di nuovo il QR code sul PC (Impostazioni › Generali › Companion per il telefono)."
+      ? "Il codice di accesso manca o non è più valido. Inquadra di nuovo il QR code sul PC (Impostazioni › Generali › Companion per il telefono) oppure incolla qui il codice."
       : "Controlla che ED Copilot sia aperto sul PC e che il telefono sia sulla stessa rete Wi-Fi. Riprovo da solo ogni pochi secondi.";
     $("conn-retry").hidden = state === "denied";
+    $("code-form").hidden = state !== "denied";
     banner.hidden = false;
   } else {
     banner.hidden = true;
   }
 }
 $("conn-retry").addEventListener("click", () => { haptic(25); pollState(); pollNotify(); });
+// Codice incollato a mano (serve soprattutto all'app installata su iPhone, che non vede la memoria di Safari).
+// Va bene anche l'indirizzo completo del QR: ne prendo il parametro t.
+$("code-form").addEventListener("submit", e => {
+  e.preventDefault();
+  let v = $("code-input").value.trim();
+  const m = v.match(/[?&]t=([^&#\s]+)/);
+  if (m) v = decodeURIComponent(m[1]);
+  if (!/^[A-Za-z0-9_-]{8,64}$/.test(v)) { showToast(CLANG.t("Codice non valido")); return; }
+  localStorage.setItem("edc_token", v);
+  location.reload();
+});
 
 // 2. SCHEDE IN BASSO
 function showTab(id, focus, user) {
@@ -1392,9 +1497,120 @@ $("notify-clear").addEventListener("click", () => { NOTIFY.items = []; renderNot
 //     ogni 15 secondi e quando la pagina torna in primo piano).
 function syncLang() { api("/api/ui_lang").then(d => CLANG.sync(d.ui_lang)).catch(() => {}); }
 
+// 11. INSTALLA COME APP (icona sulla schermata Home, a schermo intero, senza barra del browser).
+//     - Il browser installa solo da una connessione sicura con un certificato ATTENDIBILE (web.dev/articles/install-criteria:
+//       "Be served over HTTPS"; MDN, Using Service Workers: "Service workers are restricted to running across HTTPS").
+//       Un certificato accettato con "Avanzate → Procedi" non basta: per questo il PC crea una piccola CA (app/tls.py)
+//       da rendere attendibile una volta sul telefono. Non si può chiedere al browser se il certificato è attendibile:
+//       lo deduco dal service worker, che con un certificato non attendibile non si registra.
+//     - Chrome/Edge/Samsung Internet: evento beforeinstallprompt -> pulsante "Installa app" (MDN: non c'è su iOS).
+//     - iPhone/iPad: Condividi → Aggiungi alla schermata Home (webkit.org/blog/13878). L'app installata ha la propria
+//       memoria, separata da Safari ("Web applications added to the home screen are not part of Safari",
+//       webkit.org/blog/10218): al primo avvio può chiedere il codice di accesso, per questo c'è "Copia codice".
+//     - Già aperta come app (display-mode standalone): la sezione non serve e resta nascosta.
+const INSTALL = { sw: "pending", prompt: null, installed: false, copied: false };
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_STANDALONE = matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches
+  || navigator.standalone === true;
+function installSteps(items) {
+  return `<ol class="inst-steps">${items.map(x => `<li>${esc(CLANG.t(x))}</li>`).join("")}</ol>`;
+}
+function certStepsHtml() {
+  const android = `<div class="inst-h">Android</div>` + installSteps([
+    "Tocca «Scarica il certificato». Se compare l'avviso di sicurezza, prosegui. Se il telefono dice che i certificati CA si installano dalle Impostazioni, va bene: il file è nei Download.",
+    "Apri Impostazioni › Sicurezza e privacy › Altre impostazioni di sicurezza › Crittografia e credenziali › Installa un certificato › Certificato CA.",
+    "Conferma l'avviso e scegli il file ED-Copilot-CA.crt. Serve un blocco schermo (PIN, sequenza o password).",
+    "I nomi dei menu cambiano con la marca e la versione: se non li trovi, cerca «certificato CA» nelle Impostazioni.",
+  ]);
+  const ios = `<div class="inst-h">iPhone e iPad</div>` + installSteps([
+    "Apri questa pagina in Safari e tocca «Scarica il certificato», poi «Consenti».",
+    "Impostazioni › Generali › VPN e gestione dispositivi: tocca il profilo «ED Copilot - CA rete locale» e poi Installa.",
+    "Impostazioni › Generali › Info › Impostazioni certificati attendibili: attiva l'attendibilità completa per «ED Copilot - CA rete locale».",
+  ]);
+  return `<div class="inst-why">${esc(CLANG.t("Il certificato vale solo per gli indirizzi delle reti di casa (192.168…, 10…, 172.16-31…, 100.64-127…): è limitato così al suo interno e non può essere usato per nessun sito internet."))}</div>
+    <a class="btn" href="/companion-ca.crt" download="ED-Copilot-CA.crt" id="install-ca">${esc(CLANG.t("Scarica il certificato"))}</a>
+    ${IS_IOS ? ios + android : android + ios}
+    ${installSteps(["Poi chiudi questa scheda e riapri l'indirizzo del companion (o tocca «Ricontrolla»)."])}
+    <div class="nb-actions"><button type="button" id="install-recheck">Ricontrolla</button></div>`;
+}
+function appStepsHtml() {
+  if (INSTALL.installed) return `<div class="inst-ok">${esc(CLANG.t("App installata: aprila dall'icona ED Copilot sulla schermata Home."))}</div>`;
+  if (INSTALL.prompt) {
+    return `<p class="hint">${esc(CLANG.t("Il telefono si fida della connessione: puoi installare il companion come app."))}</p>
+      <div class="nb-actions"><button type="button" class="primary" id="install-go">Installa app</button></div>`;
+  }
+  if (IS_IOS) {
+    return installSteps([
+      "Tocca «Copia codice di accesso»: l'app installata non vede la memoria di Safari e al primo avvio potrebbe chiederlo.",
+      "Tocca Condividi (il quadrato con la freccia) › Aggiungi alla schermata Home › Aggiungi.",
+      "Apri ED Copilot dalla schermata Home. Se chiede il codice di accesso, incollalo.",
+    ]) + `<div class="nb-actions"><button type="button" id="install-copy">${INSTALL.copied ? "Codice copiato" : "Copia codice di accesso"}</button></div>`;
+  }
+  return installSteps([
+    "Il pulsante «Installa app» compare qui quando il browser è pronto, di solito dopo qualche secondo di uso della pagina.",
+    "In alternativa apri il menu del browser (⋮) e scegli «Installa app» o «Aggiungi a schermata Home».",
+  ]);
+}
+function renderInstall() {
+  const box = $("install-box");
+  if (IS_STANDALONE) { box.hidden = true; return; }
+  box.hidden = false;
+  let state, body;
+  if (!window.isSecureContext) {
+    state = "serve HTTPS";
+    body = `<p class="hint">${esc(CLANG.t("Per installare l'app serve la connessione cifrata (HTTPS): sul PC, in Impostazioni › Generali › Companion per il telefono, deve risultare attiva."))}</p>`;
+  } else if (INSTALL.sw === "pending") {
+    state = "controllo…";
+    body = `<p class="hint">${esc(CLANG.t("Controllo se il telefono si fida della connessione…"))}</p>`;
+  } else if (INSTALL.sw !== "ok") {
+    state = "certificato da installare";
+    body = `<p class="hint">${esc(CLANG.t("Il telefono non si fida ancora del certificato creato da ED Copilot sul tuo PC, quindi non permette di installare l'app. Basta farlo una volta:"))}</p>`
+      + certStepsHtml();
+  } else {
+    state = INSTALL.installed ? "installata" : "pronta";
+    body = appStepsHtml() + `<details class="sub-box"><summary>Certificato di ED Copilot</summary>${certStepsHtml()}</details>`;
+  }
+  $("install-state").textContent = state;
+  $("install-body").innerHTML = body;
+}
+document.addEventListener("click", e => {
+  const id = e.target.closest("button, a")?.id;
+  if (id === "install-recheck") { haptic(25); location.reload(); }
+  else if (id === "install-go" && INSTALL.prompt) {
+    haptic(25);
+    const p = INSTALL.prompt;
+    INSTALL.prompt = null;  // prompt() si può chiamare una volta sola
+    p.prompt().then(() => p.userChoice).then(choice => {
+      if (choice && choice.outcome === "accepted") INSTALL.installed = true;
+      renderInstall();
+    }).catch(() => renderInstall());
+  } else if (id === "install-copy") {
+    haptic(25);
+    navigator.clipboard.writeText(ACCESS_TOKEN)
+      .then(() => { INSTALL.copied = true; showToast(CLANG.t("Codice copiato")); renderInstall(); })
+      .catch(() => showToast(CLANG.t("Copia non riuscita")));
+  }
+});
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();  // niente banner automatico: il pulsante sta nella sezione
+  INSTALL.prompt = e;
+  renderInstall();
+});
+window.addEventListener("appinstalled", () => { INSTALL.installed = true; INSTALL.prompt = null; renderInstall(); });
+function registerWorker() {
+  if (!window.isSecureContext || !("serviceWorker" in navigator)) { INSTALL.sw = "fail"; return renderInstall(); }
+  navigator.serviceWorker.register("/companion-sw.js")
+    .then(() => { INSTALL.sw = "ok"; })
+    .catch(() => { INSTALL.sw = "fail"; })  // tipicamente: certificato non attendibile
+    .finally(renderInstall);
+}
+
 // AVVIO
 CLANG.start();
 renderNotify();
+$("code-input").placeholder = CLANG.t("Codice di accesso");
+renderInstall();
+registerWorker();
 layoutBottom();
 api("/api/voice/config").then(applyVoiceConfig).catch(() => {});
 pollState();
