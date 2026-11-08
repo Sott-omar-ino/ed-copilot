@@ -24,6 +24,8 @@ from .lang import pick
 DEFAULT_REPO = "Sott-omar-ino/ed-copilot"
 
 ASSET = "ED Copilot.exe"
+# GitHub sostituisce gli spazi nei nomi dei file allegati con punti ("ED.Copilot.exe").
+ASSET_NAMES = {ASSET, ASSET.replace(" ", ".")}
 _state = {"checked": None, "latest": None, "error": None, "progress": None, "busy": False}
 _lock = threading.Lock()
 
@@ -54,8 +56,8 @@ def check():
     try:
         with _get(f"https://api.github.com/repos/{repo}/releases/latest") as r:
             rel = json.loads(r.read())
-        asset = next((a for a in rel.get("assets", []) if a.get("name") == ASSET), None)
-        sha_asset = next((a for a in rel.get("assets", []) if a.get("name") == ASSET + ".sha256"), None)
+        asset = next((a for a in rel.get("assets", []) if a.get("name") in ASSET_NAMES), None)
+        sha_asset = next((a for a in rel.get("assets", []) if a.get("name") in {n + ".sha256" for n in ASSET_NAMES}), None)
         digest = (asset or {}).get("digest") or ""
         _state.update(error=None, checked=time.time(), latest={
             "version": rel.get("tag_name", "").lstrip("vV"), "name": rel.get("name"), "notes": (rel.get("body") or "")[:3000],
