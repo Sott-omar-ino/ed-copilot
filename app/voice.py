@@ -269,9 +269,41 @@ def synthesize(text, voice_key="elsa", rate=None, pitch=None):
     return path
 
 
-def mark_speaking(seconds):
+# Cosa ha detto il copilota e quando: in ascolto continuo il microfono sente anche le casse, e "Cella scudo attivata"
+# verrebbe ricapito come il comando "cella scudo" (che lo ripeterebbe all'infinito).
+_spoken = []  # (inizio, fine, parole)
+
+
+def _words(text):
+    import unicodedata
+    t = unicodedata.normalize("NFD", str(text or "").lower())
+    return [w for w in re.sub(r"[^a-z0-9 ]", " ", "".join(c for c in t if not unicodedata.combining(c))).split() if len(w) > 2]
+
+
+def note_spoken(text, start, end):
+    now = time.time()
+    _spoken.append((start, end, _words(text)))
+    _spoken[:] = [x for x in _spoken if x[1] > now - 90][-30:]
+
+
+def _echo_of_copilot(audio_seconds, text=None):
+    """Vero se la registrazione si sovrappone a una frase del copilota, o se ciò che è stato capito è una sua frase."""
+    now = time.time()
+    rec_start = now - audio_seconds - 1.0
+    for start, end, words in _spoken:
+        if start < now and end + 1.2 > rec_start:
+            return True
+        if text is not None and words and end > now - 6:  # l'eco arriva subito dopo la frase
+            heard = set(_words(text))
+            if heard and len(heard & set(words)) / len(heard) >= 0.6:
+                return True
+    return False
+
+
+def mark_speaking(seconds, text=""):
     global _speaking_until
     _speaking_until = max(_speaking_until, time.time() + seconds)
+    note_spoken(text, time.time(), time.time() + seconds)
 
 
 def is_speaking():
@@ -285,8 +317,9 @@ _queue = queue.Queue(maxsize=20)
 
 def _player():
     while True:
-        path, volume = _queue.get()
+        path, volume, said = _queue.get()
         alias = "edc_" + uuid.uuid4().hex[:8]
+        started = time.time()
         try:
             mark_speaking(30)
             mci = ctypes.windll.winmm.mciSendStringW
@@ -299,6 +332,8 @@ def _player():
         finally:
             global _speaking_until
             _speaking_until = time.time() + 1.2  # coda del riverbero: il microfono resta sordo ancora un attimo
+            _spoken[:] = [x for x in _spoken if not (x[0] >= started - 0.01 and not x[2])]  # via il segnaposto di mark_speaking(30)
+            note_spoken(said, started, time.time())
 
 
 threading.Thread(target=_player, daemon=True).start()
@@ -324,7 +359,7 @@ def say(text, voice_key=None, volume=None):
 
     def work():
         try:
-            _queue.put_nowait((render_with_effect(synthesize(text, voice_key), cfg), volume))
+            _queue.put_nowait((render_with_effect(synthesize(text, voice_key), cfg), volume, text))
         except queue.Full:
             pass
         except Exception as exc:
@@ -485,6 +520,10 @@ def transcribe(data, content_type="", source="", floor_db=None):
     except Exception as exc:
         print(f"[Voce] Audio non leggibile: {exc}")
         return ""
+    seconds = len(audio) / 16000
+    if source != "phone" and _echo_of_copilot(seconds):
+        print("[Voce] registrazione scartata: si sovrappone alla voce del copilota")
+        return ""
     try:
         if noise_filter.available():
             res = filter_noise(audio, source or ("ptt" if "wav" in content_type else "app"), floor_db, strength)
@@ -509,6 +548,9 @@ def transcribe(data, content_type="", source="", floor_db=None):
         text = " ".join(s.text for s in segments).strip()
         # Nel registro ciò che è stato capito: serve per capire dove il riconoscimento sbaglia (resta solo sul PC).
         print(f"[Voce] capito ({source or 'app'}, {_whisper_name}): {text!r}")
+        if source != "phone" and _echo_of_copilot(0, text):
+            print("[Voce] scartato: è una frase appena detta dal copilota")
+            return ""
         return text if re.search(r"\w", text) else ""  # "..." e simili: Whisper non ha sentito parole
     except Exception as exc:
         print(f"[Voce] Trascrizione non riuscita: {exc}")

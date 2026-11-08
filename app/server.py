@@ -298,7 +298,7 @@ def _qrcode(q):
 
 def _tts(q):
     path = voice.synthesize(q.get("text", ""), q.get("voice") or voice.load_config()["voice"])
-    voice.mark_speaking(len(q.get("text", "")) * 0.08 + 1.5)
+    voice.mark_speaking(len(q.get("text", "")) * 0.08 + 1.5, q.get("text", ""))
     with open(path, "rb") as f:
         return f.read(), "audio/mpeg"
 
