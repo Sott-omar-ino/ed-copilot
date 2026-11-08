@@ -1,0 +1,1449 @@
+{
+ "_source": "EDCD/coriolis (MIT, Copyright (c) 2015 Coriolis.io, Colin McLeod), commit 7248d2beb3966cb227986975b2a4b43d3bab0789, __tests__/fixtures: *-test-detailed-export-v*.json (references[].url, components), expected-builds.json (codici v3 prodotti da Ship.toString), slef-*.json; valid-detailed-export.json (references[0].code: link v1 di cui test-link-migration.js verifica la riscrittura v3 in expected-builds.json)",
+ "detailed": [
+  {
+   "file": "anaconda-test-detailed-export-v5.json",
+   "ship": "anaconda",
+   "url": "https://coriolis.io/outfit/anaconda?code=B4putkFklkdzsuf52c0o0o0o1m1m0q0q0404-0l0b0100034k5n052d04---0303326b--.AwRj4zNLeYg%3D.CwBhCYzBGW9qCTSqq5IiA%3D%3D%3D.H4sIAAAAAAAAA2MUe8HMwPD%2FPwMAAGvB0AkAAAA%3D&bn=Test%20My%20Ship",
+   "name": "Test My Ship",
+   "bulkheads": {
+    "name": "Reactive Surface Composite"
+   },
+   "standard": [
+    {
+     "class": 8,
+     "rating": "A",
+     "modifications": {
+      "pgen": 1000
+     }
+    },
+    {
+     "class": 6,
+     "rating": "A"
+    },
+    {
+     "class": 6,
+     "rating": "A"
+    },
+    {
+     "class": 5,
+     "rating": "A"
+    },
+    {
+     "class": 8,
+     "rating": "A"
+    },
+    {
+     "class": 8,
+     "rating": "A"
+    },
+    {
+     "class": 5,
+     "rating": "C"
+    }
+   ],
+   "hardpoints": [
+    {
+     "class": 4,
+     "rating": "A",
+     "group": "Plasma Accelerator"
+    },
+    {
+     "class": 3,
+     "rating": "D",
+     "group": "Beam Laser"
+    },
+    {
+     "class": 3,
+     "rating": "D",
+     "group": "Beam Laser"
+    },
+    {
+     "class": 3,
+     "rating": "D",
+     "group": "Beam Laser"
+    },
+    {
+     "class": 2,
+     "rating": "E",
+     "group": "Cannon"
+    },
+    {
+     "class": 2,
+     "rating": "E",
+     "group": "Cannon"
+    },
+    {
+     "class": 1,
+     "rating": "F",
+     "group": "Beam Laser"
+    },
+    {
+     "class": 1,
+     "rating": "F",
+     "group": "Beam Laser"
+    }
+   ],
+   "utility": [
+    {
+     "class": 0,
+     "rating": "A",
+     "group": "Shield Booster"
+    },
+    {
+     "class": 0,
+     "rating": "A",
+     "group": "Shield Booster"
+    },
+    null,
+    {
+     "class": 0,
+     "rating": "C",
+     "group": "Kill Warrant Scanner"
+    },
+    {
+     "class": 0,
+     "rating": "C",
+     "group": "Cargo Scanner"
+    },
+    {
+     "class": 0,
+     "rating": "F",
+     "group": "Electronic Countermeasure",
+     "name": "Electronic Countermeasure"
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Chaff Launcher",
+     "name": "Chaff Launcher"
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Point Defence",
+     "name": "Point Defence"
+    }
+   ],
+   "internal": [
+    {
+     "class": 7,
+     "rating": "A",
+     "group": "Shield Generator"
+    },
+    {
+     "class": 6,
+     "rating": "A",
+     "group": "Shield Cell Bank"
+    },
+    {
+     "class": 6,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    {
+     "class": 5,
+     "rating": "D",
+     "group": "Hull Reinforcement Package"
+    },
+    {
+     "class": 5,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    null,
+    null,
+    null,
+    {
+     "class": 4,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    {
+     "class": 4,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    {
+     "class": 4,
+     "rating": "A",
+     "group": "Fuel Scoop"
+    },
+    {
+     "class": 2,
+     "rating": "A",
+     "group": "Frame Shift Drive Interdictor"
+    },
+    null,
+    null
+   ]
+  },
+  {
+   "file": "asp-test-detailed-export-v4.json",
+   "ship": "asp",
+   "url": "https://coriolis.edcd.io/outfit/asp?code=0pftiFflfddsnf5------020202033c044002v62f2i.AwRj4yvI.CwRgDBldHnJA.H4sIAAAAAAAAA2P858DAwPCXEUhwHPvx%2F78YG5AltB7I%2F8%2F0TwImJboDSPJ%2F%2B%2Ff%2Fv%2FKlX%2F%2F%2Fi3AwMTBIfARK%2FGf%2BJwVSxArStVAYqOjvz%2F%2F%2FJVo5GRhE2IBc4SKQSSz%2FDGEmCa398P8%2F%2F2%2BgTf%2F%2FAwDFxwtofAAAAA%3D%3D&bn=Multi-purpose%20Asp%20Explorer",
+   "name": "Multi-purpose Asp Explorer",
+   "bulkheads": "Lightweight Alloy",
+   "standard": [
+    {
+     "class": 5,
+     "rating": "A",
+     "blueprint": {
+      "id": 64,
+      "grade": 1
+     },
+     "modifications": {
+      "eff": -1850,
+      "pgen": 6,
+      "mass": 431
+     }
+    },
+    {
+     "class": 5,
+     "rating": "D",
+     "blueprint": {
+      "id": 24,
+      "grade": 1
+     },
+     "modifications": {
+      "optmul": 440,
+      "integrity": -266,
+      "thermload": -1326,
+      "optmass": 520,
+      "power": 241
+     }
+    },
+    {
+     "class": 5,
+     "rating": "A",
+     "blueprint": {
+      "id": 26,
+      "grade": 5
+     },
+     "modifications": {
+      "mass": 5025,
+      "integrity": -1539,
+      "power": 2437,
+      "optmass": 4870,
+      "maxfuel": 370
+     }
+    },
+    {
+     "class": 4,
+     "rating": "A",
+     "blueprint": {
+      "id": 49,
+      "grade": 1
+     },
+     "modifications": {
+      "mass": -3923,
+      "integrity": -1797
+     }
+    },
+    {
+     "class": 3,
+     "rating": "D"
+    },
+    {
+     "class": 5,
+     "rating": "D"
+    },
+    {
+     "class": 5,
+     "rating": "C"
+    }
+   ],
+   "hardpoints": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "utility": [
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Heat Sink Launcher",
+     "name": "Heat Sink Launcher"
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Heat Sink Launcher",
+     "name": "Heat Sink Launcher"
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Heat Sink Launcher",
+     "name": "Heat Sink Launcher"
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Point Defence",
+     "name": "Point Defence"
+    }
+   ],
+   "internal": [
+    {
+     "class": 6,
+     "rating": "A",
+     "group": "Fuel Scoop"
+    },
+    {
+     "class": 5,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    {
+     "class": 3,
+     "rating": "A",
+     "group": "Shield Generator"
+    },
+    {
+     "class": 3,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    {
+     "class": 2,
+     "rating": "G",
+     "group": "Planetary Vehicle Hangar"
+    },
+    {
+     "class": 1,
+     "rating": "C",
+     "group": "Scanner",
+     "name": "Advanced Discovery Scanner"
+    },
+    {
+     "class": 1,
+     "rating": "C",
+     "group": "Scanner",
+     "name": "Detailed Surface Scanner"
+    }
+   ]
+  },
+  {
+   "file": "courier-test-detailed-export-v4.json",
+   "ship": "imperial_courier",
+   "url": "https://coriolis.edcd.io/outfit/imperial_courier?code=0patzF5l0das8f31a1a270202000e402t0101-2f.AwRj4zKA.CwRgDBldLiQ%3D.H4sIAAAAAAAAA12OP0tCYRjFj9fuVbvF1du9ekkT8s%2FkIg4NElyIBBd321yaGvwUQTS3N7UFfYygIT9EoyQUJA36ns47XJCWA%2B%2Fz%2Bz3Pe3ImBbDNKaqNPSBoGrL4ngfomKpFGiJ%2BLgHteR1IPjxJT5pF11uSeXNsJVcRfgdC92syWUuK0iMdKZqrjJ%2F0aoA71lJ5oKf38knWcCiptCPdhJIerdS00vlK0qktlqoj983UmqqHjQ33VsW8eazFmaTyULP2hQ4lX8LBme6g%2F6v0TTdbxJ2KhdEIaCw15MF%2FNB0L%2BS2hwEwyFM8KgP%2BqEpWWA3Qu9Z3z9kPWHzakt7Dt%2BAeD7ghSTgEAAA%3D%3D&bn=Multi-purpose%20Imperial%20Courier",
+   "name": "Multi-purpose Imperial Courier",
+   "bulkheads": "Lightweight Alloy",
+   "standard": [
+    {
+     "class": 4,
+     "rating": "A",
+     "blueprint": {
+      "id": 63,
+      "grade": 1
+     },
+     "modifications": {
+      "pgen": 1052,
+      "integrity": -482,
+      "eff": 974
+     }
+    },
+    {
+     "class": 3,
+     "rating": "A",
+     "name": "Enhanced Performance",
+     "blueprint": {
+      "id": 22,
+      "grade": 4
+     },
+     "modifications": {
+      "optmul": 2476,
+      "thermload": 7023,
+      "power": 1763,
+      "integrity": 165,
+      "optmass": -667
+     }
+    },
+    {
+     "class": 3,
+     "rating": "A",
+     "blueprint": {
+      "id": 26,
+      "grade": 5
+     },
+     "modifications": {
+      "mass": 4082,
+      "integrity": -2422,
+      "power": 1782,
+      "optmass": 4927
+     }
+    },
+    {
+     "class": 1,
+     "rating": "A"
+    },
+    {
+     "class": 3,
+     "rating": "A"
+    },
+    {
+     "class": 2,
+     "rating": "D"
+    },
+    {
+     "class": 3,
+     "rating": "C"
+    }
+   ],
+   "hardpoints": [
+    {
+     "class": 2,
+     "rating": "F",
+     "group": "Pulse Laser",
+     "blueprint": {
+      "id": 89,
+      "grade": 5
+     },
+     "modifications": {
+      "rof": 5931,
+      "damage": -184,
+      "jitter": 50,
+      "distdraw": -4689,
+      "piercing": 3328
+     }
+    },
+    {
+     "class": 2,
+     "rating": "F",
+     "group": "Pulse Laser",
+     "blueprint": {
+      "id": 89,
+      "grade": 5
+     },
+     "modifications": {
+      "rof": 4715,
+      "damage": -97,
+      "jitter": 30,
+      "distdraw": -4548,
+      "piercing": 1057,
+      "integrity": 319
+     }
+    },
+    {
+     "class": 2,
+     "rating": "F",
+     "group": "Multi-cannon",
+     "blueprint": {
+      "id": 88,
+      "grade": 3,
+      "special": 3
+     },
+     "modifications": {
+      "damage": 2437,
+      "distdraw": 5487,
+      "rof": 1120,
+      "jitter": 58,
+      "thermload": 1346,
+      "power": 1009,
+      "integrity": -202,
+      "ammo": -2000
+     }
+    }
+   ],
+   "utility": [
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Heat Sink Launcher",
+     "name": "Heat Sink Launcher",
+     "blueprint": {
+      "id": 37,
+      "grade": 3
+     },
+     "modifications": {
+      "ammo": 5000,
+      "mass": 17684,
+      "reload": 9707
+     }
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Heat Sink Launcher",
+     "name": "Heat Sink Launcher",
+     "blueprint": {
+      "id": 37,
+      "grade": 3
+     },
+     "modifications": {
+      "ammo": 5000,
+      "mass": 18520,
+      "reload": 8715
+     }
+    },
+    {
+     "class": 0,
+     "rating": "I",
+     "group": "Chaff Launcher",
+     "name": "Chaff Launcher"
+    },
+    {
+     "class": 0,
+     "rating": "A",
+     "group": "Frame Shift Wake Scanner"
+    }
+   ],
+   "internal": [
+    {
+     "class": 3,
+     "rating": "A",
+     "group": "Shield Generator",
+     "blueprint": {
+      "id": 77,
+      "grade": 3
+     },
+     "modifications": {
+      "optmul": 1888,
+      "explres": 455,
+      "kinres": 546,
+      "thermres": 1092,
+      "brokenregen": -2614,
+      "regen": -876,
+      "distdraw": 463
+     }
+    },
+    {
+     "class": 3,
+     "rating": "A",
+     "group": "Fuel Scoop"
+    },
+    {
+     "class": 2,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    {
+     "class": 2,
+     "rating": "E",
+     "group": "Cargo Rack"
+    },
+    null,
+    {
+     "class": 1,
+     "rating": "C",
+     "group": "Scanner",
+     "name": "Advanced Discovery Scanner"
+    }
+   ]
+  }
+ ],
+ "expected_builds": {
+  "type_6_transporter": {
+   "Cargo": "B0p0tdFal8d8s8f4------04040303430101--.Iw18SQ==.Aw18SQ==.",
+   "Miner": "B0p5tdFal8d8s8f42l2l----040403451q0101--.Iw18SQ==.Aw18SQ==.",
+   "Hopper": "B0p0tdFal8d0s8f41717----030302024300---.Iw18SQ==.Aw18SQ==."
+  },
+  "type_7_transport": {
+   "Cargo": "B0p0tiFfliddsdf5----------0505040403480101---.Iw18ZxA=.Aw18ZxA=.",
+   "Miner": "B0pdtiFflid8sdf5--2l2l------0505041v03450000---.Iw18ZxA=.Aw18ZxA=."
+  },
+  "federal_dropship": {
+   "Cargo": "B0pdtiFflnddsif4-1717-------0504044802--0201--.Iw18ZxA=.Aw18ZxA=."
+  },
+  "asp": {
+   "Miner": "B2pftfFflidfskf50s0s24242l2l---04054a1q02022o27--.Iw18RQ==.Aw18RQ==."
+  },
+  "imperial_clipper": {
+   "Cargo": "B0p5tiFflndisnf4--0s0s-----0605450302020101--.Iw18RQ==.Aw18RQ==.",
+   "Dream": "B2pktkFflndpskf40v0v0s0s0404040n-4k5n5d2b29292o---.AwRj4y2VvI==.CwBhCYy6ZBGKBmBIg===.",
+   "Current": "B0patkFflndfskf4-------------------.AwRj4y2VvI==.CwBhCYy6ZBGKBmBIg===."
+  },
+  "type_9_heavy": {
+   "Current": "B0patsFklndnsif6---------0706054a0303020224---.AwRj4yo5aA==.EwBhEYy6dmg=."
+  },
+  "python": {
+   "Cargo": "B0patnFflidsssf5---------050505040448020201--.Iw18eAMVA===.Aw18ZQ==.",
+   "Miner": "B0pktkFflidpspf50v0v0v2m2m0404--050505Ce4a1v02022o--.Iw18eAMVA===.IwBhBYy6dkCYxA==.",
+   "Dream": "B2pptkFfliduspf50v0v0v27270404040m5n5n4f2d2d032t0201--.Iw1+gDByZQ==.EwBhEYy6e0XkA===.",
+   "Missile": "B0pttoFjljdystf52f2g2d2ePh----04044j03---00---.Iw18eAMVA===.Aw18ZQ==."
+  },
+  "anaconda": {
+   "Dream": "B4putpFklndzsuf52c0o0o0o1m1m0q0q0404040l0b0100004k5n5n112d2d04-0303326b--.AwRj4yo5dzZA.MwBhCYy6duvARjEA.",
+   "Cargo": "B0patnFklndnsxf5----------------06050505040404-45030301--.Iw18ZUAzUA==.Aw18ZUkA.",
+   "Current": "B0patnFklndksxf5----------------06050505040404-03034524--.Iw18ZUAzUA==.Aw18ZUkA.",
+   "Explorer": "B0patnFklndksxf5--------0202------f7050505040s37--2i4524--.AwRj4yVKJ9iKA===.AwhMIyumQRkkA===.",
+   "Test": "B4putkFklkdzsuf52c0o0o0o1m1m0q0q0404-0l0b0100034k5n052d04---0303326b--.Iw18ZUAzUA==.Aw18ZUkA."
+  },
+  "diamondback_explorer": {
+   "Explorer": "B0p0tdFfldddsdf5---0202--320p432i-----.AwRj4zTZeI==.AwiMIyuo."
+  },
+  "vulture": {
+   "Bounty Hunter": "B3patcFalddksff31e1e0404-0l4a-5d27662j---.AwRj4z2HiA==.MwBhBYy6oJmAjLKQ."
+  },
+  "fer_de_lance": {
+   "Attack": "B2pfthFalidpsff31r0s0s0s0s000404-04-4a-5d27---.Iw18aAMVA===.CwBhrSu8EZzEA===."
+  },
+  "eagle": {
+   "Figther": "B4p0t5F5l3d5s5f20p0p24-4053-2j----.Iw18gDNQ.Aw1/kA==."
+  }
+ },
+ "slef": {
+  "slef-single-build.json": [
+   {
+    "header": {
+     "appName": "Inara",
+     "appVersion": "1.0",
+     "appURL": "https://inara.cz/cmdr-fleet/123/123/",
+     "appCustomProperties": {
+      "inaraCommanderID": 123,
+      "inaraShipID": 123
+     }
+    },
+    "data": {
+     "Ship": "krait_mkii",
+     "ShipID": 7,
+     "ShipName": "pancake hammer",
+     "ShipIdent": "PH-01",
+     "HullValue": 44160710,
+     "ModulesValue": 111274094,
+     "Rebuy": 7771743,
+     "Modules": [
+      {
+       "Slot": "largehardpoint1",
+       "Item": "hpt_mininglaser_fixed_small",
+       "On": true
+      },
+      {
+       "Slot": "largehardpoint2",
+       "Item": "hpt_cannon_gimbal_large",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "weapon_overcharged",
+        "Level": 2,
+        "Quality": 1,
+        "ExperimentalEffect": "special_auto_loader"
+       }
+      },
+      {
+       "Slot": "largehardpoint3",
+       "Item": "hpt_cannon_gimbal_large",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "weapon_overcharged",
+        "Level": 2,
+        "Quality": 1,
+        "ExperimentalEffect": "special_auto_loader"
+       }
+      },
+      {
+       "Slot": "mediumhardpoint1",
+       "Item": "hpt_basicmissilerack_fixed_medium",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "weapon_highcapacity",
+        "Level": 5,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "mediumhardpoint2",
+       "Item": "hpt_basicmissilerack_fixed_medium",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint1",
+       "Item": "hpt_heatsinklauncher_turret_tiny",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint2",
+       "Item": "hpt_cloudscanner_size0_class3",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint3",
+       "Item": "hpt_shieldbooster_size0_class5",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint4",
+       "Item": "hpt_shieldbooster_size0_class5",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "slot01_size6",
+       "Item": "int_cargorack_size6_class1",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "slot02_size6",
+       "Item": "int_cargorack_size6_class1",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "slot03_size5",
+       "Item": "int_guardianfsdbooster_size5",
+       "On": true
+      },
+      {
+       "Slot": "slot04_size5",
+       "Item": "int_fighterbay_size5_class1",
+       "On": true
+      },
+      {
+       "Slot": "slot05_size4",
+       "Item": "int_shieldgenerator_size4_class5",
+       "On": true
+      },
+      {
+       "Slot": "slot06_size3",
+       "Item": "int_dronecontrol_collection_size3_class4",
+       "On": true
+      },
+      {
+       "Slot": "slot07_size3",
+       "Item": "int_dronecontrol_collection_size3_class4",
+       "On": true
+      },
+      {
+       "Slot": "slot08_size2",
+       "Item": "int_refinery_size2_class2",
+       "On": true
+      },
+      {
+       "Slot": "slot09_size1",
+       "Item": "int_dronecontrol_prospector_size1_class4",
+       "On": true
+      },
+      {
+       "Slot": "powerplant",
+       "Item": "int_powerplant_size7_class5",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "mainengines",
+       "Item": "int_engine_size6_class5",
+       "On": true
+      },
+      {
+       "Slot": "frameshiftdrive",
+       "Item": "int_hyperdrive_size5_class5",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "fsd_longrange",
+        "Level": 2,
+        "Quality": 0.861
+       }
+      },
+      {
+       "Slot": "lifesupport",
+       "Item": "int_lifesupport_size4_class2",
+       "On": true,
+       "Priority": 3
+      },
+      {
+       "Slot": "powerdistributor",
+       "Item": "int_powerdistributor_size7_class5",
+       "On": true
+      },
+      {
+       "Slot": "radar",
+       "Item": "int_sensors_size6_class2",
+       "On": true
+      },
+      {
+       "Slot": "fueltank",
+       "Item": "int_fueltank_size5_class3",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "armour",
+       "Item": "krait_mkii_armour_grade3",
+       "On": true,
+       "Priority": 1,
+       "Engineering": {
+        "BlueprintName": "armour_heavyduty",
+        "Level": 5,
+        "Quality": 1
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "slef-multiple-builds.json": [
+   {
+    "header": {
+     "appName": "Inara",
+     "appVersion": "1.0",
+     "appURL": "https://inara.cz/cmdr-fleet/123/123/",
+     "appCustomProperties": {
+      "inaraCommanderID": 123,
+      "inaraShipID": 123
+     }
+    },
+    "data": {
+     "Ship": "krait_mkii",
+     "ShipID": 7,
+     "ShipName": "pancake hammer",
+     "ShipIdent": "PH-01",
+     "HullValue": 44160710,
+     "ModulesValue": 111274094,
+     "Rebuy": 7771743,
+     "Modules": [
+      {
+       "Slot": "largehardpoint1",
+       "Item": "hpt_mininglaser_fixed_small",
+       "On": true
+      },
+      {
+       "Slot": "largehardpoint2",
+       "Item": "hpt_cannon_gimbal_large",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "weapon_overcharged",
+        "Level": 2,
+        "Quality": 1,
+        "ExperimentalEffect": "special_auto_loader"
+       }
+      },
+      {
+       "Slot": "largehardpoint3",
+       "Item": "hpt_cannon_gimbal_large",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "weapon_overcharged",
+        "Level": 2,
+        "Quality": 1,
+        "ExperimentalEffect": "special_auto_loader"
+       }
+      },
+      {
+       "Slot": "mediumhardpoint1",
+       "Item": "hpt_basicmissilerack_fixed_medium",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "weapon_highcapacity",
+        "Level": 5,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "mediumhardpoint2",
+       "Item": "hpt_basicmissilerack_fixed_medium",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint1",
+       "Item": "hpt_heatsinklauncher_turret_tiny",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint2",
+       "Item": "hpt_cloudscanner_size0_class3",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint3",
+       "Item": "hpt_shieldbooster_size0_class5",
+       "On": true
+      },
+      {
+       "Slot": "tinyhardpoint4",
+       "Item": "hpt_shieldbooster_size0_class5",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "slot01_size6",
+       "Item": "int_cargorack_size6_class1",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "slot02_size6",
+       "Item": "int_cargorack_size6_class1",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "slot03_size5",
+       "Item": "int_guardianfsdbooster_size5",
+       "On": true
+      },
+      {
+       "Slot": "slot04_size5",
+       "Item": "int_fighterbay_size5_class1",
+       "On": true
+      },
+      {
+       "Slot": "slot05_size4",
+       "Item": "int_shieldgenerator_size4_class5",
+       "On": true
+      },
+      {
+       "Slot": "slot06_size3",
+       "Item": "int_dronecontrol_collection_size3_class4",
+       "On": true
+      },
+      {
+       "Slot": "slot07_size3",
+       "Item": "int_dronecontrol_collection_size3_class4",
+       "On": true
+      },
+      {
+       "Slot": "slot08_size2",
+       "Item": "int_refinery_size2_class2",
+       "On": true
+      },
+      {
+       "Slot": "slot09_size1",
+       "Item": "int_dronecontrol_prospector_size1_class4",
+       "On": true
+      },
+      {
+       "Slot": "powerplant",
+       "Item": "int_powerplant_size7_class5",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "mainengines",
+       "Item": "int_engine_size6_class5",
+       "On": true
+      },
+      {
+       "Slot": "frameshiftdrive",
+       "Item": "int_hyperdrive_size5_class5",
+       "On": true,
+       "Engineering": {
+        "BlueprintName": "fsd_longrange",
+        "Level": 2,
+        "Quality": 0.861
+       }
+      },
+      {
+       "Slot": "lifesupport",
+       "Item": "int_lifesupport_size4_class2",
+       "On": true,
+       "Priority": 3
+      },
+      {
+       "Slot": "powerdistributor",
+       "Item": "int_powerdistributor_size7_class5",
+       "On": true
+      },
+      {
+       "Slot": "radar",
+       "Item": "int_sensors_size6_class2",
+       "On": true
+      },
+      {
+       "Slot": "fueltank",
+       "Item": "int_fueltank_size5_class3",
+       "On": true,
+       "Priority": 1
+      },
+      {
+       "Slot": "armour",
+       "Item": "krait_mkii_armour_grade3",
+       "On": true,
+       "Priority": 1,
+       "Engineering": {
+        "BlueprintName": "armour_heavyduty",
+        "Level": 5,
+        "Quality": 1
+       }
+      }
+     ]
+    }
+   },
+   {
+    "header": {
+     "appName": "Inara",
+     "appVersion": "1.0",
+     "appURL": "https://inara.cz/cmdr-fleet/123/123/",
+     "appCustomProperties": {
+      "inaraCommanderID": 123,
+      "inaraShipID": 123
+     }
+    },
+    "data": {
+     "Ship": "diamondbackxl",
+     "ShipID": 11,
+     "ShipName": "star Hopper",
+     "ShipIdent": "PH-02",
+     "HullValue": 1615649,
+     "ModulesValue": 16981039,
+     "Rebuy": 929837,
+     "Modules": [
+      {
+       "Slot": "tinyhardpoint1",
+       "Item": "hpt_heatsinklauncher_turret_tiny",
+       "On": true,
+       "Value": 3072
+      },
+      {
+       "Slot": "slot01_size4",
+       "Item": "int_fuelscoop_size4_class5",
+       "On": true,
+       "Priority": 3,
+       "Value": 2862364
+      },
+      {
+       "Slot": "slot02_size4",
+       "Item": "int_guardianfsdbooster_size4",
+       "On": true,
+       "Value": 2847499
+      },
+      {
+       "Slot": "slot03_size3",
+       "Item": "int_shieldgenerator_size3_class2",
+       "On": true,
+       "Value": 18812,
+       "Engineering": {
+        "BlueprintName": "shieldgenerator_thermic",
+        "Level": 3,
+        "Quality": 1,
+        "ExperimentalEffect": "special_shield_health"
+       }
+      },
+      {
+       "Slot": "slot04_size3",
+       "Item": "int_repairer_size3_class5",
+       "On": true,
+       "Value": 2302911
+      },
+      {
+       "Slot": "slot05_size2",
+       "Item": "int_buggybay_size2_class2",
+       "On": true,
+       "Priority": 3,
+       "Value": 21600
+      },
+      {
+       "Slot": "slot06_size2",
+       "Item": "int_cargorack_size2_class1",
+       "On": true,
+       "Priority": 1,
+       "Value": 2852
+      },
+      {
+       "Slot": "slot07_size1",
+       "Item": "int_supercruiseassist",
+       "On": true,
+       "Priority": 3,
+       "Value": 9121
+      },
+      {
+       "Slot": "slot08_size1",
+       "Item": "int_detailedsurfacescanner_tiny",
+       "On": true,
+       "Value": 250000,
+       "Engineering": {
+        "BlueprintName": "sensor_expanded",
+        "Level": 5,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "powerplant",
+       "Item": "int_powerplant_size4_class5",
+       "On": true,
+       "Priority": 1,
+       "Value": 1441233,
+       "Engineering": {
+        "BlueprintName": "powerplant_boosted",
+        "Level": 1,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "mainengines",
+       "Item": "int_engine_size4_class5",
+       "On": true,
+       "Value": 1610080,
+       "Engineering": {
+        "BlueprintName": "engine_dirty",
+        "Level": 5,
+        "Quality": 1,
+        "ExperimentalEffect": "special_engine_lightweight"
+       }
+      },
+      {
+       "Slot": "frameshiftdrive",
+       "Item": "int_hyperdrive_size5_class5",
+       "On": true,
+       "Value": 5103953,
+       "Engineering": {
+        "BlueprintName": "fsd_longrange",
+        "Level": 5,
+        "Quality": 1,
+        "ExperimentalEffect": "special_fsd_lightweight"
+       }
+      },
+      {
+       "Slot": "lifesupport",
+       "Item": "int_lifesupport_size3_class2",
+       "On": true,
+       "Value": 10133,
+       "Engineering": {
+        "BlueprintName": "misc_lightweight",
+        "Level": 3,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "powerdistributor",
+       "Item": "int_powerdistributor_size4_class5",
+       "On": true,
+       "Value": 389022,
+       "Engineering": {
+        "BlueprintName": "powerdistributor_highfrequency",
+        "Level": 4,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "radar",
+       "Item": "int_sensors_size3_class2",
+       "On": true,
+       "Value": 10133,
+       "Engineering": {
+        "BlueprintName": "sensor_lightweight",
+        "Level": 5,
+        "Quality": 1
+       }
+      },
+      {
+       "Slot": "fueltank",
+       "Item": "int_fueltank_size5_class3",
+       "On": true,
+       "Priority": 1,
+       "Value": 97754
+      },
+      {
+       "Slot": "armour",
+       "Item": "diamondbackxl_armour_grade1",
+       "On": true,
+       "Priority": 1,
+       "Engineering": {
+        "BlueprintName": "armour_heavyduty",
+        "Level": 5,
+        "Quality": 1
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "slef-federal-dropship.json": {
+   "header": {
+    "appName": "EDSY",
+    "appVersion": 424009902
+   },
+   "data": {
+    "event": "Loadout",
+    "Ship": "federation_dropship",
+    "ShipName": "Little Helper",
+    "ShipIdent": "99942",
+    "Modules": [
+     {
+      "Slot": "CargoHatch",
+      "Item": "modularcargobaydoor",
+      "On": true,
+      "Priority": 2
+     },
+     {
+      "Slot": "LargeHardpoint1",
+      "Item": "hpt_plasmaaccelerator_fixed_large_advanced",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "MediumHardpoint1",
+      "Item": "hpt_plasmaaccelerator_fixed_medium",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "MediumHardpoint2",
+      "Item": "hpt_plasmaaccelerator_fixed_medium",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "MediumHardpoint3",
+      "Item": "hpt_slugshot_turret_medium",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "MediumHardpoint4",
+      "Item": "hpt_slugshot_turret_medium",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "TinyHardpoint1",
+      "Item": "hpt_shieldbooster_size0_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "TinyHardpoint2",
+      "Item": "hpt_shieldbooster_size0_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "TinyHardpoint3",
+      "Item": "hpt_shieldbooster_size0_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "TinyHardpoint4",
+      "Item": "hpt_shieldbooster_size0_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "Armour",
+      "Item": "federation_dropship_armour_mirrored",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "PowerPlant",
+      "Item": "int_powerplant_size6_class5",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "MainEngines",
+      "Item": "int_engine_size6_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "FrameShiftDrive",
+      "Item": "int_hyperdrive_overcharge_size5_class2",
+      "On": true,
+      "Priority": 3
+     },
+     {
+      "Slot": "LifeSupport",
+      "Item": "int_lifesupport_size5_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "PowerDistributor",
+      "Item": "int_powerdistributor_size6_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "Radar",
+      "Item": "int_sensors_size4_class5",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "FuelTank",
+      "Item": "int_fueltank_size4_class3",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Slot01_Size6",
+      "Item": "int_shieldgenerator_size6_class3_fast",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "Slot02_Size5",
+      "Item": "int_hullreinforcement_size5_class2",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Slot03_Size5",
+      "Item": "int_hullreinforcement_size5_class2",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Slot04_Size4",
+      "Item": "int_guardianshieldreinforcement_size4_class2",
+      "On": true,
+      "Priority": 0
+     },
+     {
+      "Slot": "Slot05_Size3",
+      "Item": "int_hullreinforcement_size3_class2",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Slot06_Size3",
+      "Item": "int_hullreinforcement_size3_class2",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Slot09_Size2",
+      "Item": "int_hullreinforcement_size2_class2",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Slot10_Size1",
+      "Item": "int_fsdinterdictor_size1_class5",
+      "On": true,
+      "Priority": 4
+     },
+     {
+      "Slot": "Military01",
+      "Item": "int_hullreinforcement_size4_class2",
+      "On": true,
+      "Priority": 1
+     },
+     {
+      "Slot": "Military02",
+      "Item": "int_hullreinforcement_size4_class2",
+      "On": true,
+      "Priority": 1
+     }
+    ]
+   }
+  }
+ },
+ "v1_links": [
+  {
+   "ship": "Type-6 Transporter",
+   "name": "Cargo",
+   "code": "02A4D4A2D2D2D4C-----04040303430101"
+  },
+  {
+   "ship": "Type-6 Transporter",
+   "name": "Miner",
+   "code": "03A4D4A2D2D2D4C2l2l---040403451q0101"
+  },
+  {
+   "ship": "Type-6 Transporter",
+   "name": "Hopper",
+   "code": "02A4D4A2D1A2D4C1717---030302024300-"
+  },
+  {
+   "ship": "Type-7 Transporter",
+   "name": "Cargo",
+   "code": "02A5D5A4D3D3D5C--------0505040403480101"
+  },
+  {
+   "ship": "Type-7 Transporter",
+   "name": "Miner",
+   "code": "04D5D5A4D2D3D5C--2l2l----0505041v03450000"
+  },
+  {
+   "ship": "Federal Dropship",
+   "name": "Cargo",
+   "code": "04D5D5A5D3D4D4C-1717------05040448020201"
+  },
+  {
+   "ship": "Asp Explorer",
+   "name": "Miner",
+   "code": "25A5A5A4D4A5A5C0s0s24242l2l---04054a1q02022o27"
+  },
+  {
+   "ship": "Imperial Clipper",
+   "name": "Cargo",
+   "code": "03A5D5A5D4D5D4C--0s0s----0605450302020101"
+  },
+  {
+   "ship": "Imperial Clipper",
+   "name": "Dream",
+   "code": "26A6A5A5D6A5A4C0v0v0s0s0404040n4k5n5d2b29292o-.AwRj4yWU1I==.CwBhCYy6YRigzLIA"
+  },
+  {
+   "ship": "Imperial Clipper",
+   "name": "Current",
+   "code": "04A6A5A5D4A5A4C----------------.AwRj4yWU1I==.CwBhCYy6YRigzLIA"
+  },
+  {
+   "ship": "Type-9 Heavy",
+   "name": "Current",
+   "code": "04A7D6A5D5D4D6C---------0706054a0303020224.AwRj4yoo.EwBhEYy6dsg="
+  },
+  {
+   "ship": "Python",
+   "name": "Cargo",
+   "code": "04A6D5A4D6D6D5C---------050505040448020201.Iw18eQ==.Aw18eQ=="
+  },
+  {
+   "ship": "Python",
+   "name": "Miner",
+   "code": "06A6A5A4D6A6A5C0v0v0v2m2m0404--050505Ce4a1v02022o.Iw18eQ==.IwBhBYy6dkCYg==="
+  },
+  {
+   "ship": "Python",
+   "name": "Dream",
+   "code": "27A6A5A4D7A6A5C0v0v0v27270404040m5n5n4f2d2d032t0201.Iw1+gDBxA===.EwBhEYy6e0WEA==="
+  },
+  {
+   "ship": "Anaconda",
+   "name": "Dream",
+   "code": "48A7A6A5D8A8A5C2c0o0o0o1m1m0q0q0404040l0b0100004k5n5n112d2d040303326b.AwRj4yo5dig=.MwBhCYy6du3ARiA="
+  },
+  {
+   "ship": "Anaconda",
+   "name": "Cargo",
+   "code": "04A6D6A5D5D8D5C----------------0605050504040445030301.Iw18ZlA=.Aw18ZlA="
+  },
+  {
+   "ship": "Anaconda",
+   "name": "Current",
+   "code": "04A6D6A5D5A8D5C----------------0605050504040403034524.Iw18ZlA=.Aw18ZlA="
+  },
+  {
+   "ship": "Anaconda",
+   "name": "Explorer",
+   "code": "04A6D6A5D5A8D5C--------0202------f7050505040s372f2i4524.AwRj4yVKJthA.AwhMIyungRhEA==="
+  },
+  {
+   "ship": "Anaconda",
+   "name": "Test",
+   "code": "48A6A6A5A8A8A5C2c0o0o0o1m1m0q0q0404-0l0b0100034k5n052d04--0303326b.Iw18ZlA=.Aw18ZlA="
+  },
+  {
+   "ship": "Diamondback Explorer",
+   "name": "Explorer",
+   "code": "02A4D5A3D3D3D5C---0202--320p432i2f.AwRj4zTI.AwiMIypI"
+  },
+  {
+   "ship": "Vulture",
+   "name": "Bounty Hunter",
+   "code": "34A4C4A3D5A4A3C1e1e0404-0l4a5d27662j.AwRj4y2I.MwBhBYy6wJmAjLIA"
+  },
+  {
+   "ship": "Fer-de-Lance",
+   "name": "Attack",
+   "code": "25A5C4A4D6A4A3C1r0s0s0s0s000404-04-4a-5d27-.Iw18aQ==.CwBhrSu8EZyA"
+  },
+  {
+   "ship": "Eagle",
+   "name": "Figther",
+   "code": "42A3A3A1D2A2A2C0p0p24-40532j-.Iw1-EA==.Aw1-EA=="
+  },
+  {
+   "ship": "Python",
+   "name": "Missile",
+   "code": "07E6E5E4E7E6E5C2f2g2d2ePh----04044j03---002h.Iw18eQ==.Aw18eQ=="
+  }
+ ]
+}

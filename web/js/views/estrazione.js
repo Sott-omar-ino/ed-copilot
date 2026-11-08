@@ -69,7 +69,7 @@ function mnRock(r) {
     : `<span>Contenuto</span> ${esc(T("value", r.content) || "—")}`;
   return `<div class="rock"><div class="rock-head"><span>${head}</span>
       <span class="mono muted">${r.remaining != null ? `rimasto ${Number(r.remaining).toFixed(0)}% · ` : ""}${r.ts.slice(11, 19)}</span></div>
-      ${r.materials.map(x => `<div class="mat-line"><span>${esc(T("commodity", x.name))}</span>${meter(x.pct * 2, "holo")}<span class="num">${x.pct.toFixed(1)}%</span></div>`).join("")}</div>`;
+      ${r.materials.map(x => `<div class="mat-line"><span>${esc(T("commodity", x.name))}</span>${meter(x.pct * 2, "holo")}<span class="num">${dec(x.pct)}%</span></div>`).join("")}</div>`;
 }
 
 function mnProspector() {
@@ -97,14 +97,14 @@ function mnCores(d) {
     const list = s.cores.length ? `<table style="margin-top:10px"><thead><tr><th>Core</th><th>Contenuto</th><th class="num">Rimasto</th><th>Superficie</th><th class="num">Ora</th></tr></thead><tbody>
       ${s.cores.map(c => `<tr><td class="gold"><b>${esc(T("commodity", c.name))}</b></td><td>${esc(mnContent(c.content))}</td>
         <td class="num">${c.remaining != null ? Number(c.remaining).toFixed(0) + "%" : "—"}</td>
-        <td class="sub">${c.materials.map(x => `${esc(T("commodity", x.name))} ${x.pct.toFixed(1)}%`).join(" · ") || "—"}</td>
+        <td class="sub">${c.materials.map(x => `${esc(T("commodity", x.name))} ${dec(x.pct)}%`).join(" · ") || "—"}</td>
         <td class="num mono">${esc((c.ts || "").slice(11, 16))}</td></tr>`).join("")}</tbody></table>`
       : '<div class="empty" style="margin-top:10px">Nessun core trovato in questa sessione.</div>';
     body = `<div class="kv-grid">
       ${mnKv("Asteroidi analizzati", num(s.prospected))}
       ${mnKv("Core trovati", num(s.cores_found), s.cores_found ? "gold" : "")}
       ${mnKv("Core crackati", num(s.cracked))}
-      ${mnKv("Core ogni", s.cores_found ? `${(s.prospected / s.cores_found).toFixed(1)}` : "—", "", "asteroidi")}</div>${list}`;
+      ${mnKv("Core ogni", s.cores_found ? dec(s.prospected / s.cores_found) : "—", "", "asteroidi")}</div>${list}`;
   }
   const open = UI.open.has("mn:tips");
   const tips = `<details class="build" data-key="mn:tips" ${open ? "open" : ""} style="margin:12px 0 0"><summary>Consigli per il core mining</summary>

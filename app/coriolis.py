@@ -20,11 +20,15 @@ from .gamedata import _GRADES, BLUEPRINTS, ENGINEER_ALIASES, MATERIAL_GRADE
 # Il catalogo aggiornato sta nella cache dell'utente; quello incluso nel programma serve solo al primo avvio.
 CATALOG_FILE = paths.cache_file("catalog.json")
 SEED_FILE = os.path.join(paths.SEED_DATA_DIR, "catalog.json")
-SOURCE = "https://codeload.github.com/EDCD/coriolis-data/tar.gz/refs/heads/master"
+# Ramo "develop": è quello da cui è costruito coriolis.io (il ship-slots.json pubblicato su coriolis.io contiene navi,
+# come Anaconda Mk II e Lynx Highliner, che esistono solo in develop). "master" è fermo al 24/04/2026 e non ha né queste
+# navi né l'ordine degli slot dei link Coriolis attuali (EDCD/coriolis, docs/link-format-v3.md).
+SOURCE = "https://codeload.github.com/EDCD/coriolis-data/tar.gz/refs/heads/develop"
 MAX_AGE = 14 * 86400
 # Versione dello schema: un catalogo salvato con una versione inferiore va rigenerato.
 # 3: blueprint con gli effetti per grado ("features"), effetti sperimentali ("actions") e metodo di ogni modificatore.
-SCHEMA = 3
+# 4: id numerici di blueprint, sperimentali e modificatori (servono a leggere i link /outfit/ di Coriolis); dati da develop.
+SCHEMA = 4
 
 # Simbolo della nave nel journal -> chiave nel repository di Coriolis.
 JOURNAL_TO_CORIOLIS = {
@@ -40,7 +44,7 @@ JOURNAL_TO_CORIOLIS = {
     "anaconda": "anaconda", "federation_corvette": "federal_corvette", "cutter": "imperial_cutter",
     "type8": "type_8_transport", "mandalay": "mandalay", "cobramkv": "cobramkv", "corsair": "imperial_corsair",
     "lakonminer": "type_11_prospector", "panthermkii": "panthermkii", "explorer_nx": "explorer_nx",
-    "smallcombat01_nx": "kestrel",
+    "smallcombat01_nx": "kestrel", "anacondamkii": "anaconda2", "mediumtransport01": "lynx_highliner",
 }
 
 # Statistiche dei moduli che il configuratore usa.
@@ -92,17 +96,20 @@ def _engineering(files):
     actions, defs = files.get("modifierActions", {}), files.get("modifications", {})
     # features: {grado: {attributo: [minimo, massimo]}} = effetto del grado dal tiro peggiore al migliore
     # (modifications/blueprints.json); actions: effetto fisso dello sperimentale (modifications/modifierActions.json).
-    blueprints = {k: {"name": b.get("name"), "grades": {g: d.get("components", {}) for g, d in b.get("grades", {}).items()},
+    blueprints = {k: {"name": b.get("name"), "id": b.get("id"), "grades": {g: d.get("components", {}) for g, d in b.get("grades", {}).items()},
                       "features": {g: {a: v for a, v in (d.get("features") or {}).items()
                                        if isinstance(v, list) and len(v) == 2 and all(isinstance(x, (int, float)) for x in v)}
                                    for g, d in b.get("grades", {}).items()}}
                   for k, b in bps.items()}
-    specials = {k: {"name": sp.get("name"), "components": sp.get("components", {}),
+    specials = {k: {"name": sp.get("name"), "id": sp.get("id"), "components": sp.get("components", {}),
                     "actions": {a: v for a, v in (actions.get(k) or {}).items() if isinstance(v, (int, float))}}
                 for k, sp in sps.items()}
     # Come si combina ogni modificatore col valore di base (modifications/modifications.json):
     # "multiplicative" = base * (1 + mod), "additive" = base + mod, "overwrite" = mod.
     methods = {k: d.get("method") for k, d in defs.items() if isinstance(d, dict) and d.get("type") in ("percentage", "numeric")}
+    # Id numerico -> [nome, tipo]: nei link di Coriolis ogni modificatore è scritto con il suo id (src/app/shipyard/Ship.js,
+    # updateModificationsString); "percentage" vale id / 10000 (-2,34% = -234), come in Module.js (setModValue).
+    mod_ids = {str(d["id"]): [k, d.get("type")] for k, d in defs.items() if isinstance(d, dict) and isinstance(d.get("id"), int)}
     by_grp = {}
     for grp, m in mods.items():
         entry = {"bp": {}, "sp": [k for k in m.get("specials") or [] if k in specials]}
@@ -122,6 +129,7 @@ def _engineering(files):
     if unknown:
         print("Materiali Coriolis senza simbolo:", ", ".join(unknown))
     return {"blueprints": blueprints, "specials": specials, "engineering": by_grp, "bp_labels": BLUEPRINTS, "mod_methods": methods,
+            "mod_ids": mod_ids,
             "materials": {n: v for n, v in materials.items() if v}}
 
 
@@ -140,6 +148,9 @@ def _build(raw):
             data = json.load(tar.extractfile(member))
             if "/ships/" in name:
                 for key, s in data.items():
+                    # ships/ship-slots.json (solo nomi degli slot, niente "properties") non è una nave.
+                    if not isinstance(s, dict) or not isinstance(s.get("properties"), dict):
+                        continue
                     p = s["properties"]
                     ships[key] = {
                         "key": key, "name": p["name"], "manufacturer": p.get("manufacturer"), "size": p.get("class"),

@@ -23,6 +23,25 @@
     ShieldGenStrength: ["optmul", 0.01], EngineOptPerformance: ["optmul", 0.01],
     DefenceModifierHealthMultiplier: ["hullboost", 0.01], DefenceModifierShieldMultiplier: ["shieldboost", 0.01],
     DefenceModifierHealthAddition: ["hullreinforcement", 1], DefenceModifierShieldAddition: ["shieldaddition", 1] };
+  // Il contrario, per esportare i valori reali di una nave importata dal gioco: attributo -> etichetta del journal
+  // (optmass e optmul dipendono dal tipo di modulo).
+  function journalLabel(attr, grp) {
+    const shield = ["sg", "bsg", "psg"].includes(grp);
+    if (attr === "optmass") return grp === "fsd" ? "FSDOptimalMass" : grp === "t" ? "EngineOptimalMass" : shield ? "ShieldGenOptimalMass" : null;
+    if (attr === "optmul") return grp === "t" ? "EngineOptPerformance" : shield ? "ShieldGenStrength" : null;
+    return Object.keys(JOURNAL_MODS).find(l => JOURNAL_MODS[l][0] === attr && !/OptimalMass|OptPerformance|ShieldGenStrength/.test(l)) || null;
+  }
+  // Modificatori del journal ricostruiti da valori reali (entry.fx): Value e OriginalValue nelle unità del journal.
+  function journalModifiers(base, res, fx, grp) {
+    const out = [];
+    for (const attr of Object.keys(fx || {})) {
+      const label = journalLabel(attr, grp);
+      if (!label || res[attr] == null) continue;
+      const unit = JOURNAL_MODS[label][1];
+      out.push({ Label: label, Value: +(res[attr] / unit).toFixed(6), OriginalValue: +((base[attr] || 0) / unit).toFixed(6) });
+    }
+    return out;
+  }
   // Vecchio formato salvato (valori assoluti del journal in entry.mods) -> attributi.
   const LEGACY_ABS = ["mass", "power", "optmass", "maxfuel", "pgen", "fuel", "cargo"];
   const RES = new Set(["kinres", "thermres", "explres", "causres"]);  // resistenze: il configuratore non le usa
@@ -175,7 +194,10 @@
     const names = slotTable ? slotNamesFor(catalog, key, slotTable) : null;
     const toEntry = r => {
       const itemSym = String(r.item || r.Item || "").toLowerCase();
-      const m = idx.bySymbol[itemSym];
+      // Varianti "_free" (moduli regalati con la nave, es. int_fighterbaymk2_size6_class1_free): stesse statistiche del
+      // modulo normale e prezzo 0 (EDSY eddb.js, Int_FighterBayMk2_Size6_Class1_Free: mass 20, cost 0).
+      const free = !idx.bySymbol[itemSym] && /_free$/.test(itemSym) && idx.bySymbol[itemSym.slice(0, -5)];
+      const m = idx.bySymbol[itemSym] || free;
       if (!m) { cfg.unknown.push(itemSym); return null; }
       // Modificatori reali: {Label: Value} (Flotta, app/ships.py) oppure [{Label, Value}] (Loadout incollato).
       const rawMods = r.mods || r.Engineering?.Modifiers || {};
@@ -183,6 +205,7 @@
       const src = r.Engineering || r.eng || null;
       const bp = src && (src.BlueprintName || src.bp || src.blueprint);
       const entry = { id: m.uid };
+      if (free) entry.free = true;
       const fx = journalEffects(m, mods);
       if (fx) entry.fx = fx;
       if (bp) {
@@ -341,13 +364,17 @@
       if (bp) {
         armour.Engineering = { BlueprintName: bp, Level: Math.max(1, Math.min(5, +be.grade || 5)), Quality: 1 };
         if (sp) Object.assign(armour.Engineering, { ExperimentalEffect: sp, ExperimentalEffect_Localised: catalog.specials[sp].name });
+        const baseB = ship.bulkheads[cfg.bulkhead || 0] || {};
+        const mods = be.fx ? journalModifiers(baseB, r.bulk || {}, be.fx, "bh") : [];
+        if (mods.length) armour.Engineering.Modifiers = mods;
       }
     }
     modules.push(armour);
     const add = (slot, entry) => {
       const m = idx.byId[entry.id];
       if (!m || !m.symbol) { skipped.push(m?.name || entry.id); return; }
-      const out = { Slot: slot, Item: m.symbol, On: true, Priority: 0, Health: 1, Value: Math.round(m.cost || 0) };
+      const out = { Slot: slot, Item: m.symbol + (entry.free ? "_free" : ""), On: true, Priority: 0, Health: 1,
+        Value: entry.free ? 0 : Math.round(m.cost || 0) };
       // Ingegneria pianificata, altrimenti quella già montata sul modulo della nave vera.
       const eng = entry.engineering?.blueprint ? entry.engineering : entry.installed;
       if (eng && eng.blueprint) {
@@ -357,6 +384,9 @@
         // (Coriolis la usa per calcolare i valori quando mancano i Modifiers).
         out.Engineering = { BlueprintName: bp, Level: Math.max(1, Math.min(5, +eng.grade || 5)), Quality: 1 };
         if (sp) Object.assign(out.Engineering, { ExperimentalEffect: sp, ExperimentalEffect_Localised: catalog.specials[sp].name });
+        // Nave importata dal gioco (o da un link con i valori): si esportano i valori reali dei modificatori.
+        const mods = entry.fx ? journalModifiers(m, resolve(catalog, entry), entry.fx, m.grp) : [];
+        if (mods.length) out.Engineering.Modifiers = mods;
       }
       modules.push(out);
     };
@@ -400,7 +430,7 @@
   function encodeCode(cfg, name) {
     const pack = e => e ? { i: e.id, ...(e.fx ? { f: e.fx } : {}), ...(!e.fx && e.mods ? { m: e.mods } : {}),
       ...(e.engineering ? { e: e.engineering } : {}),
-      ...(e.slot ? { s: e.slot } : {}), ...(e.installed ? { x: e.installed } : {}) } : 0;
+      ...(e.slot ? { s: e.slot } : {}), ...(e.installed ? { x: e.installed } : {}), ...(e.free ? { fr: 1 } : {}) } : 0;
     const be = bulkheadEng(cfg);
     return CODE_PREFIX + b64url.enc(JSON.stringify({ v: 1, n: name || "", s: cfg.ship, b: cfg.bulkhead || 0,
       ...(be ? { be: { blueprint: be.blueprint, grade: be.grade, exp: be.exp || "", ...(be.fx ? { f: be.fx } : {}) } } : {}),
@@ -451,6 +481,7 @@
         if (en) e.engineering = en;
         if (inst) e.installed = { blueprint: inst.blueprint, grade: inst.grade, exp: inst.exp || "" };
         if (str(p.s, 40, /^[A-Za-z0-9_]+$/)) e.slot = p.s;
+        if (p.fr === 1) e.free = true;
         cfg[kind][i] = e;
       });
     }
@@ -463,6 +494,150 @@
     return { cfg, name: str(o.n, 60) || "" };
   }
 
+  // ==========================================================================
+  // Link /outfit/<nave>?code=... di Coriolis. Porting di EDCD/coriolis (MIT), commit 7248d2beb396 (develop, 25/10/2026):
+  //  - src/app/shipyard/Ship.js: buildFrom() (versione dal primo carattere, decodeToArray(), upgradeInternals() per i
+  //    link v1) e updateModificationsString()/decodeModificationsStruct() (ingegnerie);
+  //  - src/app/shipyard/LinkMigration.js: link v1/v2 delle navi a cui Frontier ha aggiunto slot;
+  //  - docs/link-format-v3.md: "B" = v3, posizionale sull'ordine degli slot attuale (ship-slots.json).
+  // Il codice è "<versione><corazza><moduli standard><hardpoint><interni>": ogni modulo è un id di 2 caratteri di
+  // coriolis-data oppure "-" (slot vuoto). La parte binaria delle ingegnerie (gzip) la decodifica app/buildshare.py:
+  // qui arriva già come [{slot, bp, grade, sp, mods: {id: valore}}], con slot = indice globale
+  // [corazza, 7 standard, hardpoint, interni] e valori "percentage" in decimillesimi (-2,34% = -234, Module.js).
+  // ==========================================================================
+  // LinkMigration.js, OLD_INTERNAL_LAYOUTS / OLD_HARDPOINT_LAYOUTS: disposizione prima delle modifiche di Frontier.
+  const OLD_INTERNAL = {
+    type_6_transporter: [["num", 5], ["num", 5], ["num", 4], ["num", 4], ["num", 3], ["num", 2], ["num", 2], ["num", 1], ["pas", 1]],
+    type_7_transport: [["num", 6], ["num", 6], ["num", 6], ["num", 5], ["num", 5], ["num", 5], ["num", 3], ["num", 3], ["num", 2],
+      ["num", 1], ["pas", 1]],
+    imperial_clipper: [["num", 7], ["num", 6], ["num", 4], ["num", 4], ["num", 3], ["num", 3], ["num", 2], ["num", 2], ["num", 1],
+      ["pas", 1]],
+    federal_dropship: [["num", 6], ["num", 5], ["num", 5], ["num", 4], ["mil", 4], ["mil", 4], ["num", 3], ["num", 3], ["num", 2],
+      ["num", 1], ["pas", 1]],
+  };
+  const OLD_HARDPOINTS = { asp_scout: [2, 2, 1, 1, 0, 0] };
+  const MAX_CORIOLIS_CODE = 800;
+  const cKind = slot => {
+    const n = slotInfo(slot).name || "";
+    return n === "PlanetaryApproachSuite" ? "pas" : n === "Military" ? "mil" : n === "Cargo" ? "cargo" : "num";
+  };
+  // newFromOld[nuovo indice] = vecchio indice o null. Interni: allineati in fondo al gruppo tipo|classe (gli slot nuovi
+  // sono in testa, Slot00_SizeN); hardpoint: allineati in testa per classe (le utility nuove sono in coda).
+  function coriolisRemap(ship, shipKey, kind) {
+    const oldL = kind === "internal" ? OLD_INTERNAL[shipKey].map(([k, c]) => k + "|" + c) : OLD_HARDPOINTS[shipKey].map(String);
+    const newL = kind === "internal" ? ship.slots.internal.map(x => cKind(x) + "|" + slotInfo(x).cls)
+      : ship.slots.hardpoints.map(x => String(slotInfo(x).cls));
+    const group = list => list.reduce((g, k, i) => ((g[k] ||= []).push(i), g), {});
+    const oldBy = group(oldL), newBy = group(newL), out = new Array(newL.length).fill(null);
+    for (const [k, idxs] of Object.entries(newBy)) {
+      const olds = oldBy[k] || [], off = kind === "internal" ? Math.max(0, idxs.length - olds.length) : 0;
+      olds.forEach((o, j) => { if (idxs[off + j] != null) out[idxs[off + j]] = o; });
+    }
+    return out;
+  }
+  function fromCoriolis(catalog, data) {
+    const own = (o, k) => o != null && Object.prototype.hasOwnProperty.call(o, k);
+    const key = String(data?.ship || "");
+    if (!own(catalog.ships, key)) throw new Error("Nave non presente nel catalogo: " + key.slice(0, 40));
+    const ship = catalog.ships[key], idx = index(catalog);
+    let code = String(data.code || "");
+    if (!code || code.length > MAX_CORIOLIS_CODE || !/^[A-Za-z0-9\-]+$/.test(code)) throw new Error("Codice della build non valido");
+    const version = /^[0-4]/.test(code) ? 1 : code[0] === "B" ? 3 : 2;
+    if (version > 1) code = code.slice(1);
+    const migIn = version !== 3 && own(OLD_INTERNAL, key), migHp = version !== 3 && own(OLD_HARDPOINTS, key);
+    const nStd = ship.slots.standard.length;
+    const hpLen = migHp ? OLD_HARDPOINTS[key].length : ship.slots.hardpoints.length;
+    const inLen = migIn ? OLD_INTERNAL[key].length : ship.slots.internal.length;
+    let pos = 1;
+    const take = n => Array.from({ length: n }, () => {
+      if (pos >= code.length) return 0;
+      if (code[pos] === "-") { pos++; return 0; }
+      const id = code.slice(pos, pos + 2);
+      pos += 2;
+      return id;
+    });
+    const std = take(nStd);
+    let hps = take(hpLen), ints = take(inLen);
+    const total = 1 + nStd + hpLen + inLen;
+    let mods = new Array(total).fill(null);
+    for (const m of Array.isArray(data.mods) ? data.mods : [])
+      if (m && Number.isInteger(m.slot) && m.slot >= 0 && m.slot < total) mods[m.slot] = m;
+    if (version === 1) {
+      // upgradeInternals(): i link v1 sono precedenti agli slot Military; ogni slot Military riceve un buco.
+      const off = 1 + nStd + hpLen;
+      ship.slots.internal.forEach((x, i) => {
+        if (!slotInfo(x).eligible?.mrp || i >= ints.length) return;
+        ints = [...ints.slice(0, i), 0, ...ints.slice(i)].slice(0, inLen);
+        mods = [...mods.slice(0, off + i), null, ...mods.slice(off + i)].slice(0, total);
+      });
+    }
+    const pre = 1 + nStd;
+    let modsHp = mods.slice(pre, pre + hpLen), modsIn = mods.slice(pre + hpLen, pre + hpLen + inLen);
+    if (migHp) {
+      const map = coriolisRemap(ship, key, "hardpoints");
+      hps = map.map(o => o == null ? 0 : hps[o]);
+      modsHp = map.map(o => o == null ? null : modsHp[o]);
+    }
+    if (migIn) {
+      const map = coriolisRemap(ship, key, "internal");
+      ints = map.map(o => o == null ? 0 : ints[o]);
+      modsIn = map.map(o => o == null ? null : modsIn[o]);
+    }
+    const bpById = {}, spById = {};
+    for (const [k, b] of Object.entries(catalog.blueprints || {})) if (Number.isInteger(b.id)) bpById[b.id] = k;
+    for (const [k, sp] of Object.entries(catalog.specials || {})) if (Number.isInteger(sp.id)) spById[sp.id] = k;
+    const engOf = (m, grp) => {
+      if (!m) return {};
+      const bp = own(bpById, m.bp) ? blueprintKey(catalog, grp, bpById[m.bp]) : null;
+      const sp = own(spById, m.sp) ? specialKey(catalog, grp, spById[m.sp]) : null;
+      const out = {};
+      if (bp) out.engineering = { blueprint: bp, grade: Math.max(1, Math.min(5, Math.round(+m.grade) || 5)), exp: sp || "" };
+      // Valori dei modificatori senza lo sperimentale (Coriolis li salva con getModValue(name, true)): si aggiunge lo
+      // sperimentale come in engEffects.
+      const fx = {};
+      for (const [id, v] of Object.entries(m.mods && typeof m.mods === "object" ? m.mods : {})) {
+        const def = own(catalog.mod_ids, id) ? catalog.mod_ids[id] : null;
+        if (!def || def[1] !== "percentage" || typeof v !== "number" || !isFinite(v) || RES.has(def[0]) || !FX_KEY.test(def[0])) continue;
+        fx[def[0]] = v / 10000;
+      }
+      if (Object.keys(fx).length) {
+        for (const [a, v] of Object.entries(sp ? catalog.specials[sp].actions || {} : {})) {
+          if (RES.has(a)) continue;
+          const mth = method(catalog, a);
+          fx[a] = mth === "additive" ? (fx[a] || 0) + v : mth === "overwrite" ? v : (1 + (fx[a] || 0)) * (1 + v) - 1;
+        }
+        const clean = cleanFx(fx);
+        if (clean) out.fx = clean;
+      }
+      return out;
+    };
+    const cfg = { ship: key, bulkhead: 0, standard: Array(7).fill(null), internal: ship.slots.internal.map(() => null),
+      hardpoints: ship.slots.hardpoints.map(() => null), unknown: [] };
+    const b = +code[0];
+    cfg.bulkhead = Number.isInteger(b) && b >= 0 && b < ship.bulkheads.length ? b : 0;
+    const be = engOf(mods[0], "bh");
+    if (be.engineering) cfg.bulkheadEng = { ...be.engineering, bi: cfg.bulkhead, ...(be.fx ? { fx: be.fx } : {}) };
+    const place = (kind, list, engList) => list.forEach((id, i) => {
+      if (!id || i >= cfg[kind].length) return;
+      const uid = (kind === "standard" ? "s:" : kind === "internal" ? "i:" : "h:") + id;
+      let m = own(idx.byId, uid) ? idx.byId[uid] : null;
+      // ModuleUtils.standard(): nei link più vecchi i moduli standard sono scritti come classe + rating ("4D").
+      if (kind === "standard" && (!m || m.grp !== STD_GROUPS[i]))
+        m = catalog.modules.find(x => x.section === "standard" && x.grp === STD_GROUPS[i] && String(x.class) === id[0]
+          && x.rating === id[1] && !x.pre) || m;
+      const size = kind === "standard" ? ship.slots.standard[i] : slotInfo(ship.slots[kind][i]).cls;
+      const ok = m && (kind === "standard" ? m.grp === STD_GROUPS[i] : m.section === kind) && (m.class || 0) <= size
+        && (kind !== "hardpoints" || (size === 0) === ((m.class || 0) === 0));
+      if (!ok) { cfg.unknown.push(id); return; }
+      cfg[kind][i] = { id: m.uid, ...engOf(engList[i], m.grp) };
+    });
+    place("standard", std, mods.slice(1, pre));
+    place("hardpoints", hps, modsHp);
+    place("internal", ints, modsIn);
+    const name = typeof data.name === "string" ? data.name.replace(/[\x00-\x1f\x7f]/g, "").slice(0, 60) : "";
+    return { cfg, name, version };
+  }
+
   // Effetti dell'ingegneria su un modulo: valori reali del journal (fx) se ci sono, altrimenti il blueprint pianificato.
   function entryEffects(catalog, m, entry) {
     if (!entry) return null;
@@ -473,6 +648,7 @@
     const m = index(catalog).byId[entry.id];
     if (!m) return null;
     const res = { ...m };
+    if (entry.free) res.cost = 0;  // modulo "_free" (vedi fromLoadout)
     const fx = entryEffects(catalog, m, entry);
     if (fx) { applyEffects(catalog, res, fx); res.fx = fx; res.engineered = true; }
     if (entry.engineering) { res.engineering = entry.engineering; res.engineered = true; }
@@ -776,7 +952,7 @@
   const api = { STD_GROUPS, STD_SLOTS, index, blank, fromLoadout, resolve, resolveBulkhead, bulkheadEng, compute, compatible, slotInfo,
     engEffects, entryEffects, describeEffects, blueprintsFor, engLabel, bpName,
     ROLL_PRESETS, DEFAULT_ROLLS, MATERIAL_FAMILIES, blueprintKey, specialKey, blueprintEngineers, engineeringJobs, shoppingList,
-    slotNamesFor, toLoadout, journalSymbol, encodeCode, decodeCode };
+    slotNamesFor, toLoadout, journalSymbol, encodeCode, decodeCode, fromCoriolis };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.ShipCalc = api;
 })(typeof window !== "undefined" ? window : globalThis);

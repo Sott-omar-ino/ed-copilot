@@ -28,7 +28,7 @@ VIEWS.cmdr = () => {
   const rep = Object.entries(S.reputation).map(([k, v]) => {
     const lbl = { Empire: "Impero", Federation: "Federazione", Alliance: "Alleanza", Independent: "Indipendenti" }[k];
     return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span class="eyebrow">${lbl}</span>
-      <span class="mono ${v < 0 ? "bad" : v > 50 ? "ok" : ""}">${v > 0 ? "+" : ""}${v.toFixed(1)}</span></div>${meter((v + 100) / 2, "center" + (v < 0 ? " bad" : ""))}</div>`;
+      <span class="mono ${v < 0 ? "bad" : v > 50 ? "ok" : ""}">${v > 0 ? "+" : ""}${dec(v)}</span></div>${meter((v + 100) / 2, "center" + (v < 0 ? " bad" : ""))}</div>`;
   }).join("");
   const stats = Object.entries(STAT_SECTIONS).filter(([k]) => st[k]).map(([k, lbl]) =>
     panel(lbl, `<table><tbody>${Object.entries(st[k]).filter(([, v]) => v !== 0).map(([sk, v]) =>

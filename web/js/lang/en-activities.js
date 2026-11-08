@@ -167,7 +167,7 @@ LANG.add({
   "Distanza rimanente": "Distance left",
   "Tappa": "Waypoint",
   "Integrita FSD": "FSD integrity",
-  "▲ ATTENZIONE FSD: Integrita {}% (inferiore a 80%). Rischio malfunzionamento e drop dall'iperspazio! Effettua riparazione con AFMU prima del prossimo salto.": "▲ FSD WARNING: integrity {}% (below 80%). Risk of malfunctions and drops from hyperspace! Repair it with an AFMU before the next jump.",
+  "▲ ATTENZIONE FSD: integrità {}% (inferiore a 80%). Rischio malfunzionamento e drop dall'iperspazio! Effettua riparazione con AFMU prima del prossimo salto.": "▲ FSD WARNING: integrity {}% (below 80%). Risk of malfunctions and drops from hyperspace! Repair it with an AFMU before the next jump.",
   "Viaggio verso {}": "Travel to {}",
   "Cancella rotta": "Clear route",
   "Rotta attiva": "Active route",

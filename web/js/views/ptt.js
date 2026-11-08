@@ -18,7 +18,7 @@ function pttLive(st) {
   if (!st) return '<div class="loading">LETTURA STATO PUSH-TO-TALK</div>';
   let tag;
   if (st.learning) tag = `<span class="tag gold">● PREMI ORA IL PULSANTE O IL TASTO… ${Math.ceil(st.learn_left)} s (Esc annulla)</span>`;
-  else if (st.recording) tag = `<span class="tag ok">● REGISTRAZIONE IN CORSO ${st.recording_for.toFixed(1)} s / ${st.max_seconds} s</span>`;
+  else if (st.recording) tag = `<span class="tag ok">● REGISTRAZIONE IN CORSO ${dec(st.recording_for)} s / ${st.max_seconds} s</span>`;
   else if (st.transcribing) tag = '<span class="tag gold">◌ TRASCRIZIONE…</span>';
   else if (st.enabled && st.binding) tag = `<span class="tag">● IN ATTESA · ${st.mode === "toggle" ? "premi" : "tieni premuto"} ${esc(st.binding.name)}</span>`;
   else tag = `<span class="tag sub">○ ${st.enabled ? "NESSUN PULSANTE ASSEGNATO" : "SPENTO"}</span>`;

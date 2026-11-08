@@ -65,8 +65,8 @@ LANG.add({
   "Velocità massima": "Max speed",
   "Difesa": "Defence",
   "Estrazione mineraria": "Mining",
-  "FSD classe A con Increased Range G5 e Mass Manager, Life Support e Sensors D con Lightweight G5, Guardian FSD Booster, niente armi":
-    "Class A FSD with Increased Range G5 and Mass Manager, D-rated Life Support and Sensors with Lightweight G5, Guardian FSD Booster, no weapons",
+  "FSD classe A con Increased Range G5 e Mass Manager, Guardian FSD Booster, Life Support e Sensors D con Lightweight G5, Thrusters e Power Distributor D, il Power Plant più leggero che basta, il Shield Generator più leggero che regge lo scafo, nessun Cargo Rack, niente armi":
+    "Class A FSD with Increased Range G5 and Mass Manager, Guardian FSD Booster, D-rated Life Support and Sensors with Lightweight G5, D-rated Thrusters and Power Distributor, the lightest Power Plant that is enough, the lightest Shield Generator that holds the hull, no Cargo Racks, no weapons",
   "Cargo Rack in tutti gli slot interni liberi": "Cargo Racks in every free internal slot",
   "Thrusters A con Dirty Drives G5 e Drag Drives, Power Distributor A con Charge Enhanced G5 e Super Conduits":
     "A-rated Thrusters with Dirty Drives G5 and Drag Drives, A-rated Power Distributor with Charge Enhanced G5 and Super Conduits",
@@ -84,7 +84,8 @@ LANG.add({
   "Il formato journal porta moduli, slot, blueprint, grado ed effetto sperimentale; per una build pianificata i valori dei modificatori non ci sono (grado al tiro migliore). Il codice ED Copilot conserva tutto, ma lo legge solo ED Copilot.":
     "The journal format carries modules, slots, blueprint, grade and experimental effect; for a planned build the modifier values are missing (grade at the best roll). The ED Copilot code keeps everything, but only ED Copilot can read it.",
   "Importa una build": "Import a build",
-  "Incolla una build in formato journal (Loadout), un link di una build o un codice ED Copilot": "Paste a build in journal format (Loadout), a build link or an ED Copilot code",
+  "Incolla una build in formato journal (Loadout) o SLEF, un link di una build o un codice ED Copilot": "Paste a build in journal (Loadout) or SLEF format, a build link or an ED Copilot code",
+  "Codice della build non valido": "Invalid build code",
   "Importa nel cantiere": "Import into the shipyard",
   "Incolla prima una build": "Paste a build first",
   "Testo troppo lungo": "Text too long",

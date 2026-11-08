@@ -123,7 +123,7 @@ function discordPanel(st) {
     <div style="display:flex;gap:8px;margin-top:10px">
       <input id="discord-id" placeholder="Application ID (solo numeri)" value="${esc(d.client_id)}" style="flex:1">
       <button class="small" id="discord-id-save">Salva</button></div>
-    <button class="small ghost" data-open="https://discord.com/developers/applications" style="margin-top:6px">Apri Discord Developer Portal</button>
+    <button class="small ghost" data-open="https://discord.com/developers/applications" style="margin:6px 0 10px">Apri Discord Developer Portal</button>
     ${dataRow("Mostra su Discord", d.connected ? '<span class="ok">Collegato a Discord</span>' : esc(d.error || (d.enabled ? "In attesa di Discord" : "Spento")),
       switchBtn("discord-toggle", d.enabled, "Discord"))}
     ${dataRow("Mostra il sistema", "Spento: si vede solo la nave e l'attività, non dove sei.", switchBtn("discord-system", d.show_system, "Mostra il sistema"))}`;

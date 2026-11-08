@@ -244,7 +244,7 @@ VIEWS.wishlist = () => {
         </div>
 
         <div style="margin-top:6px;font-size:12px;color:var(--text-1);line-height:1.45;background:rgba(0,0,0,0.3);border-left:2px solid var(--accent);padding:6px 10px">
-          <span style="color:var(--gold);font-weight:bold">&#x25c6; DOVE E COME TROVARLO:</span> ${srcInfo.where}
+          <span style="color:var(--gold);font-weight:bold">Dove e come trovarlo:</span> ${srcInfo.where}
         </div>
 
         <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">

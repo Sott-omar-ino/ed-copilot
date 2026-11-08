@@ -87,7 +87,7 @@ function ttsVoicePanel() {
   const effDesc = presets.find(p => p.id === eff)?.desc || "";
   const amount = cfg.tts_fx_amount ?? 70, rate = cfg.tts_rate ?? 0, pitch = cfg.tts_pitch ?? 0;
   const vol = SETTINGS.ttsVolume != null ? SETTINGS.ttsVolume : 100;
-  return `<div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,138,31,0.22);padding:14px;display:flex;flex-direction:column;gap:10px">
+  return `<div class="subpanel vc-stack">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <label style="font-size:12px;font-weight:bold;color:var(--gold);margin:0">Volume</label>
       <div style="display:flex;align-items:center;gap:10px">
@@ -99,7 +99,7 @@ function ttsVoicePanel() {
 
     <label style="font-size:11px">Voce
       <div style="display:flex;gap:6px;margin-top:3px">
-        <select id="tts-voice-sel" style="flex:1;height:32px;background:#110800;border:1px solid var(--accent);color:var(--gold)">${options}</select>
+        <select id="tts-voice-sel" style="flex:1;height:32px">${options}</select>
         <button class="small" data-tts-try="voice" style="height:32px">&#x25b6; Prova</button>
       </div>
     </label>
@@ -107,7 +107,7 @@ function ttsVoicePanel() {
 
     <label style="font-size:11px">Effetto sulla voce
       <div style="display:flex;gap:6px;margin-top:3px">
-        <select id="tts-effect-sel" style="flex:1;height:32px;background:#110800;border:1px solid var(--accent);color:var(--gold)">
+        <select id="tts-effect-sel" style="flex:1;height:32px">
           ${(presets.length ? presets : [{ id: "naturale", label: "Naturale" }]).map(p => `<option value="${esc(p.id)}" ${p.id === eff ? "selected" : ""}>${esc(p.label)}</option>`).join("")}
         </select>
         <button class="small" data-tts-try="effect" style="height:32px">&#x25b6; Prova</button>
@@ -145,10 +145,10 @@ function noiseFilterPanel() {
   const last = UI.res.voiceNoise?.data?.last;
   const src = { app: "microfono dell'app", ptt: "push-to-talk", phone: "telefono" };
   const lastTxt = last && last.ts ? `Ultima registrazione (${src[last.source] || last.source}, ${ago(last.ts)}): ${
-    last.speech ? `voce tenuta (${(last.kept_ms / 1000).toFixed(1)} s)` : "nessuna voce, non inviata al riconoscimento"}${
+    last.speech ? `voce tenuta (${dec(last.kept_ms / 1000)} s)` : "nessuna voce, non inviata al riconoscimento"}${
     last.dropped ? `, tagliati ${last.dropped} rumori` : ""}.` : "Nessuna registrazione analizzata dall'avvio.";
   const calRes = UI.nfCal;
-  return `<div style="background:rgba(0,0,0,0.3);padding:10px 12px;border:1px solid rgba(255,138,31,0.18);display:flex;flex-direction:column;gap:8px">
+  return `<div class="subpanel vc-stack">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <label style="font-size:12px;font-weight:bold;color:var(--gold);margin:0">Filtro rumori</label>
       <span id="nf-strength-val" class="mono gold" style="font-size:13px;font-weight:bold">${st}%</span>
@@ -189,7 +189,7 @@ function voiceCommandsHelp() {
     ["Rotta", "“copia destinazione”"],
     ["Nave", "“abbassa carrello”, “apri stiva”, “accendi luci”, “estrai armi”, “mappa galattica”… (vedi Controlli di bordo)"],
   ];
-  return `<div class="eyebrow" style="font-size:10px;color:var(--gold);margin-top:6px">&#x25c6; COSA PUOI DIRE</div>
+  return `<h3>Cosa puoi dire</h3>
     <table style="font-size:11px"><tbody>${rows.map(([a, b]) => `<tr><td class="gold" style="white-space:nowrap;vertical-align:top">${esc(a)}</td><td>${esc(b)}</td></tr>`).join("")}</tbody></table>`;
 }
 
@@ -251,139 +251,105 @@ VIEWS.voice_commands = () => {
   const autoGain = localStorage.getItem("ed_mic_auto_gain") !== "false";
   const activeTab = UI.activeVoiceTab || "controls";
 
-  return `<div style="display:flex;flex-direction:column;gap:18px">
-
-    <!-- 1. HEADER DI STATO COPILOTA VOCALE -->
-    <div style="background:rgba(20,8,0,0.65);border:1.5px solid var(--accent);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-radius:2px;box-shadow:0 0 16px rgba(255,138,31,0.15)">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <b class="gold" style="font-size:16px;letter-spacing:0.06em">&#x25c6; SISTEMA VOCALE INTEGRATO // COPILOTA &amp; CONTROLLI NAVE</b>
-          <span id="voice-status-pill-settings" class="tag ${VOICE_ENGINE.active ? "ok" : "sub"}" style="font-size:11px">
-            ${VOICE_ENGINE.active ? "ATTIVO // IN ASCOLTO" : "DISATTIVATO"}
-          </span>
-          <span class="tag gold" style="font-size:11px">MODALITÀ: ${VOICE_ENGINE.mode === "ptt" ? `PUSH-TO-TALK (${esc(VOICE_ENGINE.pttKeyName)})` : "CONTINUA"}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text-2);margin-top:4px;max-width:760px">
-          Riconoscimento vocale integrato. Ascolta continuamente in cabina o tramite Push-to-Talk, controlla la nave a livello hardware (DirectInput) e risponde con sintesi vocale neurale in tempo reale.
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button id="btn-voice-toggle-settings" class="${VOICE_ENGINE.active ? "danger" : "primary"}" style="height:38px;padding:0 20px;font-size:13px;display:inline-flex;align-items:center;gap:8px">
+  // Ogni sezione è un pannello come nelle altre schede (angoli smussati, titolo a linguetta);
+  // i blocchi interni sono sotto-riquadri (.subpanel). Gli id restano quelli usati da events.js e voice-engine.js.
+  const voiceHead = panel("Copilota vocale integrato", `
+      <div class="vc-head">
+        <p class="sub vc-lead">Riconoscimento vocale integrato. Ascolta continuamente in cabina o tramite Push-to-Talk, controlla la nave a livello hardware (DirectInput) e risponde con sintesi vocale neurale in tempo reale.</p>
+        <button id="btn-voice-toggle-settings" class="${VOICE_ENGINE.active ? "danger" : "primary"}">
           ${VOICE_ENGINE.active ? "&#x2715; Disattiva Copilota Vocale" : "&#x25b6; Attiva Copilota Vocale"}
         </button>
-      </div>
-    </div>
+      </div>`, { code: "VOICE-SYS", aside: `<span id="voice-status-pill-settings" class="tag ${VOICE_ENGINE.active ? "ok" : "sub"}">${VOICE_ENGINE.active ? "ATTIVO // IN ASCOLTO" : "DISATTIVATO"}</span>
+          <span class="tag gold">MODALITÀ: ${VOICE_ENGINE.mode === "ptt" ? `PUSH-TO-TALK (${esc(VOICE_ENGINE.pttKeyName)})` : "CONTINUA"}</span>` });
 
-    ${gameKeysPanel()}
-
-    ${typeof pttPanel === "function" ? pttPanel() : ""}
-
-    <!-- 2. SEZIONE PUSH-TO-TALK & MODALITÀ ASCOLTO -->
-    <div style="background:rgba(20,8,0,0.6);border:1px solid rgba(255,138,31,0.35);padding:14px 18px;border-radius:2px">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
-        <div class="eyebrow" style="color:var(--gold);font-size:12px;margin:0">&#x25c6; MODALITÀ ATTIVAZIONE MICROFONO &amp; PUSH-TO-TALK</div>
-        <div id="ptt-transmission-indicator" class="tag" style="font-size:11px;background:#110800;border:1px solid ${VOICE_ENGINE.pttActive ? "#00e676" : "rgba(255,138,31,0.3)"};color:${VOICE_ENGINE.pttActive ? "#00e676" : "var(--text-3)"}">
-          ${VOICE_ENGINE.pttActive ? "&#x25cf; TRASMISSIONE VOCALE IN CORSO" : "&#x25cf; IN ATTESA DI INPUT VOCALE"}
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px;align-items:center">
-        <!-- Scelta Modalita Ascolto -->
-        <div style="display:flex;gap:8px">
-          <button class="seg-btn ${VOICE_ENGINE.mode !== "ptt" ? "primary" : ""}" id="btn-mode-continuous" style="flex:1;padding:10px 8px;font-size:12px;text-align:center;border-radius:2px">
-            &#x25cf; SEMPRE ATTIVO<br><span style="font-size:10px;font-weight:normal;opacity:0.85">Ascolto continuo automatico</span>
+  const listenMode = panel("Modalità di ascolto", `
+      <div class="vc-grid vc-grid-mid">
+        <div class="seg-choice vc-mode">
+          <button class="${VOICE_ENGINE.mode !== "ptt" ? "primary" : ""}" id="btn-mode-continuous">
+            &#x25cf; SEMPRE ATTIVO<small>Ascolto continuo automatico</small>
           </button>
-          <button class="seg-btn ${VOICE_ENGINE.mode === "ptt" ? "primary" : ""}" id="btn-mode-ptt" style="flex:1;padding:10px 8px;font-size:12px;text-align:center;border-radius:2px">
-            &#x25cf; PUSH-TO-TALK<br><span style="font-size:10px;font-weight:normal;opacity:0.85">Attiva con tasto dedicato</span>
+          <button class="${VOICE_ENGINE.mode === "ptt" ? "primary" : ""}" id="btn-mode-ptt">
+            &#x25cf; PUSH-TO-TALK<small>Attiva con tasto dedicato</small>
           </button>
         </div>
-
-        <!-- Tasto PTT configurato -->
-        <div style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,138,31,0.25);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <div>
-            <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em">Tasto Push-to-Talk Assegnato</div>
-            <div id="ptt-key-display" class="mono gold" style="font-size:15px;font-weight:bold;margin-top:2px">
-              [ ${esc(VOICE_ENGINE.pttKeyName || "SPAZIO (Space)")} ]
-            </div>
-          </div>
-          <button class="small" id="btn-record-ptt-key" style="height:34px;border:1px solid var(--accent);background:#1a0a00;color:var(--gold);font-weight:bold;padding:0 12px">
-            &#x25cf; IMPOSTA TASTO PTT
-          </button>
+        <div class="subpanel vc-row">
+          <div class="kv"><span>Tasto Push-to-Talk Assegnato</span>
+            <span id="ptt-key-display" class="mono gold">[ ${esc(VOICE_ENGINE.pttKeyName || "SPAZIO (Space)")} ]</span></div>
+          <button class="small" id="btn-record-ptt-key">&#x25cf; IMPOSTA TASTO PTT</button>
         </div>
-
-        <!-- Comportamento PTT -->
-        <div style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,138,31,0.25);padding:10px 14px;display:flex;flex-direction:column;gap:4px">
-          <label style="font-size:11px;font-weight:bold;color:var(--gold);margin:0">Comportamento Pressione Tasto PTT
-            <select id="ptt-behavior-select" style="width:100%;height:32px;margin-top:4px;background:#110800;border:1px solid var(--accent);color:var(--gold)">
+        <div class="subpanel form">
+          <label class="grow-1">Comportamento Pressione Tasto PTT
+            <select id="ptt-behavior-select">
               <option value="hold" ${VOICE_ENGINE.pttBehavior !== "toggle" ? "selected" : ""}>Tieni premuto per parlare (Hold)</option>
               <option value="toggle" ${VOICE_ENGINE.pttBehavior === "toggle" ? "selected" : ""}>Premi per attivare / disattivare (Toggle)</option>
             </select>
           </label>
         </div>
-      </div>
-    </div>
+      </div>`, { code: "MIC-MODE", aside: `<span id="ptt-transmission-indicator" class="tag ${VOICE_ENGINE.pttActive ? "ok" : "sub"}">
+          ${VOICE_ENGINE.pttActive ? "&#x25cf; TRASMISSIONE VOCALE IN CORSO" : "&#x25cf; IN ATTESA DI INPUT VOCALE"}</span>` });
 
-    <!-- 3. VOCE DEL COPILOTA + CRONOLOGIA -->
-    <div style="background:rgba(20,8,0,0.65);border:1px solid rgba(255,138,31,0.3);padding:16px 18px;border-radius:2px">
-      <div class="eyebrow" style="margin-bottom:12px;color:var(--gold);font-size:12px">&#x25c6; VOCE DEL COPILOTA</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:20px;align-items:start">
+  const copilotVoice = panel("Voce del copilota", `
+      <div class="vc-grid vc-grid-wide">
         ${ttsVoicePanel()}
-        <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,138,31,0.22);padding:14px;display:flex;flex-direction:column;gap:10px">
-          <div class="eyebrow" style="font-size:10px;color:var(--gold)">&#x25c6; ULTIMI COMANDI RICONOSCIUTI</div>
-          <div id="voice-history-list" style="background:#0c0500;padding:8px 12px;border:1px solid rgba(255,138,31,0.2);min-height:92px;max-height:160px;overflow-y:auto">
+        <div class="subpanel vc-stack">
+          <h3>Ultimi comandi riconosciuti</h3>
+          <div id="voice-history-list" class="vc-history">
             ${VOICE_ENGINE.renderHistory()}
           </div>
           ${voiceCommandsHelp()}
         </div>
-      </div>
-    </div>
+      </div>`, { code: "TTS" });
 
-    <!-- 4. MICROFONO E FILTRO RUMORI -->
-    <div style="background:rgba(20,8,0,0.5);border:1px solid rgba(255,138,31,0.28);padding:16px 18px">
-      <div class="eyebrow" style="color:var(--gold);margin-bottom:12px;font-size:12px">&#x25c6; MICROFONO E FILTRO RUMORI</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;align-items:start">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <label style="font-size:11px;font-weight:bold;color:var(--gold)">Microfono dell'app
-            <select id="mic-device-select" style="width:100%;height:34px;margin-top:4px;background:#110800;border:1px solid var(--accent);color:var(--gold)">
+  const micPanel = panel("Microfono e filtro rumori", `
+      <div class="vc-grid vc-grid-wide">
+        <div class="vc-stack">
+          <div class="form"><label class="grow-1">Microfono dell'app
+            <select id="mic-device-select">
               <option value="">Microfono predefinito di sistema</option>
             </select>
-          </label>
-          <div class="sub" style="font-size:11px">Il push-to-talk dalla cloche usa il microfono scelto nel suo pannello.</div>
-          <div style="display:flex;flex-direction:column;gap:8px;background:rgba(0,0,0,0.3);padding:10px 12px;border:1px solid rgba(255,138,31,0.18)">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px">
+          </label></div>
+          <div class="sub">Il push-to-talk dalla cloche usa il microfono scelto nel suo pannello.</div>
+          <div class="subpanel vc-stack vc-checks">
+            <label>
               <input type="checkbox" id="mic-noise-suppression" ${noiseSupp ? "checked" : ""}>
               <span><b>Riduzione rumore del browser:</b> solo acceso/spento, attenua fruscii continui (ventole). Non toglie i clic.</span>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px">
+            <label>
               <input type="checkbox" id="mic-echo-cancellation" ${echoCancel ? "checked" : ""}>
               <span><b>Cancellazione dell'eco:</b> evita che la voce delle casse rientri nel microfono</span>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px">
+            <label>
               <input type="checkbox" id="mic-auto-gain" ${autoGain ? "checked" : ""}>
               <span><b>Guadagno automatico:</b> tiene costante il volume della voce</span>
             </label>
           </div>
         </div>
         ${noiseFilterPanel()}
-      </div>
-    </div>
+      </div>`, { code: "MIC" });
+
+  return `<div class="col">
+    ${voiceHead}
+
+    ${gameKeysPanel()}
+
+    ${typeof pttPanel === "function" ? pttPanel() : ""}
+
+    ${listenMode}
+
+    ${copilotVoice}
+
+    ${micPanel}
 
     <!-- PANNELLO 1: CONTROLLI DI BORDO DELLA NAVE -->
-    
-      <div id="controls-panel" style="background:rgba(255,138,31,0.06);border:1.5px solid var(--accent);padding:18px;border-radius:2px;box-shadow:0 0 16px rgba(255,138,31,0.12)">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,138,31,0.25)">
-          <div>
-            <div class="gold" style="font-size:16px;font-weight:700;letter-spacing:0.06em">&#x25c6; CONTROLLI DI BORDO DELLA NAVE (TASTI + VOCE NEURALE)</div>
-            <div class="sub" style="font-size:12px;margin-top:3px">Aziona comandi singoli di bordo (carrello, fari, stiva, armi, fsd, pips, visione notturna) con voce o tasti hardware.</div>
-          </div>
-          <button class="primary" id="control-new-toggle" style="height:36px;padding:0 18px;display:inline-flex;align-items:center;gap:8px;font-size:13px">
-            + Crea Nuovo Controllo di Bordo
-          </button>
+    <section class="panel" id="controls-panel"><div class="hd"><h2>Controlli di bordo della nave</h2><span class="code">KEYS + TTS</span></div><div class="bd">
+        <div class="vc-section-head">
+          <p class="sub">Aziona comandi singoli di bordo (carrello, fari, stiva, armi, fsd, pips, visione notturna) con voce o tasti hardware.</p>
+          <button class="primary" id="control-new-toggle">+ Crea Nuovo Controllo di Bordo</button>
         </div>
 
         ${(UI.showControlForm || UI.editingControl) ? `
-          <div style="background:rgba(10,5,1,0.95);border:2px solid var(--gold);padding:16px;margin-bottom:18px;box-shadow:0 0 20px rgba(255,138,31,0.25)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,138,31,0.3)">
+          <div class="subpanel vc-form">
+            <div class="vc-form-hd">
               <b class="gold" style="font-size:14px;letter-spacing:0.05em">
                 ${UI.editingControl ? `&#x270e; MODIFICA CONTROLLO DI BORDO: ${esc(UI.editingControl.name)}` : "&#x25c6; CREA NUOVO CONTROLLO DI BORDO"}
               </b>
@@ -417,7 +383,7 @@ VIEWS.voice_commands = () => {
                 <input type="text" id="ctrl-input-desc" value="${esc(UI.editingControl?.desc || "")}" placeholder="es. Inietta energia per accelerare al massimo con i propulsori di manovra" style="width:100%;height:34px;margin-top:3px">
               </label>
 
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,138,31,0.2)">
+              <div class="vc-form-ft">
                 <button type="button" class="small" id="ctrl-form-test">&#x25b6; Prova Tasto &amp; Voce</button>
                 <div style="display:flex;gap:8px">
                   <button type="button" class="small ghost" id="ctrl-form-cancel">Annulla</button>
@@ -430,46 +396,36 @@ VIEWS.voice_commands = () => {
           </div>
         ` : ""}
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));gap:12px">
+        <div class="vc-cards">
           ${CONTROLS.map(c => `
-            <div class="todo-item" style="flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;background:rgba(20,8,0,0.6);border:1px solid rgba(255,138,31,0.25);border-radius:2px">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-                <div>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <b class="gold" style="font-size:15px">&#x25c6; ${esc(c.name)}</b>
-                    <span class="tag gold" style="font-size:12px;font-family:var(--mono);padding:2px 8px">[ ${esc(c.key)} ]</span>
-                  </div>
-                  <div style="margin-top:4px;font-size:12px;color:var(--hud-hi)"><b>Cosa dire:</b> <code>${esc(c.say)}</code></div>
-                </div>
-                <div style="display:flex;gap:4px;flex-shrink:0">
+            <div class="subpanel vc-card">
+              <div class="vc-card-hd">
+                <div class="vc-card-name"><b class="gold">${esc(c.name)}</b> <span class="tag gold mono">${esc(c.key)}</span></div>
+                <div class="vc-card-btns">
                   <button class="small" data-control-test="${esc(c.id)}" title="Simula tasto DirectInput e voce neurale">&#x25b6; Prova</button>
                   <button class="small primary" data-control-edit="${esc(c.id)}" title="Modifica questo controllo">&#x270e; Modifica</button>
-                  ${!c.builtIn ? `<button class="small ghost" data-control-del="${esc(c.id)}" title="Elimina questo controllo">&#x2715;</button>` : ""}
+                  ${!c.builtIn ? `<button class="small ghost" data-control-del="${esc(c.id)}" title="Elimina questo controllo" aria-label="Elimina questo controllo">&#x2715;</button>` : ""}
                 </div>
               </div>
-              ${c.voice ? `<div class="sub" style="font-size:12px"><b>Voce copilota:</b> "${esc(c.voice)}"</div>` : ""}
-              ${c.desc ? `<div class="sub" style="font-size:11px;color:var(--text-3)">${esc(c.desc)}</div>` : ""}
+              <div class="vc-say"><b>Cosa dire:</b> ${esc(c.say)}</div>
+              ${c.voice ? `<div class="sub"><b>Voce copilota:</b> "${esc(c.voice)}"</div>` : ""}
+              ${c.desc ? `<div class="sub muted">${esc(c.desc)}</div>` : ""}
             </div>
           `).join("")}
         </div>
-      </div>
+      </div></section>
 
     <!-- PANNELLO 2: TELEMETRIA COPILOTA & AVVISI AUTOMATICI -->
     
-      <div id="telemetry-panel" style="background:rgba(255,138,31,0.06);border:1.5px solid var(--accent);padding:18px;border-radius:2px;box-shadow:0 0 16px rgba(255,138,31,0.12)">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,138,31,0.25)">
-          <div>
-            <div class="gold" style="font-size:16px;font-weight:700;letter-spacing:0.06em">&#x25c6; TELEMETRIA COPILOTA &amp; AVVISI AUTOMATICI DI BORDO</div>
-            <div class="sub" style="font-size:12px;margin-top:3px">Allarmi intelligenti e avvisi vocali automatici scatenati in tempo reale dai sensori della nave (carburante, calore, scudi, scafo, fsd, pianeti, esobiologia).</div>
-          </div>
-          <button class="primary" id="telemetry-new-toggle" style="height:36px;padding:0 18px;display:inline-flex;align-items:center;gap:8px;font-size:13px">
-            + Crea Nuova Regola Telemetria
-          </button>
+    <section class="panel" id="telemetry-panel"><div class="hd"><h2>Telemetria e avvisi automatici</h2><span class="code">TELEMETRY</span></div><div class="bd">
+        <div class="vc-section-head">
+          <p class="sub">Allarmi intelligenti e avvisi vocali automatici scatenati in tempo reale dai sensori della nave (carburante, calore, scudi, scafo, fsd, pianeti, esobiologia).</p>
+          <button class="primary" id="telemetry-new-toggle">+ Crea Nuova Regola Telemetria</button>
         </div>
 
         ${(UI.showTelemetryForm || UI.editingTelemetry) ? `
-          <div style="background:rgba(10,5,1,0.95);border:2px solid var(--gold);padding:16px;margin-bottom:18px;box-shadow:0 0 20px rgba(255,138,31,0.25)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,138,31,0.3)">
+          <div class="subpanel vc-form">
+            <div class="vc-form-hd">
               <b class="gold" style="font-size:14px;letter-spacing:0.05em">
                 ${UI.editingTelemetry ? `&#x270e; MODIFICA REGOLA TELEMETRIA: ${esc(UI.editingTelemetry.name)}` : "&#x25c6; CREA NUOVA REGOLA TELEMETRIA"}
               </b>
@@ -481,7 +437,7 @@ VIEWS.voice_commands = () => {
                   <input type="text" id="telem-input-name" value="${esc(UI.editingTelemetry?.name || "")}" placeholder="es. Allarme Carburante Critico" style="width:100%;height:34px;margin-top:3px">
                 </label>
                 <label style="font-size:11px">Metrica Telemetria da Monitorare
-                  <select id="telem-input-metric" style="width:100%;height:34px;margin-top:3px;background:#110800;border:1px solid var(--accent);color:var(--gold)">
+                  <select id="telem-input-metric" style="width:100%;height:34px;margin-top:3px">
                     <option value="fuel" ${UI.editingTelemetry?.metric === "fuel" ? "selected" : ""}>Livello Carburante Principale (%)</option>
                     <option value="heat" ${UI.editingTelemetry?.metric === "heat" ? "selected" : ""}>Temperatura Termica Scafo (%)</option>
                     <option value="shields_down" ${UI.editingTelemetry?.metric === "shields_down" ? "selected" : ""}>Collasso / Disattivazione Scudi</option>
@@ -497,7 +453,7 @@ VIEWS.voice_commands = () => {
               <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;align-items:center">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                   <label style="font-size:11px">Condizione
-                    <select id="telem-input-cond" style="width:100%;height:34px;margin-top:3px;background:#110800;border:1px solid var(--accent);color:var(--gold)">
+                    <select id="telem-input-cond" style="width:100%;height:34px;margin-top:3px">
                       <option value="lt" ${UI.editingTelemetry?.condition === "lt" ? "selected" : ""}>Minore di (&lt;)</option>
                       <option value="gt" ${UI.editingTelemetry?.condition === "gt" ? "selected" : ""}>Maggiore di (&gt;)</option>
                       <option value="eq" ${UI.editingTelemetry?.condition === "eq" ? "selected" : ""}>Uguale a / Attivo (=)</option>
@@ -516,7 +472,7 @@ VIEWS.voice_commands = () => {
                 <input type="text" id="telem-input-desc" value="${esc(UI.editingTelemetry?.desc || "")}" placeholder="es. Avvisa vocalmente quando il livello di carburante scende al di sotto della soglia" style="width:100%;height:34px;margin-top:3px">
               </label>
 
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,138,31,0.2)">
+              <div class="vc-form-ft">
                 <button type="button" class="small" id="telem-form-test">&#x25b6; Ascolta Voce Neurale</button>
                 <div style="display:flex;gap:8px">
                   <button type="button" class="small ghost" id="telem-form-cancel">Annulla</button>
@@ -529,7 +485,7 @@ VIEWS.voice_commands = () => {
           </div>
         ` : ""}
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));gap:14px">
+        <div class="vc-cards vc-cards-wide">
           ${TELEMETRY_RULES.map(r => `
             <div class="telem-rule-card" style="opacity:${r.enabled ? "1" : "0.75"}">
               <div class="telem-card-header">
@@ -554,24 +510,19 @@ VIEWS.voice_commands = () => {
             </div>
           `).join("")}
         </div>
-      </div>
+      </div></section>
 
     <!-- PANNELLO 3: SEQUENZE MACRO HARDWARE MULTITASTO -->
     
-      <div id="macro-editor-panel" style="background:rgba(255,138,31,0.06);border:1.5px solid var(--accent);padding:18px;border-radius:2px;box-shadow:0 0 16px rgba(255,138,31,0.12)">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,138,31,0.25)">
-          <div>
-            <div class="gold" style="font-size:16px;font-weight:700;letter-spacing:0.06em">&#x25c6; SEZIONE MACRO HARDWARE &amp; SEQUENZE TASTI MULTIPLE</div>
-            <div class="sub" style="font-size:12px;margin-top:3px">Crea comandi composti DirectInput con pause temporizzate e risposte vocali dedicate per manovre complesse.</div>
-          </div>
-          <button class="primary" id="macro-new-toggle" style="height:36px;padding:0 18px;display:inline-flex;align-items:center;gap:8px;font-size:13px">
-            + Crea Nuova Macro
-          </button>
+    <section class="panel" id="macro-editor-panel"><div class="hd"><h2>Macro e sequenze di tasti</h2><span class="code">MACRO</span></div><div class="bd">
+        <div class="vc-section-head">
+          <p class="sub">Crea comandi composti DirectInput con pause temporizzate e risposte vocali dedicate per manovre complesse.</p>
+          <button class="primary" id="macro-new-toggle">+ Crea Nuova Macro</button>
         </div>
 
         ${(UI.showMacroForm || UI.editingMacro) ? `
-          <div style="background:rgba(10,5,1,0.92);border:2px solid var(--gold);padding:16px;margin-bottom:18px;box-shadow:0 0 20px rgba(255,138,31,0.25)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,138,31,0.3)">
+          <div class="subpanel vc-form">
+            <div class="vc-form-hd">
               <b class="gold" style="font-size:14px;letter-spacing:0.05em">
                 ${UI.editingMacro ? `&#x270e; MODIFICA MACRO: ${esc(UI.editingMacro.name)}` : "&#x25c6; CREA NUOVA MACRO HARDWARE"}
               </b>
@@ -615,7 +566,7 @@ VIEWS.voice_commands = () => {
                 </label>
               </div>
               
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,138,31,0.2)">
+              <div class="vc-form-ft">
                 <button type="button" class="small" id="macro-form-test-seq">&#x25b6; Prova Tasti &amp; Voce</button>
                 <div style="display:flex;gap:8px">
                   <button type="button" class="small ghost" id="macro-form-cancel">Annulla</button>
@@ -628,30 +579,27 @@ VIEWS.voice_commands = () => {
           </div>
         ` : ""}
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));gap:12px">
+        <div class="vc-cards">
           ${MACROS.map(m => `
-            <div class="todo-item" style="flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;background:rgba(20,8,0,0.6);border:1px solid rgba(255,138,31,0.25);border-radius:2px">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-                <div>
-                  <b class="gold" style="font-size:15px">&#x25c6; ${esc(m.name)}</b>
-                  <div style="margin-top:3px;font-size:12px;color:var(--hud-hi)"><b>Cosa dire:</b> <code>${esc(m.say)}</code></div>
-                </div>
-                <div style="display:flex;gap:4px;flex-shrink:0">
+            <div class="subpanel vc-card">
+              <div class="vc-card-hd">
+                <div class="vc-card-name"><b class="gold">${esc(m.name)}</b></div>
+                <div class="vc-card-btns">
                   <button class="small" data-macro-test="${esc(m.id)}" title="Simula tasti ed esegue voce neurale">&#x25b6; Prova</button>
                   <button class="small primary" data-macro-edit="${esc(m.id)}" title="Modifica questa macro">&#x270e; Modifica</button>
-                  <button class="small ghost" data-macro-del="${esc(m.id)}" title="Elimina questa macro">&#x2715;</button>
+                  <button class="small ghost" data-macro-del="${esc(m.id)}" title="Elimina questa macro" aria-label="Elimina questa macro">&#x2715;</button>
                 </div>
               </div>
-              <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:2px">
-                <span class="sub" style="font-size:11px">Tasti:</span>
-                ${(m.keys || []).map(k => `<span class="tag gold" style="font-size:11px;padding:2px 6px">${esc(k)}</span>`).join("")}
+              <div class="vc-say"><b>Cosa dire:</b> ${esc(m.say)}</div>
+              <div class="vc-keys"><span class="sub">Tasti:</span>
+                ${(m.keys || []).map(k => `<span class="tag gold">${esc(k)}</span>`).join("")}
               </div>
-              ${m.voice ? `<div class="sub" style="font-size:12px"><b>Voce copilota:</b> "${esc(m.voice)}"</div>` : ""}
-              ${m.desc ? `<div class="sub" style="font-size:11px;color:var(--text-3)">${esc(m.desc)}</div>` : ""}
+              ${m.voice ? `<div class="sub"><b>Voce copilota:</b> "${esc(m.voice)}"</div>` : ""}
+              ${m.desc ? `<div class="sub muted">${esc(m.desc)}</div>` : ""}
             </div>
           `).join("")}
         </div>
-      </div>
+      </div></section>
 
   </div>`;
 };

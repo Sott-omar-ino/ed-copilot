@@ -171,7 +171,7 @@ VIEWS.route = () => {
         <div class="kv"><span>Integrità FSD</span><span class="${S.fsd_health != null && S.fsd_health <= 80 ? "bad bold" : "ok"}">${S.fsd_health ?? 100}%</span></div>
         ${extra}
       </div></div>${seg(pct, 40)}
-      ${S.fsd_health != null && S.fsd_health <= 80 ? `<div class="bad" style="margin-top:10px;padding:8px;border:1px solid #ff4444;background:rgba(255,0,0,0.1)">▲ ATTENZIONE FSD: Integrita ${S.fsd_health}% (inferiore a 80%). Rischio malfunzionamento e drop dall'iperspazio! Effettua riparazione con AFMU prima del prossimo salto.</div>` : ""}
+      ${S.fsd_health != null && S.fsd_health <= 80 ? `<div class="bad" style="margin-top:10px;padding:8px;border:1px solid #ff4444;background:rgba(255,0,0,0.1)">▲ ATTENZIONE FSD: integrità ${S.fsd_health}% (inferiore a 80%). Rischio malfunzionamento e drop dall'iperspazio! Effettua riparazione con AFMU prima del prossimo salto.</div>` : ""}
       <div class="route-list" style="margin-top:12px;max-height:560px;overflow:auto">${ROUTE.jumps.map((j, i) => `<div class="hop ${i < st.here ? "done" : i === st.here ? "here" : i === st.nextIdx ? "next" : ""}">
         <span class="n">${String(i).padStart(3, "0")}</span><span>${sys(j.system)} ${hopBadges(j)}</span>
         <span class="mono sub">${j.jumps > 1 ? j.jumps + " salti · " : ""}${j.distance_jumped ? ly(j.distance_jumped) : ""}${j.fuel != null ? ` · ${num(j.fuel)} t` : ""}</span>${hopBodies(j)}</div>`).join("")}</div>

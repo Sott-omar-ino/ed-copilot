@@ -57,7 +57,7 @@ function rkCard(r) {
 
 function rkRepBar(v, level) {
   return `<div style="display:flex;justify-content:space-between"><span class="mono ${RK_LEVEL_CLS[level] ?? ""}">${esc(level || "—")}</span>
-    <span class="mono ${v < 0 ? "bad" : v > 35 ? "ok" : ""}">${v > 0 ? "+" : ""}${v.toFixed(1)}</span></div>${meter((v + 100) / 2, "center" + (v < 0 ? " bad" : ""))}`;
+    <span class="mono ${v < 0 ? "bad" : v > 35 ? "ok" : ""}">${v > 0 ? "+" : ""}${dec(v)}</span></div>${meter((v + 100) / 2, "center" + (v < 0 ? " bad" : ""))}`;
 }
 
 VIEWS.ranks = () => {
@@ -84,7 +84,7 @@ VIEWS.ranks = () => {
     ${shown.map(f => `<tr><td>${esc(f.name)}${f.allegiance ? ` <span class="sub">· ${esc(f.allegiance)}</span>` : ""}</td>
       <td>${sys(f.system)}${f.systems.length > 1 ? ` <span class="sub" title="${esc(f.systems.join(", "))}">+${f.systems.length - 1}</span>` : ""}</td>
       <td class="${RK_LEVEL_CLS[f.level] ?? ""}">${esc(f.level || "—")}</td>
-      <td class="num ${f.rep < 0 ? "bad" : f.rep > 35 ? "ok" : ""}">${f.rep > 0 ? "+" : ""}${f.rep.toFixed(1)}</td></tr>`).join("")}
+      <td class="num ${f.rep < 0 ? "bad" : f.rep > 35 ? "ok" : ""}">${f.rep > 0 ? "+" : ""}${dec(f.rep)}</td></tr>`).join("")}
     </tbody></table>
     ${fl.length > 40 ? `<button class="small ghost" data-rk-toggle="factions-all" style="margin-top:6px">${showAll ? "Mostra le prime 40" : `Mostra tutte (${fl.length})`}</button>` : ""}
     <div class="sub" style="margin-top:6px">Valore dell'ultima visita in un sistema dove la faction è presente; "Sistema" è l'ultimo in cui l'hai incontrata.</div>`

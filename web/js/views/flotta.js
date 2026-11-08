@@ -34,7 +34,7 @@ function shipCard(s) {
       ${s.name?.trim() ? `<div class="sub" style="text-transform:uppercase;letter-spacing:.12em">${esc(s.type)}</div>` : ""}
       <div class="loc">${shipLocation(s)}</div>`)}
     <div class="ship-stats">
-      <div class="kv"><span>Salto</span><span>${b?.jump_range ? b.jump_range.toFixed(1) + " al" : "—"}</span></div>
+      <div class="kv"><span>Salto</span><span>${b?.jump_range ? ly(b.jump_range, 1) : "—"}</span></div>
       <div class="kv"><span>Stiva</span><span>${b?.cargo != null ? b.cargo + " t" : "—"}</span></div>
       <div class="kv"><span>Valore</span><span>${short(s.value)}</span></div>
       <div class="kv"><span>Riscatto</span><span class="gold">${short(b?.rebuy)}</span></div>
@@ -48,14 +48,14 @@ function shipCard(s) {
 
 VIEWS.fleet = () => {
   const f = S.fleet;
-  const metrics = { jump: ["Salto massimo", s => s.build?.jump_range, v => v.toFixed(1) + " al"],
+  const metrics = { jump: ["Salto massimo", s => s.build?.jump_range, v => ly(v, 1)],
     cargo: ["Stiva", s => s.build?.cargo, v => v + " t"], value: ["Valore", s => s.value, v => short(v)],
     rebuy: ["Riscatto", s => s.build?.rebuy, v => short(v)] };
   const [mLabel, mGet, mFmt] = metrics[UI.fleetMetric];
   const max = Math.max(1, ...f.map(s => mGet(s) || 0));
   const compare = [...f].sort((a, b) => (mGet(b) || 0) - (mGet(a) || 0)).map(s => {
     const v = mGet(s);
-    return `<div class="compare-row"><span style="font-weight:700;text-transform:uppercase;letter-spacing:.06em" class="${s.current ? "hud-t" : ""}">${esc(s.name?.trim() || s.type)}</span>
+    return `<div class="compare-row"><span class="compare-name ${s.current ? "hud-t" : ""}" title="${esc(s.name?.trim() || s.type)}">${esc(s.name?.trim() || s.type)}</span>
       ${meter(v ? v / max * 100 : 0, s.current ? "" : "holo")}<span class="num" style="text-align:right">${v ? mFmt(v) : "—"}</span></div>`;
   }).join("");
   const total = f.reduce((a, s) => a + (s.value || 0), 0);

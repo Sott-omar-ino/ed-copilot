@@ -362,12 +362,12 @@ LANG.add({
   "Push-to-talk: {}": "Push-to-talk: {}",
 
   // --- Audio: cosa puoi dire (le frasi restano quelle riconosciute dal motore vocale) ---
-  "◆ COSA PUOI DIRE": "◆ WHAT YOU CAN SAY",
+  "Cosa puoi dire": "What you can say",
   "Rapporti": "Reports",
   "Rotta": "Route",
 
   // --- Audio: sistema vocale e push-to-talk della pagina ---
-  "◆ SISTEMA VOCALE INTEGRATO // COPILOTA & CONTROLLI NAVE": "◆ BUILT-IN VOICE SYSTEM // COPILOT & SHIP CONTROLS",
+  "Copilota vocale integrato": "Built-in voice copilot",
   "ATTIVO // IN ASCOLTO": "ACTIVE // LISTENING",
   "DISATTIVATO": "OFF",
   "MODALITÀ: PUSH-TO-TALK ({})": "MODE: PUSH-TO-TALK ({})",
@@ -376,7 +376,7 @@ LANG.add({
     "Built-in speech recognition. It listens continuously in the cockpit or via Push-to-Talk, controls the ship with key presses (DirectInput) and replies with real-time neural speech.",
   "✕ Disattiva Copilota Vocale": "✕ Turn off Voice Copilot",
   "▶ Attiva Copilota Vocale": "▶ Turn on Voice Copilot",
-  "◆ MODALITÀ ATTIVAZIONE MICROFONO & PUSH-TO-TALK": "◆ MICROPHONE ACTIVATION MODE & PUSH-TO-TALK",
+  "Modalità di ascolto": "Listening mode",
   "● TRASMISSIONE VOCALE IN CORSO": "● VOICE TRANSMISSION IN PROGRESS",
   "● IN ATTESA DI INPUT VOCALE": "● WAITING FOR VOICE INPUT",
   "● SEMPRE ATTIVO": "● ALWAYS ON",
@@ -388,9 +388,8 @@ LANG.add({
   "Comportamento Pressione Tasto PTT": "PTT key behaviour",
   "Tieni premuto per parlare (Hold)": "Hold to talk (Hold)",
   "Premi per attivare / disattivare (Toggle)": "Press to turn on / off (Toggle)",
-  "◆ VOCE DEL COPILOTA": "◆ COPILOT VOICE",
-  "◆ ULTIMI COMANDI RICONOSCIUTI": "◆ LAST RECOGNISED COMMANDS",
-  "◆ MICROFONO E FILTRO RUMORI": "◆ MICROPHONE & NOISE FILTER",
+  "Ultimi comandi riconosciuti": "Last recognised commands",
+  "Microfono e filtro rumori": "Microphone & noise filter",
   "Microfono dell'app": "App microphone",
   "Microfono predefinito di sistema": "System default microphone",
   "Microfono Predefinito di Sistema": "System default microphone",
@@ -403,7 +402,7 @@ LANG.add({
   "tiene costante il volume della voce": "keeps your voice volume steady",
 
   // --- Audio: controlli di bordo ---
-  "◆ CONTROLLI DI BORDO DELLA NAVE (TASTI + VOCE NEURALE)": "◆ SHIP CONTROLS (KEYS + NEURAL VOICE)",
+  "Controlli di bordo della nave": "Ship controls",
   "Aziona comandi singoli di bordo (carrello, fari, stiva, armi, fsd, pips, visione notturna) con voce o tasti hardware.":
     "Trigger single ship commands (landing gear, lights, cargo scoop, hardpoints, FSD, pips, night vision) by voice or keys.",
   "+ Crea Nuovo Controllo di Bordo": "+ New ship control",
@@ -432,7 +431,7 @@ LANG.add({
   "Voce copilota:": "Copilot voice:",
 
   // --- Audio: telemetria e avvisi ---
-  "◆ TELEMETRIA COPILOTA & AVVISI AUTOMATICI DI BORDO": "◆ COPILOT TELEMETRY & AUTOMATIC ONBOARD ALERTS",
+  "Telemetria e avvisi automatici": "Telemetry & automatic alerts",
   "Allarmi intelligenti e avvisi vocali automatici scatenati in tempo reale dai sensori della nave (carburante, calore, scudi, scafo, fsd, pianeti, esobiologia).":
     "Automatic voice alarms triggered in real time by the ship's sensors (fuel, heat, shields, hull, FSD, planets, exobiology).",
   "+ Crea Nuova Regola Telemetria": "+ New telemetry rule",
@@ -470,7 +469,7 @@ LANG.add({
   "Annuncio vocale:": "Voice announcement:",
 
   // --- Audio: macro ---
-  "◆ SEZIONE MACRO HARDWARE & SEQUENZE TASTI MULTIPLE": "◆ MACROS & MULTI-KEY SEQUENCES",
+  "Macro e sequenze di tasti": "Macros & key sequences",
   "Crea comandi composti DirectInput con pause temporizzate e risposte vocali dedicate per manovre complesse.":
     "Build multi-key commands with timed pauses and their own voice replies for complex manoeuvres.",
   "+ Crea Nuova Macro": "+ New macro",

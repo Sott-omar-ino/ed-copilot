@@ -51,7 +51,7 @@ VIEWS.colonia = () => {
 
   // --- (a) nave propria, neutron highway ---
   const ne = d.neutron_estimate;
-  const shipOpt = `<p class="sub">${esc(d.ship || "Nave attuale")} · gittata ${d.jump_range ? d.jump_range.toFixed(1) + " al" : "—"}.
+  const shipOpt = `<p class="sub">${esc(d.ship || "Nave attuale")} · gittata ${d.jump_range ? ly(d.jump_range, 1) : "—"}.
       Con la neutron highway ogni salto da una stella di neutroni vale ~4 volte la gittata (supercharge; l'FSD si danneggia un po' a ogni supercharge: porta un AFMU per ripararlo).</p>
     <div class="kv-grid">
       <div class="kv"><span>Salti (stima)</span><span>${ne ? "~" + num(ne.jumps) : "—"}</span></div>

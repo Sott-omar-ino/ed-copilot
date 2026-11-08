@@ -29,7 +29,7 @@ function modOption(m) {
 // PRESET: allestimenti di partenza. La descrizione dice esattamente cosa monta il preset.
 // ============================================================================
 const SHIP_PRESETS = [
-  { id: "max_jump", label: "Salto massimo", desc: "FSD classe A con Increased Range G5 e Mass Manager, Life Support e Sensors D con Lightweight G5, Guardian FSD Booster, niente armi" },
+  { id: "max_jump", label: "Salto massimo", desc: "FSD classe A con Increased Range G5 e Mass Manager, Guardian FSD Booster, Life Support e Sensors D con Lightweight G5, Thrusters e Power Distributor D, il Power Plant più leggero che basta, il Shield Generator più leggero che regge lo scafo, nessun Cargo Rack, niente armi" },
   { id: "max_cargo", label: "Carico massimo", desc: "Cargo Rack in tutti gli slot interni liberi" },
   { id: "max_speed", label: "Velocità massima", desc: "Thrusters A con Dirty Drives G5 e Drag Drives, Power Distributor A con Charge Enhanced G5 e Super Conduits" },
   { id: "max_defense", label: "Difesa", desc: "Military Grade Composite, Bi-Weave Shield Generator, Shield Cell Bank, Hull e Module Reinforcement" },
@@ -43,9 +43,15 @@ function findMod(cat, grp, cls, rating) {
   const m = cat.modules.find(x => x.grp === grp && x.class === cls && (!rating || x.rating === rating) && !x.pre);
   return m ? { id: m.uid } : null;
 }
-function findFsdMod(cat, cls) {
-  return cat.modules.find(m => m.grp === "fsd" && m.class === cls && m.rating === "A" && !m.pre && m.symbol?.includes("overcharge"))
-    || cat.modules.find(m => m.grp === "fsd" && m.class === cls && m.rating === "A" && !m.pre);
+// Moduli riservati ad altre navi (es. il Frame Shift Drive Mk II (SCO) solo sul Caspian): campo "ship" del catalogo.
+const shipAllows = (m, ship) => !m.ship || (Array.isArray(m.ship) ? m.ship.includes(ship.key) || m.ship.includes(ship.name)
+  : m.ship === ship.key || m.ship === ship.name);
+// FSD classe A montabile sulla nave con la portata migliore: fattore (maxfuel / fuelmul)^(1 / fuelpower) × optmass della
+// formula del salto (ShipCalc.compute). A parità di massa vince il Frame Shift Drive (SCO) quando c'è.
+function findFsdMod(cat, cls, ship) {
+  const reach = m => Math.pow(m.maxfuel / m.fuelmul, 1 / m.fuelpower) * m.optmass;
+  return cat.modules.filter(m => m.grp === "fsd" && m.class === cls && m.rating === "A" && !m.pre && (!ship || shipAllows(m, ship)))
+    .sort((a, b) => reach(b) - reach(a) || a.mass - b.mass)[0];
 }
 // Ingegneria pianificata: chiavi del catalogo (blueprint e sperimentale), effetti calcolati da ShipCalc.
 const plan = (catalog, grp, bp, exp, grade = 5) => {
@@ -74,7 +80,7 @@ function buildRoleMix(catalog, shipKey, roles) {
   const bh = name => Math.max(0, ship.bulkheads.findIndex(b => b.name.includes(name)));
   cfg.bulkhead = isDefense ? bh("Military Grade") : isCombat ? bh("Reinforced") : 0;
 
-  const fsd = findFsdMod(catalog, s[2]);
+  const fsd = findFsdMod(catalog, s[2], ship);
   if (fsd) cfg.standard[2] = isJump || isExplore ? withEng(catalog, { id: fsd.uid }, "FSD_LongRange", "special_fsd_heavy") : { id: fsd.uid };
   const light = isJump && !isSpeed && !isCombat;
   const pp = findMod(catalog, "pp", s[0], "A");
@@ -88,14 +94,18 @@ function buildRoleMix(catalog, shipKey, roles) {
   const sn = findMod(catalog, "s", s[5], "D");
   if (sn) cfg.standard[5] = isJump || isExplore ? withEng(catalog, sn, "Sensor_LightWeight", "") : sn;
 
-  // Slot interni: ogni modulo va nello slot libero più piccolo che lo contiene.
-  const slots = ship.slots.internal.map((x, i) => ({ ...ShipCalc.slotInfo(x), i })).filter(x => !x.name || x.name === "Military");
-  // Si parte dagli slot vuoti; lo Shield Generator di serie torna al suo posto se il preset non ne monta uno.
+  // Slot interni: ogni modulo va nello slot libero più piccolo che lo contiene. Si usano gli slot normali, i Military e
+  // quelli con nome che accettano Cargo Rack (es. "Cargo" del Panther Clipper Mk II); gli altri slot con nome
+  // (Planetary Approach Suite, Limpets, Fighter Hangar) restano come sono.
+  const slots = ship.slots.internal.map((x, i) => ({ ...ShipCalc.slotInfo(x), i }))
+    .filter(x => !x.name || x.name === "Military" || x.eligible?.cr);
+  // Si parte dagli slot vuoti; lo Shield Generator di serie si rimonta se il preset non ne monta uno.
   const SHIELDS = ["sg", "bsg", "psg"];
   const stockShield = slots.map(x => ({ x, e: cfg.internal[x.i] })).find(o => o.e && SHIELDS.includes(idxOf(o.e)?.grp));
   for (const x of slots) cfg.internal[x.i] = null;
   const free = () => slots.filter(x => !cfg.internal[x.i]);
-  const fits = (x, m) => m && x.cls >= m.class && (!x.name || x.name !== "Military" || ["hr", "mrp", "scb", "sg", "bsg", "psg", "ghrp", "gmrp", "mahr"].includes(m.grp));
+  // Slot con "eligible" (Military, Cargo): solo i tipi elencati dal catalogo.
+  const fits = (x, m) => !!m && x.cls >= m.class && (!x.eligible || !!x.eligible[m.grp]);
   const put = (grp, rating, cls) => {
     const list = catalog.modules.filter(m => m.grp === grp && (!rating || m.rating === rating) && !m.pre && (cls == null || m.class === cls));
     // Classe più grande che entra nello slot libero più grande, poi slot più piccolo che la contiene.
@@ -119,20 +129,23 @@ function buildRoleMix(catalog, shipKey, roles) {
   if (isJump || isExplore) put("gfsb", "H");
   if (isExplore) { put("fs", "A"); }
   if (isCombat) { putShield("bsg", "C"); put("scb", "A"); }
-  else if (rSet.has("trade") || isMining || isExplore) putShield("sg", "D");
+  else if (rSet.has("trade") || isMining || isExplore || isJump) putShield("sg", "D");
   if (isExplore) { put("am", "A"); put("pv", "H", 2); put("ss", "I", 1); }
   if (isMining) { put("rf", "A"); put("cc", "A"); put("pc", "A"); put("ss", "I", 1); }
   if (stockShield && !cfg.internal.some(e => e && SHIELDS.includes(idxOf(e)?.grp))) {
     const m = idxOf(stockShield.e);
-    const slot = cfg.internal[stockShield.x.i] ? free().filter(x => fits(x, m)).sort((a, b) => a.cls - b.cls)[0] : stockShield.x;
+    // Nello slot libero più piccolo che lo contiene: gli slot grandi restano ai moduli del preset (es. Cargo Rack).
+    const slot = free().filter(x => fits(x, m)).sort((a, b) => a.cls - b.cls)[0];
     if (slot) cfg.internal[slot.i] = { id: m.uid };
   }
   for (const x of free()) {
-    if (isCargo && !x.name) { const m = findMod(catalog, "cr", Math.min(x.cls, 8), "E"); if (m) cfg.internal[x.i] = m; }
-    else if (isCombat) {
+    if (isCargo && (!x.eligible || x.eligible.cr)) {
+      const m = findMod(catalog, "cr", Math.min(x.cls, 8), "E");
+      if (m && fits(x, idxOf(m))) cfg.internal[x.i] = m;
+    } else if (isCombat) {
       const grp = x.i % 2 === 0 ? "hr" : "mrp";
       const m = findMod(catalog, grp, Math.min(x.cls, 5), "D");
-      if (m) cfg.internal[x.i] = m;
+      if (m && fits(x, idxOf(m))) cfg.internal[x.i] = m;
     }
   }
   ship.slots.internal.forEach((x, i) => { if (ShipCalc.slotInfo(x).name === "PlanetaryApproachSuite") cfg.internal[i] = findMod(catalog, "pas", 1, "I"); });
@@ -153,6 +166,13 @@ function buildRoleMix(catalog, shipKey, roles) {
 
   // Controlli: Power Plant sufficiente e Thrusters che reggono la massa (altrimenti si torna ai moduli A).
   let r = ShipCalc.compute(catalog, cfg);
+  if (light) {
+    // Salto massimo: il Power Plant più leggero (anche di classe inferiore) che copre l'energia richiesta.
+    const lightest = catalog.modules.filter(m => m.grp === "pp" && m.class <= s[0] && !m.pre && shipAllows(m, ship) && m.pgen >= r.draw)
+      .sort((a, b) => a.mass - b.mass || b.pgen - a.pgen)[0];
+    if (lightest) cfg.standard[0] = { id: lightest.uid };
+    r = ShipCalc.compute(catalog, cfg);
+  }
   if (r.pgen < r.draw) {
     const better = catalog.modules.filter(m => m.grp === "pp" && m.class <= s[0] && !m.pre && m.pgen >= r.draw).sort((a, b) => a.mass - b.mass)[0];
     if (better) cfg.standard[0] = cfg.standard[0]?.engineering ? { id: better.uid, engineering: cfg.standard[0].engineering } : { id: better.uid };
@@ -197,7 +217,7 @@ function sharePanel() {
       </div>
       <div class="sub" style="margin-top:6px">Il formato journal porta moduli, slot, blueprint, grado ed effetto sperimentale; per una build pianificata i valori dei modificatori non ci sono (grado al tiro migliore). Il codice ED Copilot conserva tutto, ma lo legge solo ED Copilot.</div>
       <h3 style="margin-top:12px">Importa una build</h3>
-      <textarea id="bs-input" data-keep rows="3" maxlength="200000" spellcheck="false" placeholder="Incolla una build in formato journal (Loadout), un link di una build o un codice ED Copilot" style="width:100%;font-family:var(--mono, monospace);font-size:12px"></textarea>
+      <textarea id="bs-input" data-keep rows="3" maxlength="200000" spellcheck="false" placeholder="Incolla una build in formato journal (Loadout) o SLEF, un link di una build o un codice ED Copilot" style="width:100%;font-family:var(--mono, monospace);font-size:12px"></textarea>
       <div class="cfg-row" style="margin-top:6px">
         <button class="small primary" id="bs-import">Importa nel cantiere</button>
         ${m ? `<span class="${m.ok ? "ok" : "bad"}" style="font-size:12px">${esc(m.text)}</span>` : ""}
@@ -221,10 +241,15 @@ async function shareImport(text) {
     return { cfg, name: name || CATALOG.ships[cfg.ship].name, note: cfg.unknown.length ? LANG.t(`${cfg.unknown.length} moduli non validi ignorati`) : "" };
   }
   const res = await api("/api/buildshare/decode", { text });
+  if (res.error) throw new Error(res.error);
   if (res.kind === "coriolis_outfit") {
     const key = shareShipKey(res.ship);
     if (!key) throw new Error("Nave non presente nel catalogo");
-    return { cfg: ShipCalc.blank(CATALOG, key), name: CATALOG.ships[key].name, note: res.note };
+    if (!res.code) return { cfg: ShipCalc.blank(CATALOG, key), name: res.name || CATALOG.ships[key].name, note: res.note };
+    // Codice del link: moduli e ingegnerie (ShipCalc.fromCoriolis, porting del decoder di Coriolis).
+    const { cfg, name } = ShipCalc.fromCoriolis(CATALOG, { ...res, ship: key });
+    const notes = [res.note, cfg.unknown.length ? LANG.t(`non riconosciuti: ${cfg.unknown.join(", ")}`) : ""].filter(Boolean);
+    return { cfg, name: name || CATALOG.ships[key].name, note: notes.join(" · ") };
   }
   const lo = res.loadout;
   const cfg = ShipCalc.fromLoadout(CATALOG, lo.Ship, res.modules, SHIP_SLOTS);
@@ -657,6 +682,17 @@ document.addEventListener("click", e => {
 // ============================================================================
 // VISTA
 // ============================================================================
+// Pannello del riepilogo: titolo corto su una riga. Se il nome dell'allestimento comincia con il nome della nave
+// (es. "Panther Clipper Mk II (Salto massimo)") il titolo tiene solo la parte propria e la nave va a destra; il nome
+// completo resta nel tooltip.
+function statsPanel(ship, body) {
+  const full = String(UI.cfgName || "").trim();
+  let short = full;
+  if (full.toLowerCase().startsWith(ship.name.toLowerCase())) short = full.slice(ship.name.length).trim().replace(/^\((.*)\)$/, "$1").trim();
+  const title = short || ship.name, tip = full || ship.name;
+  return panel(`<span class="cfg-stats-title" title="${esc(tip)}">${esc(title)}</span>`, body,
+    { cls: "holo cfg-stats", code: "STATS", aside: short ? `<span title="${esc(ship.name)}">${esc(ship.name)}</span>` : "" });
+}
 VIEWS.shipyard = () => {
   if (!CATALOG) return panel("Cantiere navale", UI.catalogError ? `<div class="bad">⚠ ${esc(UI.catalogError)}</div>` : '<div class="loading">CARICAMENTO DEL CATALOGO NAVI</div>', { code: "SHIPYARD" });
   if (!UI.cfg) {
@@ -767,7 +803,7 @@ VIEWS.shipyard = () => {
       ${panel("Interni opzionali", modTable(internal), { code: "OPTIONAL", aside: `${cfg.internal.filter(Boolean).length}/${ship.slots.internal.length}` })}
       ${ship.slots.hardpoints.length ? panel("Hardpoint e utility", modTable(hard), { code: "HARDPOINTS" }) : ""}
     </div><div class="col cfg-side">
-      ${panel(esc(UI.cfgName || ship.name), stats, { cls: "holo", code: "STATS", aside: UI.cfgName ? esc(ship.name) : "" })}
+      ${statsPanel(ship, stats)}
     </div></div>
     <div class="grid cfg-grid" style="margin-top:18px"><div class="col">
       ${panel("Ingegneria consigliata", engHtml + engNote, { code: "INGEGNERIA" })}

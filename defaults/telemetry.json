@@ -45,7 +45,7 @@
   },
   {
     "id": "hull_critical",
-    "name": "Allarme Integrita Scafo Critica (<50%)",
+    "name": "Allarme integrità scafo critica (<50%)",
     "metric": "hull",
     "condition": "lt",
     "threshold": 50,
@@ -56,7 +56,7 @@
   },
   {
     "id": "fsd_integrity",
-    "name": "Allarme Integrita Motore FSD (<80%)",
+    "name": "Allarme integrità FSD (<80%)",
     "metric": "fsd",
     "condition": "lt",
     "threshold": 80,

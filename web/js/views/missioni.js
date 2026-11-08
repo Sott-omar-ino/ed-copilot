@@ -95,5 +95,5 @@ VIEWS.missions = () => {
       <td>${[x.count && x.count + "×", x.commodity, x.target, x.passengers && x.passengers + " passeggeri"].filter(Boolean).map(esc).join(" ") || "—"}</td>
       <td class="num gold">${short(x.reward)}</td><td>${x.expiry ? until(x.expiry) : "—"}</td><td>${todoBtn(`Missione: ${x.name}`, x.system || "", "Missioni")}</td></tr>`).join("")
       || '<tr><td colspan="6"><div class="empty">Nessuna missione attiva</div></td></tr>'}
-    </tbody></table>`, { code: "MISSION-BOARD", aside: `${m.length} attive · <span class="gold mono">${short(m.reduce((s, x) => s + (x.reward || 0), 0))}</span>` });
+    </tbody></table>`, { code: "MISSION-BOARD", aside: m.length ? `${m.length} attive · <span class="gold mono">${short(m.reduce((s, x) => s + (x.reward || 0), 0))}</span>` : "" });
 };

@@ -13,6 +13,7 @@ The GPL is required because the exobiology prediction rules are derived from GPL
 | Ship and module data, blueprint data, ship slot names | `data/catalog.json`, `defaults/ship_slots.json` | [EDCD/coriolis-data](https://github.com/EDCD/coriolis-data) | MIT |
 | Exobiology species rules | `app/bio_rules.py` | [EDMC-BioScan](https://github.com/Silarn/EDMC-BioScan) by Silarn | GPL-2.0-or-later |
 | Exobiology colour/genus data | `app/bio_rules.py` | [EDMC-ExploData](https://github.com/Silarn/EDMC-ExploData) by Silarn | GPL-2.0 |
+| Fonts Saira, Share Tech Mono | `web/fonts/` | Google Fonts (Omnibus-Type; Carrois Type Design) | SIL Open Font License 1.1 (`web/fonts/OFL.txt`) |
 | Galactic region map | `app/regionmap.py` | [EliteDangerousRegionMap](https://github.com/klightspeed/EliteDangerousRegionMap) by klightspeed | MIT (notice kept in the file) |
 
 Facts and formulas taken from community research (exploration value formula, material trader ratios, journal

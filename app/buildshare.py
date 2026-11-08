@@ -10,6 +10,19 @@ Formati verificati sul codice sorgente (novembre 2026):
   eventi del journal (serve "event": "Loadout") o SLEF. Fonte: https://edsy.org/edsy.js (processURLHash, importData).
 - Dati: JSON compatto -> gzip -> base64 URL-safe, "=" -> "%3D". È esattamente quello che fa EDMarketConnector
   (plugins/common_coreutils.py, shipyard_url_common; plugins/coriolis.py e plugins/edsy.py).
+- Coriolis, link di condivisione https://coriolis.io/outfit/<nave>?code=<codice>&bn=<nome> (anche /outfit/<nave>/<codice>):
+  il codice è "<moduli>.<accesi>.<priorità>.<ingegnerie>". I moduli si leggono in web/js/shipcalc.js (fromCoriolis); qui si
+  decodifica la parte delle ingegnerie: base64 con l'alfabeto di Utils.fromUrlSafe ("-" = "/", "_" = "+"), gzip, poi una
+  struttura binaria: per ogni slot int8 indice, coppie (int8 id, int32 LE valore) fino a -1, e -1 finale; gli id -2/-3/-4
+  sono blueprint/grado/sperimentale, 40 è una stringa di 4 caratteri. Accesi e priorità (LZString) non servono.
+  Fonte: EDCD/coriolis (MIT), commit 7248d2beb396, src/app/shipyard/Ship.js (buildFrom, updateModificationsString,
+  decodeModificationsStruct), src/app/utils/UtilityFunctions.js (fromUrlSafe), src/app/utils/UrlGenerators.js (outfitURL),
+  src/app/Router.js (parser della query) e src/app/Coriolis.jsx (rotte /outfit/:ship/:code?).
+- EDSY, link https://edsy.org/#/L=<codice>: formato interno di EDSY. Il codice di EDSY è distribuito con licenza
+  Creative Commons BY-NC 4.0 (intestazione di https://edsy.org/edsy.js), incompatibile con la GPL di ED Copilot: il formato
+  non si porta qui e il link viene rifiutato con un messaggio che indica di esportare la build in formato journal o SLEF.
+- SLEF (Ship Loadout Exchange Format, EDCD): [{"header": {...}, "data": Loadout}] oppure un solo {"header", "data"}.
+  È anche il formato che si copia dalla pagina di una nave sui siti della community.
 - Nomi degli slot di ogni nave: ship-slots.json di Coriolis (EDCD/coriolis-data, MIT), pubblicato su
   https://coriolis.io/ship-slots.json. Una copia compatta sta in defaults/ship_slots.json e si riaggiorna ogni 14 giorni.
 
@@ -82,6 +95,110 @@ def decode_blob(text):
 
 def as_json(loadout):
     return json.dumps(loadout, ensure_ascii=False, indent=2)
+
+
+# ---------------------------------------------------------------------------- Coriolis /outfit/
+MAX_CORIOLIS_CODE = 800      # parte dei moduli del codice (un modulo = 2 caratteri)
+MAX_CORIOLIS_MODS = 64_000   # ingegnerie dopo la decompressione
+_CORIOLIS_MODULES = re.compile(r"^[A-Za-z0-9\-]{1,%d}$" % MAX_CORIOLIS_CODE)
+_SLOT_DONE, _MOD_DONE, _MOD_BLUEPRINT, _MOD_GRADE, _MOD_SPECIAL, _MOD_TYPE = -1, -1, -2, -3, -4, 40
+
+
+def _coriolis_b64(text):
+    """Base64 dei codici Coriolis (Utils.fromUrlSafe: "-" -> "/", "_" -> "+")."""
+    text = text.replace("-", "/").replace("_", "+")
+    if not re.fullmatch(r"[A-Za-z0-9+/]*=*", text):
+        raise ValueError("base64")
+    text = text.rstrip("=")
+    return base64.b64decode(text + "=" * (-len(text) % 4))
+
+
+def decode_coriolis_mods(text):
+    """Parte delle ingegnerie di un codice Coriolis -> [{slot, bp, grade, sp, mods: {id: valore}}]. Solleva ValueError."""
+    d = zlib.decompressobj(47)
+    try:
+        buf = d.decompress(_coriolis_b64(text), MAX_CORIOLIS_MODS)
+    except (binascii.Error, zlib.error) as exc:
+        raise ValueError("gzip") from exc
+    if d.unconsumed_tail:
+        raise ValueError("troppo grande")
+    pos = 0
+
+    def take(n, signed=True):
+        nonlocal pos
+        if pos + n > len(buf):
+            raise ValueError("struttura troncata")
+        v = int.from_bytes(buf[pos:pos + n], "little", signed=signed)
+        pos += n
+        return v
+
+    out = []
+    slot = take(1)
+    while slot != _SLOT_DONE:
+        if slot < 0 or len(out) >= 200:
+            raise ValueError("slot non valido")
+        entry, mods = {"slot": slot}, {}
+        mid = take(1)
+        while mid != _MOD_DONE:
+            if mid == _MOD_TYPE:  # tipo di danno: stringa di 4 caratteri, non serve
+                take(4, False)
+            else:
+                val = take(4)
+                if mid == _MOD_BLUEPRINT:
+                    if val:
+                        entry["bp"] = val
+                elif mid == _MOD_GRADE:
+                    if val:
+                        entry["grade"] = val
+                elif mid == _MOD_SPECIAL:
+                    entry["sp"] = val
+                elif mid >= 0 and len(mods) < MAX_MODIFIERS:
+                    mods[str(mid)] = val
+            mid = take(1)
+        if mods:
+            entry["mods"] = mods
+        out.append(entry)
+        slot = take(1)
+    return out
+
+
+def _coriolis_outfit(ship, code, name):
+    ship = ship.lower().replace("-", "_")
+    base = {"kind": "coriolis_outfit", "ship": ship, "name": _str(name, 60) or ""}
+    if not code:
+        return {**base, "note": pick("Il link non contiene il codice dei moduli: caricata la nave di serie.",
+                                     "The link has no module code: loaded the stock ship.")}
+    if len(code) > MAX_TEXT:
+        raise ValueError(pick("Testo troppo lungo", "Text too long"))
+    parts = code.split(".")
+    if not _CORIOLIS_MODULES.match(parts[0]):
+        raise ValueError(pick("Codice della build non valido", "Invalid build code"))
+    out = {**base, "code": parts[0], "mods": []}
+    mods = parts[3] if len(parts) > 3 else ""
+    if mods and ":" in mods:  # formato delle ingegnerie del 2016 (decodeModificationsString): non supportato
+        out["note"] = pick("Ingegnerie in un formato troppo vecchio: importati solo i moduli.",
+                           "Engineering in a format that is too old: imported the modules only.")
+    elif mods:
+        try:
+            out["mods"] = decode_coriolis_mods(mods)
+        except ValueError:  # come Coriolis: ingegnerie illeggibili ignorate, i moduli restano
+            out["note"] = pick("Ingegnerie non leggibili: importati solo i moduli.",
+                               "Engineering can't be read: imported the modules only.")
+    return out
+
+
+def _query(q):
+    """Parametri della query come li legge Coriolis (Router.js): chiave=valore separati da &, poi decodeURIComponent."""
+    out = {}
+    for part in (q or "").split("&"):
+        k, _, v = part.partition("=")
+        if k and k not in out:
+            out[k] = urllib.parse.unquote(v)
+    return out
+
+
+def _host_is(host, *names):
+    return any(host == n or host.endswith("." + n) for n in names)
 
 
 # ---------------------------------------------------------------------------- validazione
@@ -201,32 +318,35 @@ def decode_text(text):
     if re.match(r"^https?://", text, re.I):
         u = urllib.parse.urlsplit(text)
         host = (u.hostname or "").lower()
-        if host.endswith("coriolis.io"):
-            data = re.search(r"(?:^|&)data=([^&]+)", u.query)
-            if data:
-                return _from_json(decode_blob(data.group(1)), "coriolis")
+        if host == "s.orbis.zone" or (_host_is(host, "edsy.org") and u.path.startswith("/s/")):
+            raise ValueError(pick("Link abbreviato: aprilo nel browser e incolla qui l'indirizzo completo della build",
+                                  "Short link: open it in the browser and paste the full build address here"))
+        if _host_is(host, "coriolis.io", "coriolis.edcd.io"):
+            q = _query(u.query)
+            if q.get("data"):
+                return _from_json(decode_blob(q["data"]), "coriolis")
             if u.path.startswith("/import/"):
                 return _from_json(decode_blob(u.path[len("/import/"):]), "coriolis")
-            m = re.match(r"^/outfit/([A-Za-z0-9_\-]+)", u.path)
-            if m:  # link di condivisione con il codice interno di Coriolis: si legge solo la nave
-                return {"kind": "coriolis_outfit", "ship": m.group(1).lower().replace("-", "_"),
-                        "note": pick("Da questo link si legge solo la nave. Per avere anche i moduli incolla la build "
-                                     "in formato journal (Loadout).",
-                                     "Only the ship can be read from this link. To get the modules too, paste the "
-                                     "build in journal format (Loadout).")}
+            m = re.match(r"^/outfit/([A-Za-z0-9_\-]{1,40})(?:/([^/]+))?/?$", u.path)
+            if m:
+                return _coriolis_outfit(m.group(1), q.get("code") or urllib.parse.unquote(m.group(2) or ""), q.get("bn"))
             raise ValueError(pick("Il link non contiene i dati della build", "The link doesn't contain the build data"))
-        if host.endswith("edsy.org") or host.endswith("edshipyard.com"):
+        if _host_is(host, "edsy.org", "edshipyard.com"):
             for part in u.fragment.split("/"):
                 if part.startswith("I="):
                     return _from_json(decode_blob(part[2:]), "edsy")
             if any(p.startswith("L=") for p in u.fragment.split("/")):
-                raise ValueError(pick("Questo link usa un formato interno non leggibile: incolla la build in formato "
-                                      "journal (Loadout)",
-                                      "This link uses an internal format that can't be read: paste the build in "
-                                      "journal format (Loadout)"))
+                # Formato interno di EDSY (licenza CC BY-NC 4.0, vedi in testa): non si legge.
+                raise ValueError(pick("Questo link usa un formato interno del configuratore che ED Copilot non può leggere: "
+                                      "dal configuratore esporta la build in formato journal (Loadout) o SLEF e incollala qui",
+                                      "This link uses the builder's internal format, which ED Copilot can't read: export "
+                                      "the build from the builder in journal (Loadout) or SLEF format and paste it here"))
             raise ValueError(pick("Il link non contiene i dati della build", "The link doesn't contain the build data"))
-        raise ValueError(pick("Link non riconosciuto: incolla la build in formato journal (Loadout)",
-                              "Link not recognised: paste the build in journal format (Loadout)"))
+        if _host_is(host, "inara.cz"):
+            raise ValueError(pick("Dalla pagina della nave copia il formato SLEF e incollalo qui",
+                                  "Copy the SLEF format from the ship page and paste it here"))
+        raise ValueError(pick("Link non riconosciuto: incolla la build in formato journal (Loadout) o SLEF",
+                              "Link not recognised: paste the build in journal (Loadout) or SLEF format"))
     try:
         obj = decode_blob(text)
     except _TooBig:
@@ -318,7 +438,16 @@ GET = {
     "/api/buildshare/ship": ship_loadout,
     "/api/buildshare/slots": lambda q: slot_names(),
 }
+def _decode_endpoint(body, q):
+    # Un testo che non si può importare è un esito normale (messaggio per l'utente), non un errore HTTP: risposta 200
+    # con "error", così il browser non lo segnala come risorsa fallita nella console.
+    try:
+        return decode_text(str((body or {}).get("text") or "")[:MAX_TEXT + 1])
+    except ValueError as exc:
+        return {"error": str(exc)}
+
+
 POST = {
-    "/api/buildshare/decode": lambda body, q: decode_text(str((body or {}).get("text") or "")[:MAX_TEXT + 1]),
+    "/api/buildshare/decode": _decode_endpoint,
 }
 LAN = set()

@@ -130,6 +130,8 @@ LANG.add({
   "\"Comando motore a distorsione FSD azionato.\"": "\"Frame Shift Drive engaged.\"",
   "Inizia la carica del Frame Shift Drive per il salto o per il supercruise.": "Starts charging the Frame Shift Drive for a jump or supercruise.",
   "Punti d Ancoraggio Armi": "Hardpoints",
+  "Allarme integrità scafo critica (<50%)": "Critical Hull Integrity Alarm (<50%)",
+  "Allarme integrità FSD (<80%)": "FSD Integrity Alarm (<80%)",
   "◆ Punti d Ancoraggio Armi": "◆ Hardpoints",
   "Estrai armi; Ritira armi; Armi fuori; Armi dentro; Hardpoints; Sfodera armi; Rinfodera armi": "Hardpoints; Deploy hardpoints; Retract hardpoints; Weapons out; Weapons away",
   "Punti d ancoraggio armamenti commutati.": "Hardpoints toggled.",

@@ -122,4 +122,8 @@ def slot_label(slot):
     m = re.match(r"Military(\d+)", slot)
     if m:
         return f"Military {int(m.group(1))}"
+    # Altri slot con numero (es. LimpetController01 della Type-11): nome del gioco separato in parole, "Limpet Controller 1".
+    m = re.fullmatch(r"([A-Z][A-Za-z]+?)(\d+)", slot)
+    if m:
+        return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", m.group(1)) + f" {int(m.group(2))}"
     return slot

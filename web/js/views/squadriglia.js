@@ -151,7 +151,7 @@ function sqSites(d) {
   }
   if (!by.size) return "";
   return panel("Cantieri di colonizzazione condivisi", [...by.values()].map(s => `<div class="subpanel">
-      <h3>${esc(s.station || "Cantiere")} <span class="sub">${s.system ? esc(s.system) : ""}</span><span class="aside mono">${s.progress != null ? (s.progress * 100).toFixed(1) + "%" : "—"}</span></h3>
+      <h3>${esc(s.station || "Cantiere")} <span class="sub">${s.system ? esc(s.system) : ""}</span><span class="aside mono">${s.progress != null ? dec(s.progress * 100) + "%" : "—"}</span></h3>
       ${meter((s.progress || 0) * 100, "holo")}
       <div class="sub" style="margin-top:4px">Mancano ${num(s.remaining)} t · dato di ${esc(s.from)}${s.updated ? `, ${ago(s.updated)}` : ""}</div></div>`).join(""));
 }

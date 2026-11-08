@@ -55,7 +55,7 @@
   },
   {
     "id": "hardpoints",
-    "name": "Punti d Ancoraggio Armi",
+    "name": "Hardpoint",
     "say": "Estrai armi; Ritira armi; Armi fuori; Armi dentro; Hardpoints; Sfodera armi; Rinfodera armi",
     "key": "U",
     "voice": "Punti d ancoraggio armamenti commutati.",

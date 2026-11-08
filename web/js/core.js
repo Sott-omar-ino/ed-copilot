@@ -25,16 +25,19 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 // Formato dei numeri e unità secondo la lingua dell'interfaccia (1.234 al / 1,234 ly).
 const NUM_LOCALE = LANG.lang === "en" ? "en-GB" : "it-IT";
 const num = n => n == null || isNaN(n) ? "—" : Math.round(n).toLocaleString(NUM_LOCALE);
+// Decimali fissi con il separatore della lingua (42,0 in italiano, 42.0 in inglese): da usare al posto di toFixed nel testo mostrato.
+const dec = (n, d = 1) => Number(n).toLocaleString(NUM_LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: false });
 const cr = n => n == null ? "—" : num(n) + " CR";
-const short = n => n == null ? "—" : Math.abs(n) >= 1e9 ? (n / 1e9).toFixed(2) + "B" : Math.abs(n) >= 1e6 ? (n / 1e6).toFixed(Math.abs(n) >= 1e7 ? 1 : 2) + "M" : Math.abs(n) >= 1e3 ? Math.round(n / 1e3) + "k" : String(Math.round(n));
-const ly = n => n == null ? "—" : n.toLocaleString(NUM_LOCALE, { maximumFractionDigits: n < 100 ? 1 : 0 }) + (LANG.lang === "en" ? " ly" : " al");
+const short = n => n == null ? "—" : Math.abs(n) >= 1e9 ? dec(n / 1e9, 2) + "B" : Math.abs(n) >= 1e6 ? dec(n / 1e6, Math.abs(n) >= 1e7 ? 1 : 2) + "M" : Math.abs(n) >= 1e3 ? Math.round(n / 1e3) + "k" : String(Math.round(n));
+// fixed: numero di decimali sempre mostrati (es. gittate "42,0 al" allineate in colonna).
+const ly = (n, fixed) => n == null ? "—" : (fixed != null ? dec(n, fixed) : n.toLocaleString(NUM_LOCALE, { maximumFractionDigits: n < 100 ? 1 : 0 })) + (LANG.lang === "en" ? " ly" : " al");
 const dist3 = (a, b) => a && b ? Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) : null;
 const sys = name => name ? `<span class="sysname">${esc(name)}<button class="copy" data-copy="${esc(name)}" title="Copia nome sistema">⧉</button></span>` : "—";
 const todoBtn = (text, system = "", category = "Generale") =>
   `<button class="small ghost" data-todo="${esc(text)}" data-system="${esc(system)}" data-category="${esc(category)}" title="Aggiungi alla lista delle cose da fare">+ da fare</button>`;
 
 function panel(title, body, o = {}) {
-  return `<section class="panel ${o.cls || ""}"><div class="hd"><h2>${title}</h2>${o.code ? `<span class="code">${esc(o.code)}</span>` : ""}${o.aside ? `<div class="aside">${o.aside}</div>` : ""}</div><div class="bd">${body}</div></section>`;
+  return `<section class="panel ${o.cls || ""}"${o.id ? ` id="${esc(o.id)}"` : ""}><div class="hd"><h2>${title}</h2>${o.code ? `<span class="code">${esc(o.code)}</span>` : ""}${o.aside ? `<div class="aside">${o.aside}</div>` : ""}</div><div class="bd">${body}</div></section>`;
 }
 function seg(pct, n = 20, cls = "") {
   const on = Math.round(Math.max(0, Math.min(100, pct || 0)) / 100 * n);
@@ -272,7 +275,7 @@ function renderHeader() {
     fuel.className = "fuel" + (f.cap && f.level / f.cap < .25 ? " low" : "");
     fuel.innerHTML = Array.from({ length: cells }, (_, i) => `<i class="${i < on ? "on" : ""}"></i>`).join("");
   }
-  setText("h-fuel-t", f.level != null && f.cap ? f.level.toFixed(1) + "/" + f.cap + " t" : "—");
+  setText("h-fuel-t", f.level != null && f.cap ? dec(f.level) + "/" + f.cap + " t" : "—");
   setText("h-session", `${S.session.jumps} salti · ${S.session.ly.toFixed(0)} al`);
   setText("h-live", S.live ? "IN LINEA" : "SINCRONIZZO…");
   const dot = $("h-dot");

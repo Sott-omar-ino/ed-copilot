@@ -129,6 +129,7 @@ LANG.add({
   "✔ PRONTO": "✔ READY",
   "mancano {}": "{} missing",
   "◆ DOVE E COME TROVARLO:": "◆ WHERE AND HOW TO GET IT:",
+  "Dove e come trovarlo:": "Where and how to get it:",
 
   // --- Sblocchi e progetti: pannello principale --------------------------------
   "Seleziona Modulo o Progetto da Sbloccare": "Choose a module or blueprint to unlock",
