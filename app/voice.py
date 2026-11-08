@@ -545,9 +545,21 @@ def transcribe(data, content_type="", source="", floor_db=None):
                                        initial_prompt=_command_prompt(), without_timestamps=True,
                                        vad_parameters=noise_filter.vad_parameters(strength),
                                        condition_on_previous_text=False)
-        text = " ".join(s.text for s in segments).strip()
-        # Nel registro ciò che è stato capito: serve per capire dove il riconoscimento sbaglia (resta solo sul PC).
-        print(f"[Voce] capito ({source or 'app'}, {_whisper_name}): {text!r}")
+        # Whisper, se sente solo rumore, tende a "inventare" parole (spesso quelle del suggerimento, es. "Cella di
+        # Scudo"). Si tengono solo i pezzi in cui è abbastanza sicuro: probabilità di "non parlato" bassa e
+        # log-probabilità media non troppo bassa (stessi criteri della trascrizione di riferimento di Whisper:
+        # no_speech_threshold 0.6, logprob_threshold -1.0 — github.com/openai/whisper, transcribe.py).
+        kept, dropped = [], 0
+        for seg in segments:
+            if seg.no_speech_prob > 0.6 or seg.avg_logprob < -1.0:
+                dropped += 1
+                continue
+            kept.append(seg.text)
+        text = " ".join(kept).strip()
+        # Nel registro solo i comandi brevi (per capire dove il riconoscimento sbaglia), mai le frasi lunghe:
+        # in ascolto continuo sarebbero le conversazioni dell'utente.
+        shown = text if len(text.split()) <= 6 else f"(frase di {len(text.split())} parole, non registrata)"
+        print(f"[Voce] capito ({source or 'app'}, {_whisper_name}): {shown!r}" + (f" · scartati {dropped} pezzi incerti" if dropped else ""))
         if source != "phone" and _echo_of_copilot(0, text):
             print("[Voce] scartato: è una frase appena detta dal copilota")
             return ""

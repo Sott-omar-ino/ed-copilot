@@ -267,4 +267,7 @@ LANG.add({
   "“carrier più vicino”, “carrier più vicino con riparazioni”, “cerca il carrier K3N-98F”, “dove si trova il carrier Hyperion”": "“nearest carrier”, “nearest carrier with repairs”, “find carrier K3N-98F”, “where is carrier Hyperion”",
   "Fleet carrier più vicino": "Nearest fleet carrier",
   "Cerca carrier: {}": "Find carrier: {}",
+  "Frase lunga ignorata: per un comando inizia con «copilota»": "Long sentence ignored: start with “copilot” for a command",
+  "Ascolto continuo": "Continuous listening",
+  "le frasi lunghe (più di 5 parole) vengono ignorate: per un comando lungo inizia con “copilota”, es. “copilota, stazione più vicina con riparazioni”": "long sentences (more than 5 words) are ignored: start a long command with “copilot”, e.g. “copilot, nearest station with repairs”",
 });

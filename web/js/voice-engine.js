@@ -1078,6 +1078,19 @@ const VOICE_ENGINE = {
     const todoCmd = TODO_VOICE.parse(raw);
     if (todoCmd) { this._todoCommand(todoCmd, raw); return; }
 
+    // In ascolto continuo il microfono sente anche le conversazioni: una frase lunga non è un comando, a meno che
+    // non cominci con "copilota" ("copilota, richiesta attracco"). Con il push-to-talk vale tutto quello che dici.
+    {
+      const wake = /^(copilota|computer|copilot)\s*/;
+      if (wake.test(text)) text = text.replace(wake, "").trim();
+      else if (this.mode !== "ptt" && text.split(" ").length > 5) {
+        const trl = $("voice-hud-transcript");
+        if (trl) trl.innerHTML = `<span class="muted">${esc(LANG.t("Frase lunga ignorata: per un comando inizia con «copilota»"))}</span>`;
+        return;
+      }
+      if (!text) return;
+    }
+
     // Il riconoscimento sbaglia spesso di una o due lettere ("ricchiesta attrago", "mappagallattica"): se nessuna frase
     // dei comandi compare esatta, si prende la frase più simile, solo se lo è davvero (vedi closestPhrase).
     const known = [...CONTROLS, ...MACROS].flatMap(x => (x.say || "").split(";")).map(s => s.toLowerCase()
@@ -1276,6 +1289,11 @@ const VOICE_ENGINE = {
 
     const todoCmd = TODO_VOICE_EN.parse(raw);
     if (todoCmd) { this._todoCommand(todoCmd, raw); return; }
+    // Continuous listening also hears conversations: long sentences are ignored unless they start with "copilot".
+    if (this.mode !== "ptt" && !/^(copilot|computer)/.test(text) && text.split(" ").length > 5) {
+      show(`<span class="muted">${esc(LANG.t("Frase lunga ignorata: per un comando inizia con «copilota»"))}</span>`);
+      return;
+    }
 
     // Fleet carriers: "nearest carrier" (optionally with a service) or "find carrier <name or callsign>".
     {
