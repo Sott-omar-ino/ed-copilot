@@ -264,4 +264,7 @@ LANG.add({
   "Stazioni": "Stations",
   "“base più vicina”, “stazione più vicina con riparazioni”, “material trader più vicino”, “broker tecnologico più vicino”… (risponde e copia il sistema)": "“nearest station”, “nearest station with repairs”, “nearest material trader”, “nearest technology broker”… (answers and copies the system)",
   "Stazione più vicina": "Nearest station",
+  "“carrier più vicino”, “carrier più vicino con riparazioni”, “cerca il carrier K3N-98F”, “dove si trova il carrier Hyperion”": "“nearest carrier”, “nearest carrier with repairs”, “find carrier K3N-98F”, “where is carrier Hyperion”",
+  "Fleet carrier più vicino": "Nearest fleet carrier",
+  "Cerca carrier: {}": "Find carrier: {}",
 });

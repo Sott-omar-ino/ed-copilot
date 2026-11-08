@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import threading
 import time
 import urllib.error
@@ -21,6 +22,24 @@ COORDS_LOCK = threading.Lock()
 NON_CARRIER_TYPES = ["Coriolis Starport", "Orbis Starport", "Ocellus Starport", "Asteroid base",
                      "Outpost", "Planetary Outpost", "Planetary Port", "Settlement", "Mega ship",
                      "Dodec Starport", "Space Construction Depot", "Planetary Construction Depot"]
+
+CARRIER_TYPE = "Drake-Class Carrier"
+CALLSIGN_RE = re.compile(r"^[A-Z0-9]{3}-[A-Z0-9]{3}$")
+
+
+def callsign(text):
+    """'k3n 98f', 'K3N-98F', 'k 3 n 9 8 f' -> 'K3N-98F' (codice di un fleet carrier), altrimenti None."""
+    raw = re.sub(r"[^A-Za-z0-9]", "", str(text or "")).upper()
+    return f"{raw[:3]}-{raw[3:]}" if len(raw) == 6 and re.search(r"\d", raw) else None
+
+
+def _recent(days):
+    """Filtro "visto negli ultimi N giorni": la posizione di un carrier è quella dell'ultimo dato ricevuto."""
+    now = time.time()
+    fmt = "%Y-%m-%dT%H:%M:%SZ"
+    return {"comparison": "<=>", "value": [time.strftime(fmt, time.gmtime(now - days * 86400)),
+                                           time.strftime(fmt, time.gmtime(now + 86400))]}
+
 
 # Nomi delle merci scritti in modi diversi -> nome usato da Spansh.
 COMMODITY_ALIASES = {
@@ -77,6 +96,18 @@ def stations(q):
             sort = [{key: [{"name": commodity, "direction": "asc" if mode == "buy" else "desc"}]}]
     elif mode == "ship":
         filters["ships"] = {"value": [q.get("ship")]}
+    elif mode == "carrier":
+        # Fleet carrier: per vicinanza, per servizio, per codice (XXX-XXX) o per nome; solo quelli visti di recente.
+        filters["type"] = {"value": [CARRIER_TYPE]}
+        name = (q.get("name") or "").strip()
+        if name:
+            cs = callsign(name)
+            filters["name" if cs else "carrier_name"] = {"value": [cs or name.upper()]}
+        if q.get("service"):
+            filters["services"] = [{"name": q.get("service")}]
+        days = int(q.get("max_age_days") or (0 if name else 7))
+        if days > 0:
+            filters["updated_at"] = _recent(days)
     elif mode == "module":
         mod = {"name": [q.get("module")]}
         if q.get("cls"):
@@ -91,7 +122,7 @@ def stations(q):
         filters["has_large_pad"] = {"value": True}
     if q.get("max_dist"):
         filters["distance"] = {"min": "0", "max": str(float(q["max_dist"]))}
-    if q.get("no_carriers", True):
+    if q.get("no_carriers", True) and mode != "carrier":
         filters["type"] = {"value": NON_CARRIER_TYPES}
 
     res = _search_json("https://spansh.co.uk/api/stations/search", {
@@ -105,9 +136,11 @@ def stations(q):
             "station": r.get("name"), "system": r.get("system_name"), "type": r.get("type"),
             "distance": r.get("distance"), "dist_ls": r.get("distance_to_arrival"),
             "large_pad": r.get("has_large_pad"), "medium_pad": (r.get("medium_pads") or 0) > 0,
-            "planetary": r.get("is_planetary"), "updated": r.get("market_updated_at") or r.get("updated_at"),
+            "planetary": r.get("is_planetary"), "updated": (r.get("updated_at") if mode == "carrier" else r.get("market_updated_at") or r.get("updated_at")),
             "material_trader": r.get("material_trader"), "technology_broker": r.get("technology_broker"),
             "power": r.get("system_power"), "allegiance": r.get("allegiance"),
+            "carrier_name": r.get("carrier_name"),
+            "services": [x.get("name") for x in (r.get("services") or []) if x.get("name")] if mode == "carrier" else None,
         }
         item.update(KNOWN_FIXES.get((item["station"], item["system"]), {}))
         if q.get("broker") and item.get("technology_broker") != q.get("broker"):

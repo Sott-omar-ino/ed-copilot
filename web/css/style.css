@@ -113,6 +113,10 @@ header.hud-top { grid-column: 1 / -1; display: flex; align-items: stretch;
 @keyframes pulse { 50% { opacity: .35; } }
 @media (max-width: 1700px) { .tm.opt { display: none; } }
 @media (max-width: 1450px) { .telemetry { gap: 4px 18px; } .tm > span:nth-child(2) { font-size: 14px; } }
+/* Crediti e carburante non si accorciano mai; nome, nave e posizione si accorciano per ultimi e il valore intero è nel title */
+.telemetry > .tm:nth-child(4), .telemetry > .tm:nth-child(5) { flex-shrink: 0; }
+.telemetry > .tm:nth-child(-n+3) { flex-shrink: 1; min-width: 7ch; }
+@media (max-width: 1650px) { .telemetry { gap: 4px 16px; padding: 8px 16px; } .tm > span:nth-child(2) { letter-spacing: .01em; } }
 
 /* --- navigazione: linguette come i pannelli del cockpit ------------------------ */
 aside.nav, nav.nav, nav#nav, .hud-nav {

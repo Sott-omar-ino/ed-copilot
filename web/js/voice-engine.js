@@ -384,6 +384,8 @@ const VOICE_GRAMMAR_EN = [
   { group: "Reports", report: "damage", desc: "Shield and hull integrity", help: 1,
     say: ["damage report", "hull status", "hull integrity", "shield status", "shields status", "fsd status", "fsd integrity", "damage"],
     exact: ["shields", "hull", "integrity"] },
+  { group: "Route", do: "carrier", desc: "Nearest fleet carrier, or find one by name or callsign (\"find carrier K3N-98F\")", help: 1,
+    say: ["nearest carrier", "nearest fleet carrier", "closest carrier", "nearest carrier with repairs", "find carrier", "where is carrier"] },
   { group: "Route", do: "nearest", desc: "Nearest station (optionally with a service: repairs, material trader…)", help: 1,
     say: ["nearest station", "closest station", "nearest base", "nearest starport", "nearest material trader", "nearest technology broker",
       "nearest interstellar factors", "nearest station with repairs", "where can i repair", "nearest shipyard", "nearest black market"] },
@@ -1215,6 +1217,19 @@ const VOICE_ENGINE = {
       speakReport("route");
       return;
     }
+    // Fleet carrier: "carrier più vicino" (anche con un servizio) oppure "cerca il carrier <nome o codice>".
+    {
+      const named = text.match(/(?:cerca|trova|dove (?:si trova|e|sta)|posizione (?:del|di))\s+(?:il\s+|la\s+)?(?:fleet\s+)?carrier\s+(.+)$/);
+      if (named || (/carrier/.test(text) && /(piu vicin[oa]|vicin[oa] a me|vicin[oa])/.test(text))) {
+        const name = named ? named[1].replace(/(per favore|grazie)/g, "").trim() : "";
+        const svc = name ? "" : (nearestServiceIt(text) === "Refuel" && !/rifornimento|carburante/.test(text) ? "" : nearestServiceIt(text));
+        this._recordAction(name ? `Cerca carrier ${name}` : "Fleet carrier più vicino", raw);
+        if (tr) tr.innerHTML = `<span style="color:var(--ok)">&#x2714; ${name ? "Cerca carrier: <b>" + esc(name) + "</b>" : "Fleet carrier più vicino"}</span>`;
+        const v = ttsVoiceKey(), vol = SETTINGS.ttsVolume != null ? SETTINGS.ttsVolume : 100;
+        fetch(`/api/voice/carrier?play=1&name=${encodeURIComponent(name)}&service=${encodeURIComponent(svc)}&voice=${encodeURIComponent(v)}&volume=${vol}`).catch(() => {});
+        return;
+      }
+    }
     // Stazione più vicina, anche con un servizio: "stazione più vicina con riparazioni", "material trader più vicino".
     if (/(piu vicin[oa]|vicin[oa] a me|piu vicine)/.test(text) && /(base|stazion[ei]|porto|spazioporto|attracc\w*|material trader|mercante|broker|riparazion\w*|ripara\w*|rifornimento|carburante|cartograf\w*|genomics|interstellar|factors|cantiere|outfitting|equipaggiamento|mercato nero)/.test(text)) {
       const svc = nearestServiceIt(text);
@@ -1261,6 +1276,20 @@ const VOICE_ENGINE = {
 
     const todoCmd = TODO_VOICE_EN.parse(raw);
     if (todoCmd) { this._todoCommand(todoCmd, raw); return; }
+
+    // Fleet carriers: "nearest carrier" (optionally with a service) or "find carrier <name or callsign>".
+    {
+      const named = text.match(/(?:find|search for|locate|where is)\s+(?:the\s+)?(?:fleet\s+)?carrier\s+(.+)$/);
+      if (named || (/carrier/.test(text) && /(nearest|closest|near me|nearby)/.test(text))) {
+        const name = named ? named[1].replace(/please/g, "").trim() : "";
+        const svc = name ? "" : (nearestServiceEn(text) === "Refuel" && !/fuel/.test(text) ? "" : nearestServiceEn(text));
+        this._recordAction(name ? `Find carrier ${name}` : "Nearest fleet carrier", raw);
+        show(`<span style="color:var(--ok)">&#x2714; ${name ? "Find carrier: <b>" + esc(name) + "</b>" : "Nearest fleet carrier"}</span>`);
+        const v = ttsVoiceKey(), vol = SETTINGS.ttsVolume != null ? SETTINGS.ttsVolume : 100;
+        fetch(`/api/voice/carrier?play=1&name=${encodeURIComponent(name)}&service=${encodeURIComponent(svc)}&voice=${encodeURIComponent(v)}&volume=${vol}`).catch(() => {});
+        return;
+      }
+    }
 
     const ship = matchGrammarEn(text, g => !!g.act);
     if (ship) {

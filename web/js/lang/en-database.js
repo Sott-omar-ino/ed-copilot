@@ -531,4 +531,10 @@ LANG.add({
 
   // --- Generici (ultimi: valgono solo se il pezzo dentro ha una traduzione) -----------
   "◆ {}": "◆ {}",
+  "Fleet carrier vicini": "Nearby fleet carriers",
+  "Nome o codice": "Name or callsign",
+  "es. K3N-98F (vuoto = i più vicini)": "e.g. K3N-98F (empty = nearest)",
+  "Visto negli ultimi": "Seen in the last",
+  "1 giorno": "1 day", "7 giorni": "7 days", "30 giorni": "30 days", "sempre": "any time",
+  "Munizioni": "Restock", "Barista": "Bartender",
 });

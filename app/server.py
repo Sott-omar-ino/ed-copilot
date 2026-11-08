@@ -211,6 +211,59 @@ def _nearest(q):
     return {"text": text, "station": best}
 
 
+def _ago_words(iso):
+    """'2026-11-08T09:58:04Z' -> 'oggi' / 'ieri' / '3 giorni fa' (e in inglese)."""
+    try:
+        days = int((time.time() - time.mktime(time.strptime(iso[:19], "%Y-%m-%dT%H:%M:%S")) + time.timezone) // 86400)
+    except (TypeError, ValueError):
+        return pick("in data sconosciuta", "at an unknown date")
+    if days <= 0:
+        return pick("oggi", "today")
+    if days == 1:
+        return pick("ieri", "yesterday")
+    return pick(f"{days} giorni fa", f"{days} days ago")
+
+
+def _carrier_voice(q):
+    """Comandi vocali sui fleet carrier: il più vicino (anche con un servizio) o uno per nome/codice."""
+    name = (q.get("name") or "").strip()
+    service = q.get("service") if q.get("service") in NEAREST_SERVICES else ""
+    what_it, what_en = NEAREST_SERVICES.get(service, ("", "")) if service else ("", "")
+    try:
+        res = search.stations({"mode": "carrier", "name": name, "service": service})
+        best = (res.get("results") or [None])[0]
+        err = None
+    except Exception as exc:
+        best, err = None, str(exc)
+    if not best:
+        if err:
+            text = pick(f"Ricerca non riuscita: {err}", f"Search failed: {err}")
+        elif name:
+            text = pick(f"Non trovo nessun fleet carrier chiamato {name}.", f"I can't find a fleet carrier called {name}.")
+        else:
+            text = pick(f"Nessun fleet carrier {what_it} visto di recente qui vicino.",
+                        f"No fleet carrier {what_en} seen recently nearby.")
+    else:
+        label = f"{best.get('carrier_name') or ''} {best['station']}".strip()
+        here = best["system"] == search.current_system()
+        seen = _ago_words(best.get("updated"))
+        if not here:
+            subprocess.run(["clip.exe"], input=best["system"].encode("utf-16le"), check=False, creationflags=0x08000000)
+        dist = f"{best.get('distance') or 0:.1f}"
+        it_where = "in questo sistema" if here else f"nel sistema {best['system']}, a {dist.replace('.', ',')} anni luce"
+        en_where = "in this system" if here else f"in {best['system']}, {dist} light years away"
+        first_it = f"Il fleet carrier {label}" if name else " ".join(x for x in ("Il fleet carrier più vicino", what_it, "è", label) if x)
+        first_en = f"Fleet carrier {label}" if name else " ".join(x for x in ("The nearest fleet carrier", what_en, "is", label) if x)
+        text = pick(f"{first_it}, {it_where}, visto lì {seen}." + ("" if here else " Ho copiato il sistema negli appunti."),
+                    f"{first_en}, {en_where}, last seen there {seen}." + ("" if here else " System copied to clipboard."))
+        if name:
+            text = text.replace(f"Il fleet carrier {label}, ", f"Il fleet carrier {label} è ", 1).replace(
+                f"Fleet carrier {label}, ", f"Fleet carrier {label} is ", 1)
+    if q.get("play") == "1":
+        voice.say(text, q.get("voice"), q.get("volume"))
+    return {"text": text, "carrier": best}
+
+
 def _copy_next(q):
     route = STATE.snapshot().get("route") or []
     nxt = route[0].get("StarSystem") if route else None
@@ -329,6 +382,7 @@ GET = {
     "/api/voice/macro": _run_macro,
     "/api/voice/copy-next": _copy_next,
     "/api/voice/nearest": _nearest,
+    "/api/voice/carrier": _carrier_voice,
     "/api/remote_nav": lambda q: dict(REMOTE_NAV),
     "/api/lan": lambda q: {"enabled": bool(RUNTIME["lan_port"]), "url": companion_url()},
     "/api/settings": _settings,
