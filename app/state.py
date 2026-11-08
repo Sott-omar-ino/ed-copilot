@@ -125,6 +125,9 @@ class State:
         self.statistics = {}
         self.location = {}
         self.system = self._new_system(None, None)
+        # Sistemi visitati con i corpi già scansionati: tornando in un sistema il gioco non riscrive le scansioni nel
+        # journal, quindi si riprendono da qui (al massimo gli ultimi 300 sistemi).
+        self.systems_seen = {}
         self.bio_current = None
         self.fsd_health = 100
         self.jump = None  # ultimo salto iperspaziale: per l'animazione del salto nell'interfaccia
@@ -596,7 +599,12 @@ class State:
     def _enter_system(self, e):
         name, addr = e.get("StarSystem"), e.get("SystemAddress")
         if addr != self.system["address"]:
-            self.system = self._new_system(name, addr)
+            if self.system["address"] and (self.system["bodies"] or self.system["body_count"]):
+                self.systems_seen.pop(self.system["address"], None)
+                self.systems_seen[self.system["address"]] = self.system
+                while len(self.systems_seen) > 300:
+                    self.systems_seen.pop(next(iter(self.systems_seen)))
+            self.system = self.systems_seen.pop(addr, None) or self._new_system(name, addr)
         self.location.update(system=name, star_pos=e.get("StarPos"), body=e.get("Body"),
                              population=e.get("Population"),
                              allegiance=e.get("SystemAllegiance"),

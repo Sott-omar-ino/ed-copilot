@@ -7,17 +7,19 @@ const starName = c => UI.orig ? c : c === "N" ? "Stella di neutroni" : c === "H"
 const isHot = b => b.value_mapped >= 500000 && !b.mapped_by_me;
 
 function orrery(bodies) {
-  const withDist = bodies.filter(b => b.kind !== "unknown" && b.dist > 0);
-  const max = Math.max(10, ...withDist.map(b => b.dist));
-  const rings = [], dots = [];
+  const withDist = bodies.filter(b => b.kind !== "unknown" && b.dist > 0).sort((a, b) => a.dist - b.dist);
+  // Raggio per ordine di distanza dalla stella di arrivo (non in scala): in molti sistemi i corpi sono tutti lontanissimi
+  // e quasi alla stessa distanza (es. attorno a una stella secondaria), e in scala finirebbero sullo stesso anello.
+  const dists = [...new Set(withDist.map(b => Math.round(b.dist)))];
+  const radius = d => dists.length < 2 ? 70 : 20 + 72 * dists.indexOf(Math.round(d)) / (dists.length - 1);
+  const rings = dists.map(d => `<circle class="ring" cx="100" cy="100" r="${radius(d).toFixed(1)}"/>`), dots = [];
   withDist.forEach(b => {
-    const r = 16 + 76 * Math.log10(1 + b.dist) / Math.log10(1 + max);
+    const r = radius(b.dist);
     const color = isHot(b) ? "#ffd36b" : /Water|Earthlike|Ammonia/.test(b.cls) || b.terraformable ? "#66d4ff" : b.bio ? "#8fe388" : b.kind === "star" ? "#ffb35c" : "#ff8a1f";
     const size = b.kind === "star" ? 4 : /gas giant/i.test(b.cls) ? 3.2 : 2.1;
     const angle = (b.id * 137.5) % 360, period = 30 + r * 1.6;
-    rings.push(`<circle class="ring" cx="100" cy="100" r="${r.toFixed(1)}"/>`);
     dots.push(`<g class="orbit" style="animation-duration:${period.toFixed(0)}s"><g transform="rotate(${angle} 100 100)">
-      <circle cx="${(100 + r).toFixed(1)}" cy="100" r="${size}" fill="${color}" style="filter:drop-shadow(0 0 3px ${color})"/></g></g>`);
+      <circle cx="${(100 + r).toFixed(1)}" cy="100" r="${size}" fill="${color}" style="filter:drop-shadow(0 0 3px ${color})"><title>${esc(b.short || b.name)} · ${num(Math.round(b.dist))} ls</title></circle></g></g>`);
   });
   const empty = !withDist.length ? `<text x="100" y="152" text-anchor="middle" fill="#93704f" font-family="Share Tech Mono" font-size="7.5" letter-spacing="1">IN ATTESA DI SCANSIONE FSS</text>` : "";
   return `<svg class="orrery" viewBox="0 0 200 200" aria-label="Mappa del sistema">
