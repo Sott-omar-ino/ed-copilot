@@ -328,7 +328,9 @@ def say(text, voice_key=None, volume=None):
         except queue.Full:
             pass
         except Exception as exc:
-            print(f"[Voce] {exc}")
+            import traceback
+            print(f"[Voce] Risposta vocale non riuscita ({voice_key}): {exc!r}")
+            print("".join(traceback.format_exc().splitlines(True)[-6:]))
 
     threading.Thread(target=work, daemon=True).start()
     return text
@@ -489,6 +491,15 @@ def transcribe(data, content_type="", source="", floor_db=None):
             if not res["speech"]:
                 return ""  # solo clic, tasti o fruscio: Whisper non viene chiamato (così non "inventa" frasi)
             audio = res["audio"]
+        # Volume: con un microfono che registra piano Whisper sbaglia di più. Si porta il picco a circa -1 dBFS
+        # (guadagno massimo x30, per non gonfiare il fruscio di una registrazione quasi vuota).
+        try:
+            import numpy as np
+            peak = float(np.max(np.abs(audio))) if len(audio) else 0.0
+            if 0 < peak < 0.89:
+                audio = (audio * min(30.0, 0.89 / peak)).astype(np.float32)
+        except Exception:
+            pass
         # Poi il VAD di Whisper (Silero) toglie il resto del silenzio; i parametri seguono lo stesso cursore.
         # Lingua dell'interfaccia: Whisper (modello multilingue "tiny") trascrive in italiano o in inglese.
         segments, _ = model.transcribe(audio, language=lang.current(), beam_size=1, temperature=0.0, vad_filter=True,
@@ -496,6 +507,8 @@ def transcribe(data, content_type="", source="", floor_db=None):
                                        vad_parameters=noise_filter.vad_parameters(strength),
                                        condition_on_previous_text=False)
         text = " ".join(s.text for s in segments).strip()
+        # Nel registro ciò che è stato capito: serve per capire dove il riconoscimento sbaglia (resta solo sul PC).
+        print(f"[Voce] capito ({source or 'app'}, {_whisper_name}): {text!r}")
         return text if re.search(r"\w", text) else ""  # "..." e simili: Whisper non ha sentito parole
     except Exception as exc:
         print(f"[Voce] Trascrizione non riuscita: {exc}")

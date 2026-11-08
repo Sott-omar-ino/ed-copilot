@@ -81,7 +81,7 @@ def label(name):
 GENERAL = {"UI_Select", "UI_Back", "UI_Up", "UI_Down", "UI_Left", "UI_Right", "CycleNextPanel", "CyclePreviousPanel"}
 
 # Tasti liberi da proporre se quello predefinito è già occupato.
-SPARE_KEYS = ["Key_F5", "Key_F6", "Key_F7", "Key_F8", "Key_F9", "Key_F10", "Key_F11", "Key_F12",
+SPARE_KEYS = ["Key_F5", "Key_F6", "Key_F7", "Key_F8", "Key_F9", "Key_F11", "Key_F12",
               "Key_Numpad_Divide", "Key_Numpad_Multiply", "Key_Numpad_Subtract", "Key_Numpad_Add",
               "Key_Numpad_Decimal", "Key_Numpad_0", "Key_PageUp", "Key_PageDown", "Key_End", "Key_Insert",
               "Key_Delete", "Key_Home", "Key_I", "Key_J", "Key_K", "Key_L", "Key_P", "Key_Y", "Key_H"]
@@ -120,9 +120,14 @@ def to_token(ed_key):
     return None
 
 
+# Tasti che il gioco usa per sé: F10 scatta lo screenshot (Alt+F10 quello ad alta risoluzione), quindi un comando
+# su F10 farebbe anche una foto ogni volta.
+RESERVED = {"F10"}
+
+
 def usable(token):
-    """Il token esiste e si preme con un solo tasto nel layout della tastiera (vedi kblayout.reachable)."""
-    return bool(token) and all(kblayout.reachable(t) for t in token.split("+"))
+    """Il token esiste, non è riservato dal gioco e si preme con un solo tasto nel layout della tastiera."""
+    return bool(token) and token not in RESERVED and all(kblayout.reachable(t) for t in token.split("+"))
 
 
 def _game_dirs():

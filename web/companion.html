@@ -243,14 +243,9 @@ body[data-link="offline"] .main, body[data-link="denied"] .main { opacity: .55; 
 .route { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--text-2); letter-spacing: .04em; text-transform: uppercase; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .route:empty { display: none; }
 
-/* --- copilota vocale ------------------------------------------------------------------ */
-.seg-choice { display: flex; border: 1px solid var(--hud-line); clip-path: var(--cut); }
-.voice-line:not([hidden]) + .seg-choice { margin-top: 10px; }
-.seg-choice button { flex: 1; clip-path: none; border: 0; border-right: 1px solid var(--hud-line); background: transparent; font-size: 13px; padding: 8px 6px; }
-.seg-choice button:last-child { border-right: 0; }
-.seg-choice button[aria-pressed="true"] { background: var(--hud); color: var(--ink); text-shadow: none; }
+/* --- pulsante per parlare (solo in push-to-talk) --------------------------------------- */
 .notice {
-  margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--alert); background: rgba(255, 73, 48, .08);
+  margin: 0 0 8px; padding: 10px 12px; border-left: 3px solid var(--alert); background: rgba(255, 73, 48, .08);
   font-size: 13px; line-height: 1.5; color: var(--text); text-shadow: none;
   user-select: text; -webkit-user-select: text; overflow-wrap: anywhere;
 }
@@ -265,9 +260,14 @@ body[data-link="offline"] .main, body[data-link="denied"] .main { opacity: .55; 
   background: linear-gradient(to bottom, rgba(16, 6, 0, .9), rgba(24, 9, 0, .98));
   border-top: 1px solid var(--hud-line);
 }
-.ptt-result { font-size: 13px; line-height: 1.4; margin: 0 2px 8px; color: var(--text); overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
-.ptt-result div { display: flex; gap: 8px; }
-.ptt-result .lbl { flex: none; width: 64px; font-size: 11px; font-weight: 800; letter-spacing: .14em; color: var(--label); padding-top: 2px; }
+/* Esito della frase: una riga sola sopra il pulsante, sparisce da sola qualche secondo dopo l'esito. */
+.ptt-line {
+  margin: 0 2px 6px; font-size: 13px; line-height: 1.35; color: var(--text); text-shadow: none;
+  display: flex; gap: 8px; min-width: 0; user-select: text; -webkit-user-select: text;
+}
+.ptt-line #ptt-transcript { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); font-weight: 700; }
+.ptt-line #ptt-transcript:empty { display: none; }
+.ptt-line #ptt-outcome { flex: 1 1 0; min-width: 40%; overflow-wrap: anywhere; }
 #ptt-outcome.ok { color: var(--ok); } #ptt-outcome.bad { color: var(--alert); }
 .ptt-btn {
   --cut-c: 14px;
@@ -355,6 +355,42 @@ details.panel[open] > summary { border-bottom: 1px solid var(--hud-line); margin
 .macro .m { display: flex; flex-direction: column; min-width: 0; }
 .macro .m .name { overflow-wrap: anywhere; }
 .macro .tag { flex: none; }
+/* Telecomando: gruppi come il menu laterale dell'app sul PC, richiudibili con un tocco sul titolo. */
+details.grp { margin-bottom: 4px; }
+details.grp > summary {
+  list-style: none; display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer;
+  font-size: 12px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--label);
+  user-select: none; -webkit-user-select: none; touch-action: manipulation; padding: 0 2px;
+}
+details.grp > summary::-webkit-details-marker { display: none; }
+details.grp > summary::after { content: ""; order: 3; width: 8px; height: 8px; flex: none; margin: 0 6px 0 2px;
+  border-right: 2px solid var(--hud-hi); border-bottom: 2px solid var(--hud-hi); transform: rotate(45deg) translateY(-2px); transition: transform .15s var(--ease); }
+details.grp[open] > summary::after { transform: rotate(225deg) translate(-2px, 0); }
+details.grp > summary .ln { order: 2; flex: 1; height: 1px; background: var(--hud-line); }
+details.grp > summary .tag { order: 1; }
+details.grp > summary.has-cur { color: var(--gold); }
+.navkeys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding-bottom: 8px; }
+@media (min-width: 460px) { .navkeys { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.navkey {
+  min-height: 48px; padding: 6px 10px; text-align: left; text-transform: none; letter-spacing: .02em;
+  font-size: 14px; font-weight: 700; line-height: 1.2; color: var(--text);
+  background: linear-gradient(to bottom, rgba(52, 22, 0, .72), rgba(18, 7, 0, .82)); overflow-wrap: anywhere;
+}
+.navkey:active, .navkey.tap { background: linear-gradient(to bottom, #ffa21f, var(--hud)); color: var(--ink); text-shadow: none; }
+.navkey.current { border-color: var(--gold); color: var(--gold); box-shadow: inset 3px 0 0 var(--gold); }
+/* Comandi con stato (carrello, cargo scoop, luci, hardpoints): commuta / accendi / spegni sulla stessa riga. */
+.tri { display: grid; grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr)); gap: 6px; align-items: stretch; margin-bottom: 6px; }
+.tri .lbl { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 2px; }
+.tri .lbl b { font-size: 14px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15; overflow-wrap: anywhere; }
+.tri .lbl small { font-size: 11px; font-weight: 700; color: var(--label); text-shadow: none; letter-spacing: .04em; }
+.tri .key { min-height: 52px; padding: 6px 4px; align-items: center; justify-content: center; text-align: center; }
+.tri .key .name { font-size: 13px; letter-spacing: .04em; overflow-wrap: anywhere; }
+.tri .lbl small:empty { display: none; }
+.tri + .keys { margin-top: 8px; }
+#ship-groups .keys .key { min-height: 64px; }  /* pulsantiera compatta: tante azioni, poco scorrimento */
+.key .gt:empty { display: none; }
+html[lang="en"] .key .gt, html[lang="en"] .tri .lbl small { display: none; }  /* in inglese il nome è già il termine del gioco */
+@media (max-width: 379px) { .tri { grid-template-columns: repeat(3, minmax(0, 1fr)); } .tri .lbl { grid-column: 1 / -1; padding-top: 4px; } }
 .empty { color: var(--label); font-size: 13px; font-weight: 600; padding: 10px 2px; text-shadow: none; }
 .empty::before { content: "// "; color: var(--hud); }
 
@@ -401,7 +437,7 @@ nav.tabs {
 #notify-pop.bad b { color: var(--alert); }
 #notify-pop span { display: block; font-size: 14px; color: var(--text); }
 
-/* --- schermi larghi: telefono in orizzontale e tablet. Stato, voce e notifiche a sinistra (col pulsante PTT
+/* --- schermi larghi: telefono in orizzontale e tablet. Stato e notifiche a sinistra (col pulsante PTT
    sotto, per il pollice sinistro), pulsantiera a destra; le due colonne scorrono ognuna per conto suo. --- */
 @media (min-width: 720px) {
   body {
@@ -479,18 +515,6 @@ nav.tabs {
       </div>
     </section>
 
-    <section class="panel" id="voice-panel" aria-labelledby="h-voice" hidden>
-      <div class="hd"><h2 id="h-voice">Copilota vocale</h2><span class="aside"><span class="tag" id="voice-tag">-</span></span></div>
-      <div class="bd">
-        <p class="hint voice-line" id="voice-line"></p>
-        <div class="seg-choice" role="group" aria-label="Modalità del copilota vocale">
-          <button type="button" data-voice-mode="ptt" aria-pressed="false">Push-to-talk</button>
-          <button type="button" data-voice-mode="continuous" aria-pressed="false">Ascolto continuo</button>
-        </div>
-        <div class="notice" id="ptt-insecure" hidden></div>
-      </div>
-    </section>
-
     <details class="panel" id="notify-box">
       <summary><h2>Notifiche</h2><span class="nb-last" id="notify-last">nessuna</span><span class="tag" id="notify-count" hidden></span><span class="chev" aria-hidden="true"></span></summary>
       <div class="bd">
@@ -508,43 +532,13 @@ nav.tabs {
   <div class="main">
     <section class="tabpanel" id="tab-screens" role="tabpanel" aria-labelledby="tabbtn-screens">
       <div class="section">Telecomando schermi PC</div>
-      <p class="hint">Tocca per cambiare la scheda mostrata dall'app sul monitor del PC.</p>
-      <div class="keys">
-        <button type="button" class="key" data-remote-screen="overview"><span class="tag">NAV</span><span class="name">Navigazione</span><span class="sub">Mappa &amp; Telemetria</span></button>
-        <button type="button" class="key" data-remote-screen="coriolis_station"><span class="tag">CANTIERE</span><span class="name">Stazione Coriolis</span><span class="sub">Costruzione &amp; Merci</span></button>
-        <button type="button" class="key" data-remote-screen="wishlist"><span class="tag">WISHLIST</span><span class="name">Sblocchi &amp; Liste</span><span class="sub">Progetti &amp; Materiali</span></button>
-        <button type="button" class="key" data-remote-screen="engineers"><span class="tag">INGEGNERI</span><span class="name">Ingegneri</span><span class="sub">G1-G5 &amp; Modifiche</span></button>
-        <button type="button" class="key" data-remote-screen="fleet"><span class="tag">FLOTTA</span><span class="name">Flotta &amp; Moduli</span><span class="sub">Navi &amp; Allestimenti</span></button>
-        <button type="button" class="key" data-remote-screen="search"><span class="tag">MERCI</span><span class="name">Ricerca Merci</span><span class="sub">Pad Large &amp; Prezzi</span></button>
-        <button type="button" class="key" data-remote-screen="route"><span class="tag">ROTTA</span><span class="name">Rotta Neutroni</span><span class="sub">Plotter di rotta</span></button>
-        <button type="button" class="key" data-remote-screen="settings"><span class="tag">SETUP</span><span class="name">Impostazioni</span><span class="sub">Copilota &amp; Audio</span></button>
-      </div>
+      <p class="hint">Tocca per aprire quella scheda dell'app sul PC. In evidenza l'ultima scelta dal telefono.</p>
+      <div id="remote-groups"></div>
     </section>
 
     <section class="tabpanel" id="tab-controls" role="tabpanel" aria-labelledby="tabbtn-controls" hidden>
-      <div class="section">Controlli nave</div>
-      <p class="hint">Invia i tasti dei comandi direttamente al gioco sul PC.</p>
-      <div class="keys">
-        <button type="button" class="key" data-ship-ctrl="landing_gear"><span class="tag">GEAR</span><span class="name">Carrello</span><span class="sub">Landing Gear [ L ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="ship_lights"><span class="tag">LIGHTS</span><span class="name">Luci Esterne</span><span class="sub">Ship Lights [ INS ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="night_vision"><span class="tag">NV</span><span class="name">Visione Notturna</span><span class="sub">Night Vision [ N ]</span></button>
-        <button type="button" class="key danger" data-ship-ctrl="silent_running"><span class="tag">SILENT</span><span class="name">Silenzio Radar</span><span class="sub">Silent Running [ DEL ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="cargo_scoop"><span class="tag">CARGO</span><span class="name">Stiva Cargo</span><span class="sub">Cargo Scoop [ HOME ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="hardpoints"><span class="tag">ARMI</span><span class="name">Estrai Armi</span><span class="sub">Hardpoints [ U ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="chaff"><span class="tag">CHAFF</span><span class="name">Lancio Chaff</span><span class="sub">Contromisure [ C ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="heatsink"><span class="tag">HEAT</span><span class="name">Dissipatore</span><span class="sub">Heat Sink [ V ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="shield_cell"><span class="tag">CELL</span><span class="name">Scudo Cella</span><span class="sub">Shield Cell Bank [ B ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="docking_request"><span class="tag">DOCK</span><span class="name">Chiedi Atterraggio</span><span class="sub">Sequenza Docking</span></button>
-      </div>
-
-      <div class="section">Distribuzione energia (pips)</div>
-      <div class="keys three">
-        <button type="button" class="key" data-ship-ctrl="pip_sys"><span class="tag">SYS</span><span class="name">Scudi</span><span class="sub">+4 Pips [ ◄ ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="pip_eng"><span class="tag">ENG</span><span class="name">Motori</span><span class="sub">+4 Pips [ ▲ ]</span></button>
-        <button type="button" class="key" data-ship-ctrl="pip_wep"><span class="tag">WEP</span><span class="name">Armi</span><span class="sub">+4 Pips [ ► ]</span></button>
-      </div>
-      <button type="button" class="key wide" data-ship-ctrl="pip_reset"><span class="tag">RESET</span><span class="name">Bilancia Pips a 2-2-2 [ ▼ ]</span></button>
-
+      <p class="hint">Invia i comandi direttamente al gioco sul PC, con i tasti assegnati in gioco.</p>
+      <div id="ship-groups"></div>
       <div class="section">Macro</div>
       <div id="deck-macros-container"><div class="empty">Caricamento macro configurate...</div></div>
     </section>
@@ -552,10 +546,8 @@ nav.tabs {
 </div>
 
 <div class="ptt-dock" id="ptt-dock" hidden>
-  <div class="ptt-result" id="ptt-result" aria-live="polite" hidden>
-    <div><span class="lbl">SENTITO</span><span id="ptt-transcript">-</span></div>
-    <div><span class="lbl">ESITO</span><span id="ptt-outcome">-</span></div>
-  </div>
+  <div class="notice" id="ptt-insecure" hidden></div>
+  <p class="ptt-line" id="ptt-line" aria-live="polite" hidden><span id="ptt-transcript"></span><span id="ptt-outcome"></span></p>
   <button type="button" class="ptt-btn" id="ptt-btn">
     <span class="ptt-led" aria-hidden="true"></span>
     <span class="ptt-txt"><b id="ptt-title">TIENI PREMUTO PER PARLARE</b><span id="ptt-status">Rilascia per inviare · max 8 s</span></span>
@@ -601,17 +593,6 @@ const CLANG = (() => {
     "Rotta: {} salti": "Route: {} jumps",
     "Rotta: 1 salto": "Route: 1 jump",
     "prossimo: {}": "next: {}",
-    "Copilota vocale": "Voice copilot",
-    "Modalità del copilota vocale": "Voice copilot mode",
-    "Push-to-talk": "Push-to-talk",
-    "Ascolto continuo": "Continuous",
-    "SPENTO": "OFF",
-    "PUSH-TO-TALK": "PUSH-TO-TALK",
-    "ASCOLTO CONTINUO": "CONTINUOUS",
-    "Il copilota vocale è spento sul PC. Tocca una modalità per accenderlo.": "The voice copilot is off on the PC. Tap a mode to turn it on.",
-    "Copilota vocale: ascolto continuo sul PC. Il pulsante per parlare dal telefono compare in push-to-talk.":
-      "Voice copilot: continuous listening on the PC. The phone talk button appears in push-to-talk.",
-    "Push-to-talk attivo: tieni premuto il pulsante in basso, parla e rilascia per inviare.": "Push-to-talk on: hold the button at the bottom, speak, then release to send.",
     "Notifiche": "Notifications",
     "nessuna": "none",
     "Tieni la pagina aperta e lo schermo acceso: con la pagina in background o lo schermo spento il browser rallenta o ferma gli aggiornamenti e le notifiche possono arrivare in ritardo o non arrivare. Quali eventi ricevere si sceglie sul PC (Impostazioni › Generali › Notifiche sul telefono).":
@@ -622,48 +603,9 @@ const CLANG = (() => {
     "Svuota elenco": "Clear list",
     "Nessuna notifica per ora.": "No notifications yet.",
     "Telecomando schermi PC": "PC screen remote",
-    "Tocca per cambiare la scheda mostrata dall'app sul monitor del PC.": "Tap to change the tab the app shows on the PC monitor.",
-    "Navigazione": "Navigation",
-    "Mappa & Telemetria": "Map & Telemetry",
-    "CANTIERE": "CONSTRUCTION",
-    "Stazione Coriolis": "Coriolis Station",
-    "Costruzione & Merci": "Construction & Commodities",
-    "Sblocchi & Liste": "Unlocks & Lists",
-    "Progetti & Materiali": "Projects & Materials",
-    "INGEGNERI": "ENGINEERS",
     "Ingegneri": "Engineers",
-    "G1-G5 & Modifiche": "G1-G5 & Modifications",
-    "FLOTTA": "FLEET",
-    "Flotta & Moduli": "Fleet & Modules",
-    "Navi & Allestimenti": "Ships & Loadouts",
-    "MERCI": "COMMODITIES",
-    "Ricerca Merci": "Commodity Search",
-    "Pad Large & Prezzi": "Large Pad & Prices",
-    "ROTTA": "ROUTE",
-    "Rotta Neutroni": "Neutron Route",
-    "Plotter di rotta": "Route plotter",
     "Impostazioni": "Settings",
-    "Copilota & Audio": "Copilot & Audio",
-    "Controlli nave": "Ship controls",
-    "Invia i tasti dei comandi direttamente al gioco sul PC.": "Sends the control keys straight to the game on the PC.",
-    "Carrello": "Landing Gear",
-    "Luci Esterne": "Ship Lights",
-    "Visione Notturna": "Night Vision",
-    "Silenzio Radar": "Silent Running",
-    "Stiva Cargo": "Cargo Scoop",
-    "ARMI": "WEAPONS",
-    "Estrai Armi": "Deploy Hardpoints",
-    "Lancio Chaff": "Launch Chaff",
-    "Contromisure [ C ]": "Countermeasures [ C ]",
-    "Dissipatore": "Heat Sink",
-    "Scudo Cella": "Shield Cell",
-    "Chiedi Atterraggio": "Request Docking",
-    "Sequenza Docking": "Docking sequence",
     "Distribuzione energia (pips)": "Power distribution (pips)",
-    "Scudi": "Systems",
-    "Motori": "Engines",
-    "Armi": "Weapons",
-    "Bilancia Pips a 2-2-2 [ ▼ ]": "Balance pips to 2-2-2 [ ▼ ]",
     "Macro": "Macros",
     "Caricamento macro configurate...": "Loading configured macros...",
     "Nessuna macro personalizzata creata sul PC.": "No custom macros created on the PC.",
@@ -679,9 +621,6 @@ const CLANG = (() => {
     "Errore comunicazione con il PC": "Couldn't reach the PC",
     "Comando inviato alla nave": "Command sent to the ship",
     "Errore invio comando": "Couldn't send the command",
-    "Modalità Push-to-Talk attiva": "Push-to-Talk mode on",
-    "Modalità Ascolto Continuo attiva": "Continuous listening mode on",
-    "Errore cambio modalità vocale": "Couldn't change the voice mode",
     "TIENI PREMUTO PER PARLARE": "HOLD TO TALK",
     "Rilascia per inviare · max 8 s": "Release to send · max 8 s",
     "IN ASCOLTO": "LISTENING",
@@ -691,9 +630,6 @@ const CLANG = (() => {
     "TRASCRIZIONE SUL PC…": "TRANSCRIBING ON THE PC…",
     "Attendi l'esito": "Waiting for the result",
     "MICROFONO NON DISPONIBILE": "MICROPHONE UNAVAILABLE",
-    "Istruzioni nel riquadro Copilota vocale": "Instructions in the Voice copilot panel",
-    "SENTITO": "HEARD",
-    "ESITO": "RESULT",
     "Comandi vocali non disponibili su questo indirizzo.": "Voice commands aren't available at this address.",
     "Il telefono permette il microfono solo su una connessione sicura (HTTPS).": "The phone only allows the microphone on a secure connection (HTTPS).",
     "1. Apri": "1. Open",
@@ -729,6 +665,63 @@ const CLANG = (() => {
     "Notifiche di sistema attive (con la pagina aperta)": "System notifications on (while the page is open)",
     "Permesso non concesso": "Permission not granted",
     "Permesso non disponibile": "Permission unavailable",
+    // Telecomando schermi PC: menu dell'app (web/js/lang/en-core.js "Menu (core.js NAV)" ed en-settings.js)
+    "Tocca per aprire quella scheda dell'app sul PC. In evidenza l'ultima scelta dal telefono.":
+      "Tap to open that tab of the app on the PC. Highlighted: the last one chosen from the phone.",
+    "Attività": "Activities",
+    "Panoramica": "Overview",
+    "Profilo": "Profile",
+    "Rank e reputazione": "Ranks & reputation",
+    "Missioni": "Missions",
+    "Statistiche": "Statistics",
+    "Diario di bordo": "Logbook",
+    "Mappa dei viaggi": "Travel map",
+    "Squadriglia": "Squad",
+    "Da fare": "To-do",
+    "Flotta": "Fleet",
+    "Cantiere navale": "Shipyard",
+    "Tute e armi": "Suits & weapons",
+    "Rotte": "Routes",
+    "Commercio": "Trade",
+    "Estrazione": "Mining",
+    "Combattimento": "Combat",
+    "Missioni a terra": "On-foot missions",
+    "Colonizzazione": "Colonisation",
+    "Esplorazione": "Exploration",
+    "Esobiologia": "Exobiology",
+    "Bolla ↔ Colonia": "Bubble ↔ Colonia",
+    "Materiali": "Materials",
+    "Sblocchi e progetti": "Unlocks & projects",
+    "Ricerca stazioni": "Station search",
+    "Luoghi utili": "Useful places",
+    "Generali": "General",
+    // Controlli nave
+    "Invia i comandi direttamente al gioco sul PC, con i tasti assegnati in gioco.": "Sends the commands straight to the game on the PC, using your in-game key bindings.",
+    "Volo": "Flight",
+    "Sistemi nave": "Ship systems",
+    "Combattimento e difesa": "Combat & defence",
+    "Mappe": "Maps",
+    "Salto / supercruise": "Jump / supercruise",
+    "Manetta a zero": "Throttle 0%",
+    "Manetta al 75%": "Throttle 75%",
+    "Richiesta di attracco": "Docking request",
+    "Carrello": "Landing gear",
+    "Fari": "Ship lights",
+    "Visione notturna": "Night vision",
+    "4 pips a SYS": "4 pips to SYS",
+    "4 pips a ENG": "4 pips to ENG",
+    "4 pips a WEP": "4 pips to WEP",
+    "Bilancia 2-2-2": "Balance 2-2-2",
+    "Commuta": "Toggle",
+    "Giù": "Down",
+    "Su": "Up",
+    "Apri": "Open",
+    "Chiudi": "Close",
+    "Accendi": "On",
+    "Spegni": "Off",
+    "Estrai": "Deploy",
+    "Ritira": "Retract",
+    "Istruzioni qui sopra": "Instructions above",
   };
   const norm = s => s.replace(/\s+/g, " ").trim();
   const exact = new Map(), patterns = [];
@@ -890,8 +883,48 @@ document.querySelectorAll(".tab").forEach(tab => {
 });
 showTab((() => { try { return sessionStorage.getItem("edc_tab"); } catch (e) { return null; } })() === "tab-controls" ? "tab-controls" : "tab-screens");
 
-// 3. TELECOMANDO DEGLI SCHERMI DEL PC. Si usa "click" (non pointerdown): iniziare a scorrere sopra un pulsante
-//    non deve cambiare schermo sul PC. touch-action: manipulation toglie il ritardo del tocco.
+// 3. TELECOMANDO DEGLI SCHERMI DEL PC: un pulsante per ogni scheda dell'app, raggruppati come il menu laterale.
+//    COPIA di web/js/core.js NAV (stessi id ed etichette, stesso ordine) più le tre schede delle Impostazioni
+//    (web/js/views/impostazioni.js, SETTINGS_TABS). Il server per il telefono non serve i file /js/ (app/server.py,
+//    LAN_STATIC), quindi se cambi il menu dell'app aggiorna anche questo elenco e le traduzioni nel dizionario EN
+//    qui sopra (prese da web/js/lang/en-core.js e en-settings.js).
+const PC_NAV = [
+  ["Comandante", [["overview", "Panoramica"], ["cmdr", "Profilo"], ["ranks", "Rank e reputazione"], ["missions", "Missioni"], ["stats", "Statistiche"], ["diary", "Diario di bordo"], ["travelmap", "Mappa dei viaggi"], ["squadron", "Squadriglia"], ["todo", "Da fare"]]],
+  ["Nave", [["fleet", "Flotta"], ["shipyard", "Cantiere navale"], ["onfoot", "Tute e armi"], ["carrier", "Fleet carrier"]]],
+  ["Attività", [["route", "Rotte"], ["trade", "Commercio"], ["mining", "Estrazione"], ["combat", "Combattimento"], ["thargoid", "Thargoid & AX"], ["onfoot_missions", "Missioni a terra"],
+    ["coriolis_station", "Colonizzazione"], ["exploration", "Esplorazione"], ["exobio", "Esobiologia"], ["powerplay", "Powerplay"], ["colonia", "Bolla ↔ Colonia"], ["fuelrats", "Fuel Rats"]]],
+  ["Database", [["materials", "Materiali"], ["wishlist", "Sblocchi e progetti"], ["engineers", "Ingegneri"], ["trader", "Material trader"], ["guardian", "Guardian"],
+    ["search", "Ricerca stazioni"], ["places", "Luoghi utili"]]],
+  ["Impostazioni", [["settings", "Generali"], ["voice_commands", "Audio"], ["info", "Info & FAQ"]]],
+];
+// Gruppi richiudibili con un tocco sul titolo (scelta salvata sul telefono); quello della scheda in evidenza resta aperto.
+const navShut = (() => { try { return new Set(JSON.parse(localStorage.getItem("edc_nav_shut") || "[]")); } catch (e) { return new Set(); } })();
+$("remote-groups").innerHTML = PC_NAV.map(([group, items]) => `
+  <details class="grp" data-grp="${esc(group)}"${navShut.has(group) ? "" : " open"}>
+    <summary><span class="g">${esc(group)}</span><span class="tag sub">${items.length}</span><span class="ln"></span></summary>
+    <div class="navkeys">${items.map(([id, label]) => `<button type="button" class="navkey" data-remote-screen="${id}">${esc(label)}</button>`).join("")}</div>
+  </details>`).join("");
+document.querySelectorAll("details.grp").forEach(d => d.addEventListener("toggle", () => {
+  d.open ? navShut.delete(d.dataset.grp) : navShut.add(d.dataset.grp);
+  try { localStorage.setItem("edc_nav_shut", JSON.stringify([...navShut])); } catch (e) {}
+}));
+// Il PC non comunica quale scheda ha aperto: si evidenzia l'ultima chiesta dal telefono (state.remote_nav.view).
+let REMOTE_VIEW;
+function markRemote(view) {
+  if (view === REMOTE_VIEW) return;
+  REMOTE_VIEW = view;
+  document.querySelectorAll("[data-remote-screen]").forEach(b => {
+    const on = b.dataset.remoteScreen === view;
+    b.classList.toggle("current", on);
+    if (on) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+  });
+  document.querySelectorAll("details.grp").forEach(d => {
+    const has = !!d.querySelector(".navkey.current");
+    d.querySelector("summary").classList.toggle("has-cur", has);
+    if (has && !d.open) d.open = true;
+  });
+}
+// Si usa "click" (non pointerdown): iniziare a scorrere sopra un pulsante non deve cambiare scheda sul PC.
 document.querySelectorAll("[data-remote-screen]").forEach(btn => {
   btn.addEventListener("click", () => {
     const view = btn.dataset.remoteScreen;
@@ -899,15 +932,58 @@ document.querySelectorAll("[data-remote-screen]").forEach(btn => {
     flash(btn);
     api("/api/remote_nav", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ view }) })
       .then(() => {
-        showToast(`Schermo PC: ${btn.querySelector(".name").textContent}`);
-        document.querySelectorAll("[data-remote-screen]").forEach(b => { b.classList.toggle("current", b === btn); b.removeAttribute("aria-current"); });
-        btn.setAttribute("aria-current", "true");
+        showToast(`Schermo PC: ${btn.textContent}`);
+        markRemote(view);
       })
       .catch(() => showToast("Errore comunicazione con il PC"));
   });
 });
 
-// 4. CONTROLLI DELLA NAVE (tasti inviati al gioco)
+// 4. CONTROLLI DELLA NAVE: tutte le azioni di /api/voice/ship_control (app/keys.py, ACTIONS e STATEFUL). Il PC preme
+//    i tasti assegnati in gioco; le versioni "giù/su", "apri/chiudi" ecc. controllano prima lo stato reale della nave.
+//    Pulsante: [azione, nome, termine del gioco (sottotitolo, solo in italiano), tag, classe].
+//    Riga "tri": comando con stato, commuta / accendi / spegni.
+const SHIP_GROUPS = [
+  ["Volo", [
+    ["fsd_jump", "Salto / supercruise", "Frame Shift Drive", "FSD"],
+    ["boost", "Boost", "", "BOOST"],
+    ["stop", "Manetta a zero", "Throttle 0%", "STOP"],
+    ["throttle75", "Manetta al 75%", "Throttle 75%", "75%"],
+    ["docking_request", "Richiesta di attracco", "Docking request", "DOCK"],
+  ]],
+  ["Sistemi nave", [
+    { tri: "Carrello", gt: "Landing gear", keys: [["gear", "Commuta"], ["gear_down", "Giù"], ["gear_up", "Su"]] },
+    { tri: "Cargo scoop", gt: "", keys: [["cargo", "Commuta"], ["cargo_open", "Apri"], ["cargo_close", "Chiudi"]] },
+    { tri: "Fari", gt: "Ship lights", keys: [["lights", "Commuta"], ["lights_on", "Accendi"], ["lights_off", "Spegni"]] },
+    ["night_vision", "Visione notturna", "Night vision", "NV"],
+  ]],
+  ["Combattimento e difesa", [
+    { tri: "Hardpoints", gt: "", keys: [["hardpoints", "Commuta"], ["hardpoints_deploy", "Estrai"], ["hardpoints_retract", "Ritira"]] },
+    ["heatsink", "Heat sink", "", "HEAT"],
+    ["shield_cell", "Shield cell", "", "SCB"],
+    ["chaff", "Chaff", "", "CHAFF"],
+    ["silent_running", "Silent running", "", "SILENT", "danger"],
+  ]],
+  ["Distribuzione energia (pips)", [
+    ["pips_sys", "4 pips a SYS", "Systems", "SYS"],
+    ["pips_eng", "4 pips a ENG", "Engines", "ENG"],
+    ["pips_wep", "4 pips a WEP", "Weapons", "WEP"],
+    ["pips_reset", "Bilancia 2-2-2", "Reset power distribution", "RESET"],
+  ]],
+  ["Mappe", [
+    ["galmap", "Galaxy map", "", "GAL"],
+    ["sysmap", "System map", "", "SYS"],
+  ]],
+];
+const shipKey = ([act, name, gt, tag, cls]) =>
+  `<button type="button" class="key ${cls || ""}" data-ship-ctrl="${act}"><span class="tag">${esc(tag)}</span><span class="name">${esc(name)}</span><span class="sub gt">${esc(gt)}</span></button>`;
+$("ship-groups").innerHTML = SHIP_GROUPS.map(([group, items]) => {
+  const tris = items.filter(i => i.tri), keys = items.filter(i => !i.tri);
+  return `<div class="section">${esc(group)}</div>`
+    + tris.map(r => `<div class="tri" role="group" aria-label="${esc(r.tri)}"><span class="lbl"><b>${esc(r.tri)}</b><small>${esc(r.gt)}</small></span>`
+      + r.keys.map(([act, lbl]) => `<button type="button" class="key" data-ship-ctrl="${act}"><span class="name">${esc(lbl)}</span></button>`).join("") + "</div>").join("")
+    + (keys.length ? `<div class="keys">${keys.map(shipKey).join("")}</div>` : "");
+}).join("");
 document.querySelectorAll("[data-ship-ctrl]").forEach(btn => {
   btn.addEventListener("click", () => {
     const act = btn.dataset.shipCtrl;
@@ -994,6 +1070,7 @@ function pollState() {
       setLink("online");
       renderState(s);
       if (s.voice_config) applyVoiceConfig(s.voice_config);
+      if (s.remote_nav) markRemote(s.remote_nav.view || null);
       if (!MACROS_LOADED) loadDeckMacros().catch(() => {});
     })
     .catch(err => {
@@ -1004,9 +1081,10 @@ function pollState() {
     .finally(() => { _polling = false; });
 }
 
-// 7. COPILOTA VOCALE. Il pulsante per parlare dal telefono c'è solo quando il copilota vocale è acceso sul PC
-//    ed è in push-to-talk (voice_config.enabled e mode "ptt", gli stessi valori che mostrano il pulsante PARLA nella
-//    barra del PC). Si aggiorna da solo a ogni lettura dello stato.
+// 7. PULSANTE PER PARLARE. Nessun pannello del copilota vocale sul telefono (la modalità si sceglie sul PC): il
+//    pulsante c'è solo quando il copilota è acceso sul PC ed è in push-to-talk (voice_config.enabled e mode "ptt",
+//    gli stessi valori che mostrano il pulsante PARLA nella barra del PC), altrimenti sparisce del tutto.
+//    Si aggiorna da solo a ogni lettura dello stato.
 let VOICE = { cfg: null, mode: null };
 function voiceMode(cfg) {
   if (!cfg || cfg.enabled !== true) return "off";
@@ -1018,34 +1096,12 @@ function applyVoiceConfig(cfg) {
   const mode = voiceMode(cfg);
   if (mode === VOICE.mode) return;
   VOICE.mode = mode;
-  $("voice-panel").hidden = false;
-  const tag = $("voice-tag");
-  tag.textContent = { off: "SPENTO", ptt: "PUSH-TO-TALK", continuous: "ASCOLTO CONTINUO" }[mode];
-  tag.className = "tag " + (mode === "off" ? "sub" : mode === "ptt" ? "solid" : "ok");
-  $("voice-line").hidden = mode === "ptt";
-  $("voice-line").textContent = {
-    off: "Il copilota vocale è spento sul PC. Tocca una modalità per accenderlo.",
-    continuous: "Copilota vocale: ascolto continuo sul PC. Il pulsante per parlare dal telefono compare in push-to-talk.",
-    ptt: "Push-to-talk attivo: tieni premuto il pulsante in basso, parla e rilascia per inviare.",
-  }[mode];
-  document.querySelectorAll("[data-voice-mode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.voiceMode === mode)));
-  const ptt = mode === "ptt";
-  if (!ptt) { pttAbort(); $("ptt-result").hidden = true; }
-  $("ptt-dock").hidden = !ptt;
-  $("ptt-insecure").hidden = !(ptt && voiceUnavailableReason());
+  const on = mode === "ptt";
+  if (!on) { pttAbort(); pttHideLine(); }
+  $("ptt-dock").hidden = !on;
+  $("ptt-insecure").hidden = !(on && voiceUnavailableReason());
   layoutBottom();
 }
-document.querySelectorAll("[data-voice-mode]").forEach(btn => btn.addEventListener("click", () => {
-  const next = btn.dataset.voiceMode;
-  if (VOICE.mode === next) return;
-  haptic(25);
-  api("/api/voice/config", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: next, enabled: true }) })
-    .then(cfg => {
-      applyVoiceConfig(cfg);
-      showToast(next === "ptt" ? "Modalità Push-to-Talk attiva" : "Modalità Ascolto Continuo attiva");
-    })
-    .catch(() => showToast("Errore cambio modalità vocale"));
-}));
 
 // 8. VOCE DAL TELEFONO (tieni premuto -> registra -> il PC trascrive con Whisper ed esegue il comando)
 const PTT_MAX_MS = 8000;
@@ -1054,15 +1110,25 @@ function pttLabel(title, status) { setText("ptt-title", title); setText("ptt-sta
 function pttIdle() {
   const btn = $("ptt-btn");
   btn.classList.remove("talking", "sending");
-  if (voiceUnavailableReason()) pttLabel("MICROFONO NON DISPONIBILE", "Istruzioni nel riquadro Copilota vocale");
+  if (voiceUnavailableReason()) pttLabel("MICROFONO NON DISPONIBILE", "Istruzioni qui sopra");
   else pttLabel("TIENI PREMUTO PER PARLARE", "Rilascia per inviare · max 8 s");
 }
-function pttShow(transcript, outcome, cls = "") {
-  $("ptt-result").hidden = false;
+// Riga dell'esito sopra il pulsante: resta finché si aspetta la risposta, poi sparisce da sola.
+let _lineTimer = null;
+function pttShow(transcript, outcome, cls = "", final = true) {
+  $("ptt-line").hidden = false;
   if (transcript != null) $("ptt-transcript").textContent = transcript;
   const o = $("ptt-outcome");
   o.textContent = outcome;
   o.className = cls;
+  clearTimeout(_lineTimer);
+  if (final) _lineTimer = setTimeout(pttHideLine, 7000);
+  layoutBottom();
+}
+function pttHideLine() {
+  clearTimeout(_lineTimer);
+  $("ptt-line").hidden = true;
+  $("ptt-transcript").textContent = "";
   layoutBottom();
 }
 function pickMime() {
@@ -1106,7 +1172,7 @@ async function pttStart() {
     ptt.state = "idle";
     pttIdle();
     const denied = err && (err.name === "NotAllowedError" || err.name === "SecurityError");
-    pttShow(null, denied ? "Permesso microfono negato: consentilo nelle impostazioni del sito nel browser."
+    pttShow("", denied ? "Permesso microfono negato: consentilo nelle impostazioni del sito nel browser."
                          : `Microfono non disponibile (${err && err.name || "errore"})`, "bad");
     return;
   }
@@ -1118,7 +1184,7 @@ async function pttStart() {
     pttReleaseMic();
     ptt.state = "idle";
     pttIdle();
-    pttShow(null, "Registrazione audio non supportata da questo browser.", "bad");
+    pttShow("", "Registrazione audio non supportata da questo browser.", "bad");
     return;
   }
   ptt.rec.ondataavailable = e => { if (e.data && e.data.size > 0) ptt.chunks.push(e.data); };
@@ -1163,11 +1229,11 @@ async function pttSend() {
   if (Date.now() - ptt.startedAt < 350 || blob.size < 1500) {
     ptt.state = "idle";
     pttIdle();
-    pttShow(null, "Troppo breve: tieni premuto mentre parli.", "bad");
+    pttShow("", "Troppo breve: tieni premuto mentre parli.", "bad");
     return;
   }
   pttLabel("TRASCRIZIONE SUL PC…", "Attendi l'esito");
-  pttShow("...", "In elaborazione");
+  pttShow("", "In elaborazione", "", false);
   try {
     const r = await fetch("/api/voice/remote", { method: "POST", headers: { "Content-Type": type.split(";")[0] }, body: blob });
     const data = await r.json().catch(() => ({}));
@@ -1177,7 +1243,7 @@ async function pttSend() {
     if (!text) {
       pttShow("(niente)", "Non ho capito, riprova parlando più vicino al telefono.", "bad");
     } else {
-      pttShow(`"${text}"`, "Inviato al copilota...");
+      pttShow(`"${text}"`, "Inviato al copilota...", "", !data.id);
       haptic(30);
       if (data.id) waitRemoteResult(data.id);
     }
