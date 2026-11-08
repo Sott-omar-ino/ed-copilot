@@ -189,7 +189,7 @@ document.addEventListener("click", e => {
 
 function renderNav() {
   const cur = currentTab();
-  const gearOn = cur === "settings" || cur === "voice_commands" || cur === "info";
+  const gearOn = ["settings", "voice_commands", "commands", "info"].includes(cur);
   const keep = $("nav").querySelector(".nav-scroll")?.scrollTop || 0;  // il menu viene ridisegnato: resta dov'era
   // Gruppi richiudibili (clic sul titolo); quello della scheda aperta resta sempre aperto.
   const closed = navClosed();

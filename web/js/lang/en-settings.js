@@ -678,4 +678,6 @@ LANG.add({
   "Comandi a voce (anche dalla cloche e dal telefono), avvisi parlati e briefing all'avvio.": "Voice commands (also from the stick and the phone), spoken alerts and startup briefing.",
   "Niente microfono, comandi vocali, avvisi parlati né briefing. Il resto dell'app funziona normalmente.": "No microphone, voice commands, spoken alerts or briefing. The rest of the app works as usual.",
   "Copilota vocale acceso": "Voice copilot on", "Copilota vocale spento": "Voice copilot off",
+  "Comandi e macro": "Commands & macros",
+  "I comandi e le macro funzionano dai pulsanti del telefono e dalla voce. Con il copilota vocale spento restano utilizzabili dal telefono, senza la conferma a voce.": "Commands and macros work from the phone buttons and by voice. With the voice copilot off they still work from the phone, without the spoken confirmation.",
 });

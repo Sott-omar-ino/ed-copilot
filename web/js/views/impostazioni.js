@@ -219,13 +219,16 @@ document.addEventListener("click", e => {
 });
 
 // Impostazioni divise in schede: Generali (#settings), Audio (#voice_commands: voce, microfono, comandi), Info & FAQ (#info).
-const SETTINGS_TABS = [["settings", "Generali"], ["voice_commands", "Audio"], ["info", "Info & FAQ"]];
+const SETTINGS_TABS = [["settings", "Generali"], ["voice_commands", "Audio"], ["commands", "Comandi e macro"], ["info", "Info & FAQ"]];
 const settingsTabs = cur => `<div class="settings-tabs">${SETTINGS_TABS.map(([id, label]) =>
   `<a href="#${id}" class="${id === cur ? "active" : ""}">${label}</a>`).join("")}</div>`;
 {
+  const cmds = VIEWS.commands;
+  VIEWS.commands = () => settingsTabs("commands") + cmds();
   const audio = VIEWS.voice_commands;
   VIEWS.voice_commands = () => settingsTabs("voice_commands") + audio()
-    + (typeof briefingSettingsPanel === "function" ? `<div style="margin-top:18px">${briefingSettingsPanel()}</div>` : "");
+    + (typeof briefingSettingsPanel === "function" && S?.voice_config?.copilot_on !== false
+      ? `<div style="margin-top:18px">${briefingSettingsPanel()}</div>` : "");
 }
 
 VIEWS.settings = () => {

@@ -257,7 +257,8 @@ document.addEventListener("click", async e => {
   }
 });
 
-VIEWS.voice_commands = () => {
+// Impostazioni → Audio (voce del copilota) e Impostazioni → Comandi e macro (sempre visibili, anche a copilota spento).
+function voiceSettingsParts() {
   // Le stesse chiavi che usa il motore vocale (voice-engine.js) e che salvano i controlli (events.js).
   const noiseSupp = localStorage.getItem("ed_mic_noise_supp") !== "false";
   const echoCancel = localStorage.getItem("ed_mic_echo_cancel") !== "false";
@@ -346,9 +347,8 @@ VIEWS.voice_commands = () => {
         : "Niente microfono, comandi vocali, avvisi parlati né briefing. Il resto dell'app funziona normalmente.",
       `<button class="switch ${copilotOn ? "on" : ""}" data-copilot-master role="switch" aria-checked="${copilotOn}" aria-label="${esc(LANG.t("Copilota vocale"))}"><span></span><span></span></button>`),
     { code: "VOICE" });
-  if (!copilotOn) return `<div class="col">${masterPanel}</div>`;
 
-  return `<div class="col">
+  const html = `<div class="col">
     ${masterPanel}
     ${voiceHead}
 
@@ -624,7 +624,17 @@ VIEWS.voice_commands = () => {
       </div></section>
 
   </div>`;
-};
+  // Si divide la pagina: i controlli di bordo e le macro vanno nella scheda "Comandi e macro".
+  const i1 = html.indexOf("<!-- PANNELLO 1:"), i2 = html.indexOf("<!-- PANNELLO 2:"), i3 = html.indexOf("<!-- PANNELLO 3:");
+  const head = html.slice(0, i1).replace(gameKeysPanel(), "");
+  const audio = copilotOn ? head + html.slice(i2, i3) + "</div>" : `<div class="col">${masterPanel}</div>`;
+  const commands = `<div class="col">
+    <p class="sub">I comandi e le macro funzionano dai pulsanti del telefono e dalla voce. Con il copilota vocale spento restano utilizzabili dal telefono, senza la conferma a voce.</p>
+    ${gameKeysPanel()}${html.slice(i1, i2)}${html.slice(i3)}`;
+  return { audio, commands };
+}
+VIEWS.voice_commands = () => voiceSettingsParts().audio;
+VIEWS.commands = () => voiceSettingsParts().commands;
 
 // Precisione del riconoscimento vocale (modello di faster-whisper, app/voice.py)
 document.addEventListener("click", e => {

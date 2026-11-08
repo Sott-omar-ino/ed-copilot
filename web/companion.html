@@ -732,6 +732,7 @@ const CLANG = (() => {
     "Ricerca stazioni": "Station search",
     "Luoghi utili": "Useful places",
     "Generali": "General",
+    "Comandi e macro": "Commands & macros",
     // Controlli nave
     "Invia i comandi direttamente al gioco sul PC, con i tasti assegnati in gioco.": "Sends the commands straight to the game on the PC, using your in-game key bindings.",
     "Volo": "Flight",
@@ -1000,7 +1001,7 @@ const PC_NAV = [
     ["coriolis_station", "Colonizzazione"], ["exploration", "Esplorazione"], ["exobio", "Esobiologia"], ["powerplay", "Powerplay"], ["colonia", "Bolla ↔ Colonia"], ["fuelrats", "Fuel Rats"]]],
   ["Database", [["materials", "Materiali"], ["wishlist", "Sblocchi e progetti"], ["engineers", "Ingegneri"], ["trader", "Material trader"], ["guardian", "Guardian"],
     ["search", "Ricerca stazioni"], ["places", "Luoghi utili"]]],
-  ["Impostazioni", [["settings", "Generali"], ["voice_commands", "Audio"], ["info", "Info & FAQ"]]],
+  ["Impostazioni", [["settings", "Generali"], ["voice_commands", "Audio"], ["commands", "Comandi e macro"], ["info", "Info & FAQ"]]],
 ];
 // Gruppi richiudibili con un tocco sul titolo (scelta salvata sul telefono); quello della scheda in evidenza resta aperto.
 const navShut = (() => { try { return new Set(JSON.parse(localStorage.getItem("edc_nav_shut") || "[]")); } catch (e) { return new Set(); } })();
