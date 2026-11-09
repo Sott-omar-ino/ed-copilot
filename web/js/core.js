@@ -163,7 +163,7 @@ function result(key, render, empty) {
 
 const NAV = [
   ["Comandante", [["overview", "Panoramica"], ["cmdr", "Profilo"], ["ranks", "Rank e reputazione"], ["missions", "Missioni", () => S?.missions.length], ["stats", "Statistiche"], ["diary", "Diario di bordo"], ["travelmap", "Mappa dei viaggi"], ["squadron", "Squadriglia"],
-    ["todo", "Da fare", () => TODOS.filter(t => !t.done).length]  // solo le attività aperte, non i consigli del copilota]],
+    ["todo", "Da fare", () => TODOS.filter(t => !t.done).length]]],  // solo le attività aperte, non i consigli del copilota
   ["Nave", [["fleet", "Flotta"], ["shipyard", "Cantiere navale"], ["onfoot", "Tute e armi"], ["carrier", "Fleet carrier"]]],
   ["Attività", [["route", "Rotte", () => routeState()?.left || 0], ["trade", "Commercio"], ["mining", "Estrazione"], ["combat", "Combattimento"], ["thargoid", "Thargoid & AX"], ["onfoot_missions", "Missioni a terra"],
     ["coriolis_station", "Colonizzazione"], ["exploration", "Esplorazione"], ["exobio", "Esobiologia"], ["powerplay", "Powerplay"],
@@ -300,3 +300,6 @@ document.addEventListener("input", e => {
   if (el.id && el.closest?.("#view") && el.matches("input:not([type=checkbox]):not([type=range]), textarea")) UI.dirty.set(el.id, el.value);
 });
 window.addEventListener("hashchange", () => { UI.dirty.clear(); $("view").scrollTop = 0; });
+// Riapre la scheda in cui era l'app quando è stata chiusa (la finestra parte sempre dall'indirizzo senza #scheda).
+if (!location.hash && localStorage.getItem("ed_last_view")) history.replaceState(null, "", "#" + localStorage.getItem("ed_last_view"));
+window.addEventListener("hashchange", () => localStorage.setItem("ed_last_view", location.hash.slice(1)));

@@ -52,7 +52,9 @@ COMMODITY_ALIASES = {
 }
 
 # Correzioni a dati sbagliati della comunità, verificate in gioco: (stazione, sistema) -> campi corretti.
-KNOWN_FIXES = {("Wellington Vision", "ICZ HW-V b2-0"): {"technology_broker": "Human"}}
+KNOWN_FIXES = {("Wellington Vision", "ICZ HW-V b2-0"): {"technology_broker": "Human"},
+               # Spansh lo dà Guardian; in gioco il 09/11/2026 non lo è (il journal Docked ha "techBroker").
+               ("Shaw Vista", "Col 285 Sector GL-U b17-8"): {"technology_broker": "Human"}}
 
 
 def _search_json(url, payload, ref):

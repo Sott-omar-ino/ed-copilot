@@ -33,6 +33,12 @@
       <div class="tm"><span>Collegamento</span><span><i class="live-dot" id="h-dot"></i><b id="h-live" style="font-weight:600">—</b></span></div>
       <div class="clock"><b id="clock">--:--:--</b><span id="date">—</span></div>
     </div>
+    <!-- tasti della finestra: visibili solo nell'app senza la barra di Windows (app/frame.py) -->
+    <div class="win-ctl" id="win-ctl">
+      <button data-win="min" title="Riduci a icona"><svg viewBox="0 0 10 10"><path d="M1 5.5h8"/></svg></button>
+      <button data-win="max" title="Ingrandisci o ripristina"><svg viewBox="0 0 10 10"><path d="M1.5 1.5h7v7h-7z"/></svg></button>
+      <button data-win="close" title="Chiudi Voidwatch ED"><svg viewBox="0 0 10 10"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg></button>
+    </div>
   </header>
   <div id="voice-hud-bar" class="voice-hud-bar" style="display:none">
     <div class="vh-indicator"><i class="live-dot on"></i><b>COPILOTA VOCALE</b></div>

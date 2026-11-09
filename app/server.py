@@ -22,7 +22,7 @@ import time
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import (advisor, alerts, backup, bindings, bio, colonisation, coriolis, diary, discord, gamedata, inara, keys,
+from . import (advisor, alerts, backup, bindings, bio, colonisation, coriolis, diary, discord, frame, gamedata, inara, keys,
                missions, overlay, paths, powerplay, ptt, remote_voice, search, shipimages, stats, storage, tls,
                updater, upload, voice)
 from .journal import STATE
@@ -447,6 +447,7 @@ POST = {
     "/api/remote_nav": _remote_nav,
     "/api/lan": _set_lan,
     "/api/app/focus": _focus,
+    "/api/app/window": lambda b, q: frame.control((b or {}).get("action")),
     "/api/open": _open_url,
     "/api/bindings/assign": lambda b, q: bindings.assign_missing((b or {}).get("names")),
     "/api/overlay": lambda b, q: overlay.configure(b),

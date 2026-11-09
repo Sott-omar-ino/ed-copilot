@@ -5,6 +5,7 @@ Opzioni:
   --headless  solo server, senza finestra
 """
 
+import ctypes
 import json
 import os
 import sys
@@ -137,12 +138,23 @@ def _open_window(url, server):
     extra = os.environ.get("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "")
     if "--disable-background-timer-throttling" not in extra:
         os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = (extra + " " + flags).strip()
+    if not paths.FROZEN:
+        # Dai sorgenti la finestra è di pythonw.exe e la barra delle applicazioni mostrerebbe l'icona di Python:
+        # con un identificativo proprio (AppUserModelID) Windows usa l'icona della finestra, cioè il logo dell'app.
+        # L'exe no: ha già il logo e così resta unito al suo collegamento.
+        try:
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("VoidwatchED.Sorgenti")
+        except Exception:
+            pass
+    from . import frame
     window = webview.create_window(paths.APP_NAME, url, width=1520, height=940, min_size=(1000, 680),
-                                   background_color="#030100", text_select=True, maximized=True)
+                                   background_color="#030100", text_select=True, maximized=frame.saved_maximized())
 
     def focus():
         try:
-            window.restore()
+            # Solo se è ridotta a icona: restore() su una finestra ingrandita la rimpicciolirebbe.
+            if ctypes.windll.user32.IsIconic(ctypes.c_void_p(window.native.Handle.ToInt64())):
+                window.restore()
             window.on_top = True
             window.on_top = False
         except Exception:
@@ -150,6 +162,7 @@ def _open_window(url, server):
 
     server.RUNTIME["on_focus"] = focus
     from . import overlay
+    window.events.before_show += frame.setup
     # Chiusa la finestra principale si chiude anche l'overlay, così l'app termina.
     def close_overlay():
         overlay.hide(remember=False)

@@ -111,6 +111,17 @@ header.hud-top { grid-column: 1 / -1; display: flex; align-items: stretch;
 .live-dot.on { background: var(--ok); box-shadow: 0 0 8px var(--ok); animation: pulse 1.6s infinite; }
 .live-dot.bad { background: var(--alert); box-shadow: 0 0 8px var(--alert); }
 @keyframes pulse { 50% { opacity: .35; } }
+/* Finestra senza la barra di Windows (app/frame.py): la barra in alto si trascina, i suoi comandi restano cliccabili */
+.win-ctl { display: none; }
+body.frameless header.hud-top { app-region: drag; -webkit-app-region: drag; }
+body.frameless header.hud-top button, body.frameless header.hud-top a, body.frameless header.hud-top input,
+body.frameless header.hud-top select { app-region: no-drag; -webkit-app-region: no-drag; }
+body.frameless .win-ctl { display: flex; align-items: flex-start; border-left: 2px solid var(--hud-line); }
+.win-ctl button { width: 46px; height: 34px; display: grid; place-items: center; background: none; border: 0; padding: 0;
+                  color: var(--text-3); cursor: pointer; }
+.win-ctl button:hover { background: var(--hud-faint); color: var(--hud-hi); }
+.win-ctl button[data-win="close"]:hover { background: var(--alert); color: #fff; }
+.win-ctl svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.2; }
 @media (max-width: 1700px) { .tm.opt { display: none; } }
 @media (max-width: 1450px) { .telemetry { gap: 4px 18px; } .tm > span:nth-child(2) { font-size: 14px; } }
 /* Crediti e carburante non si accorciano mai; nome, nave e posizione si accorciano per ultimi e il valore intero è nel title */

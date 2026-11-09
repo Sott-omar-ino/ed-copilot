@@ -365,6 +365,8 @@ document.addEventListener("click", e => {
     UI.cfgName = `${CATALOG.ships[UI.cfg.ship].name} ${roleNames[role] || role}`;
     renderView();
     toast(`Allestimento ${roleNames[role]} caricato`);
+  } else if (t.closest("[data-win]")) {
+    api("/api/app/window", { action: t.closest("[data-win]").dataset.win });
   } else if (t.id === "tts-test-main") {
     speak(LANG.t("Sistemi di bordo attivi. Copilota vocale operativo. Buona caccia tra le stelle, Comandante."));
   } else if (t.id === "btn-prop-voice" || t.closest("#btn-prop-voice") || t.id === "btn-voice-toggle-settings" || t.closest("#btn-voice-toggle-settings")) {
