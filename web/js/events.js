@@ -927,6 +927,8 @@ document.addEventListener("submit", e => {
     const tool = id.slice(3);
     run("route", async () => {
       const body = { ...q };
+      // il modulo manda solo i campi toccati: il valore minimo mostrato come predefinito va mandato lo stesso
+      if (body.min_value == null && TOOLS[tool]?.min) body.min_value = TOOLS[tool].min;
       if (tool === "galaxy") {
         body.fsd = fsdFor(q.ship || shipChoices().find(c => c[1].includes("attuale"))?.[0] || shipChoices()[0]?.[0]);
         if (body.fsd && q.cargo) body.fsd = { ...body.fsd };

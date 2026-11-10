@@ -326,6 +326,27 @@ function colOnBoard(name, symbol) {
   return (S?.cargo || []).filter(c => keys.includes(colNorm(c.name))).reduce((a, c) => a + (c.count || 0), 0);
 }
 
+// Passi dopo la stazione principale. Fonte: wiki della community "System Colonisation"
+// (elite-dangerous.fandom.com/wiki/System_Colonisation, letta il 10/11/2026), che cita la guida ufficiale
+// elitedangerous.com/news/system-colonisation-guide, le note di aggiornamento 4.2.1.2 (blocco delle rivendicazioni)
+// e l'annuncio Frontier forums.frontier.co.uk/threads/635519 (economia sullo stesso corpo). I costi in construction
+// points vengono dalla tabella delle strutture della wiki (dati raccolti dai giocatori).
+const COL_AFTER = [
+  ["Aspetta il tick settimanale", "La stazione apre i servizi dopo il tick del giovedì alle 07:00 UTC. Prima del tick non si possono piazzare altre strutture; a volte serve un secondo tick."],
+  ["Rivendica il sistema successivo, se vuoi", "Nella stazione finita compare un Colonisation Contact: da lì puoi rivendicare un altro sistema entro 15 al. Per 30 minuti può farlo solo l'architetto, per le 23,5 ore dopo anche la sua squadriglia, poi chiunque."],
+  ["Apri la vista Architect", "Nella mappa del sistema, vista Architect: vedi i posti orbitali liberi, quanti posti a terra ha ogni corpo e quanti cantieri puoi avere aperti insieme."],
+  ["Piazza la struttura successiva", "Scegli posto e struttura. Quelle orbitali aprono uno Space Depot; quelle a terra un cantiere che compare dopo che esci dall'istanza (anche fino a 48 ore). Da qui in poi non ci sono più scadenze."],
+  ["Accumula construction points", "Le strutture Tier 1 danno punti Tier 2, quelle Tier 2 danno punti Tier 3. Un Coriolis o un'Asteroid base costa 3 punti Tier 2 (poi 3, 5, 7, 9, 12 e 2 in più per ognuna); Orbis, Ocellus e Dodec 6 punti Tier 3 ciascuno. Dati raccolti dai giocatori."],
+  ["Scegli il corpo giusto", "L'economia di una struttura conta per i mercati delle stazioni sullo stesso corpo o in orbita attorno a esso: costruisci vicino alla stazione che vuoi rifornire."],
+  ["Il resto", "Puoi rinominare le strutture dalla mappa del sistema (5 nomi casuali gratis). Ogni settimana ricevi un pagamento da ritirare dall'Administration contact. Una struttura sbagliata si può demolire, ma non la principale: le merci consegnate non tornano, i construction points sì."],
+];
+function colNextTick() {
+  const d = new Date(), t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 7));
+  t.setUTCDate(t.getUTCDate() + (4 - t.getUTCDay() + 7) % 7);
+  if (t <= d) t.setUTCDate(t.getUTCDate() + 7);
+  return t;
+}
+
 VIEWS.coriolis_station = () => {
   const cs = getCoriolisStation();
   const curSys = S?.location?.system || "Sol";
@@ -471,10 +492,20 @@ VIEWS.coriolis_station = () => {
     ${manual ? renderViaLiberaPanel(cs, curSys) : ""}`,
     { code: "TARGETS", aside: `vicino a ${esc(curSys)}` });
 
+  // --- passi dopo la stazione principale: in alto quando il cantiere scelto è completato ---
+  const tick = colNextTick();
+  const afterPanel = panel("Dopo la stazione principale", `
+    <ol class="fr-steps">${COL_AFTER.map(([t, x]) => `<li><b>${t}</b><div>${x}</div></li>`).join("")}</ol>
+    <div class="sub">Prossimo tick settimanale: <span class="mono gold">${esc(tick.toLocaleString(NUM_LOCALE, { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }))}</span> (ora locale), tra ${until(tick.toISOString())}</div>`,
+    { code: "NEXT", aside: "fonte: wiki della community e note Frontier" });
+  const done = !manual && depot.complete;
+
   return `<div class="col">
       ${header}
+      ${done ? afterPanel : ""}
       ${materialsPanel}
       ${manual ? `<div class="grid even"><div class="col">${manualPanel}${settingsPanel}</div><div class="col">${candidatesPanel}</div></div>` : candidatesPanel}
+      ${done ? "" : afterPanel}
     </div>`;
 };
 
