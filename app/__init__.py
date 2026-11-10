@@ -1,3 +1,3 @@
 """Voidwatch ED: companion locale per Elite Dangerous."""
 
-VERSION = "7.5"
+VERSION = "7.6"
