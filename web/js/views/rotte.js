@@ -25,6 +25,9 @@ const TOOLS = {
     desc: "Salti del carrier (fino a 500 al) con il trizio necessario e dove rifornirsi.", fields: ["from", "carrier_to", "capacity_used"] },
 };
 const BODY_TOOLS = ["riches", "exobio", "earthlike", "ammonia", "rocky"];
+// Esobiologia "da scoprire": pianeti senza specie registrate su Spansh, con la previsione delle specie (app/spansh.py exobio_predict).
+const EXO_PREDICT = { desc: "Pianeti con segnali biologici dove nessuno ha ancora registrato le specie: specie possibili e valore sono una previsione dalle condizioni del pianeta.",
+  fields: ["from", "range", "area", "max_results", "max_distance", "min_value", "loop"] };
 
 function routeState() {
   if (!ROUTE?.jumps?.length || !S) return null;
@@ -69,6 +72,7 @@ function routeField(tool, name) {
     case "range": return inp(f, "range", "Salto (al)", "", `type="number" step="0.01" placeholder="${jr}" style="width:100px"`);
     case "efficiency": return `<label>Efficienza<select name="efficiency">${[[40, "40% (più neutroni)"], [60, "60% (bilanciata)"], [80, "80% (più diretta)"], [100, "100%"]].map(([v, l]) => opt(v, l, fv(f, "efficiency", 60))).join("")}</select></label>`;
     case "radius": return inp(f, "radius", "Raggio (al)", "25", 'type="number" style="width:90px"');
+    case "area": return inp(f, "area", "Raggio dalla partenza (al)", "100", 'type="number" style="width:90px"');
     case "max_results": return inp(f, "max_results", "Sistemi max", "50", 'type="number" style="width:90px"');
     case "max_distance": return inp(f, "max_distance", "Max ls dall'arrivo", "5000", 'type="number" style="width:120px"');
     case "min_value": return inp(f, "min_value", "Valore minimo (Cr)", String(TOOLS[tool].min || 1), 'type="number" style="width:140px"');
@@ -102,10 +106,18 @@ function hopBadges(j) {
 }
 function hopBodies(j) {
   if (!j.bodies?.length) return "";
-  return `<div style="grid-column:2 / -1;margin:2px 0 4px">${j.bodies.map(b => `<div class="mat-line" style="grid-template-columns:1fr auto;font-size:13px">
+  return `<div style="grid-column:2 / -1;margin:2px 0 4px">${j.bodies.map(b => b.predicted ? predictedBody(j, b) : `<div class="mat-line" style="grid-template-columns:1fr auto;font-size:13px">
     <span><b>${esc(b.name.replace(j.system, "").trim() || b.name)}</b> <span class="sub">${esc(T("body", b.type))} · ${num(b.dist_ls)} ls${b.terraformable ? " · terraformabile" : ""}</span>
     ${b.species?.length ? `<div class="sub">${b.species.map(sp => `${esc(sp.name)} <span class="gold">${short(sp.value)}</span>`).join(" · ")}</div>` : ""}</span>
     <span class="mono gold">${short(b.species?.length ? b.bio_value : b.mapping)}</span></div>`).join("")}</div>`;
+}
+
+// Pianeta previsto: le specie possibili per genere ("?" = condizioni da verificare) e il valore base minimo-massimo.
+function predictedBody(j, b) {
+  return `<div class="mat-line" style="grid-template-columns:1fr auto;font-size:13px">
+    <span><b>${esc(b.name.replace(j.system, "").trim() || b.name)}</b> <span class="sub">${esc(T("body", b.type))} · ${num(b.dist_ls)} ls · ${b.signals} ${b.signals === 1 ? "segnale" : "segnali"}${b.dss ? " · generi rilevati" : ""}</span>
+    ${b.genera.map(g => `<div class="sub">${g.species.map(sp => `${esc(sp.name)}${sp.sure ? "" : "?"} <span class="gold">${short(sp.value)}</span>`).join(" · ")}</div>`).join("")}</span>
+    <span class="mono gold">${b.bio_min === b.bio_max ? short(b.bio_max) : `${short(b.bio_min)}–${short(b.bio_max)}`}</span></div>`;
 }
 
 // --- Rischi della rotta (dati da /api/fuel, vedi app/fuel.py; caricamento in fuelrats.js) ---------------------
@@ -143,12 +155,18 @@ function routeRiskPanel() {
 }
 
 VIEWS.route = () => {
-  const tool = UI.tool || "neutron", t = TOOLS[tool], f = "rt-" + tool;
+  const tool = UI.tool || "neutron", f = "rt-" + tool;
+  const predict = tool === "exobio" && fv(f, "mode") === "predict", t = predict ? { ...TOOLS[tool], ...EXO_PREDICT } : TOOLS[tool];
+  const modes = tool === "exobio" ? `<div class="chips"><span class="seg-choice">${[["known", "Specie già note"], ["predict", "Da scoprire, con previsione"]].map(([v, l]) =>
+    `<button class="small ${(predict ? "predict" : "known") === v ? "primary" : ""}" data-exo-mode="${v}">${l}</button>`).join("")}</span></div>` : "";
   const tabs = `<div class="chips">${Object.entries(TOOLS).map(([k, v]) => `<button class="small ${k === tool ? "primary" : ""}" data-tool="${k}">${v.label}</button>`).join("")}</div>`;
-  const form = `${tabs}<div class="eyebrow" style="margin-bottom:4px">${esc(t.title)}</div><div class="sub" style="margin-bottom:10px">${esc(t.desc)}</div>
+  const form = `${tabs}${modes}<div class="eyebrow" style="margin-bottom:4px">${esc(t.title)}</div><div class="sub" style="margin-bottom:10px">${esc(t.desc)}</div>
     <form class="form" data-form="${f}" id="f-${f}" data-tool="${tool}">${t.fields.map(n => routeField(tool, n)).join("")}
       <button class="primary" type="submit" ${UI.res.route?.busy ? "disabled" : ""}>Calcola</button></form>
     <div style="margin-top:10px">${UI.res.route?.busy ? '<div class="loading">CALCOLO DELLA ROTTA IN CORSO</div>' : UI.res.route?.error ? `<div class="bad">⚠ ${esc(UI.res.route.error)}</div>` : ""}</div>
+    ${predict ? `<div class="sub"><span>Questi pianeti sono già stati scansionati da qualcuno: niente prima scoperta.</span>
+      <span>Il valore è quello base: il ×5 della prima impronta è possibile, ma Spansh non lo sa.</span>
+      <span>Del sistema si conoscono solo le stelle madri del pianeta: le specie con ? dipendono da altre stelle o corpi e sono da verificare.</span></div>` : ""}
     ${BODY_TOOLS.includes(tool) ? '<div class="sub">Nella bolla abitata quasi tutto è già stato mappato: se non trovi nulla, aumenta il raggio o parti da una zona meno esplorata.</div>' : ""}`;
 
   let active = '<div class="empty">Nessuna rotta calcolata. Scegli uno strumento qui a fianco.</div>';
@@ -157,7 +175,8 @@ VIEWS.route = () => {
     const total = ROUTE.jumps.reduce((a, j) => a + (j.jumps || 0), 0);
     const pct = total ? (total - st.left) / total * 100 : 0;
     const kind = TOOLS[ROUTE.tool] || TOOLS.neutron;
-    const extra = ROUTE.value ? `<div class="kv"><span>Valore stimato</span><span class="gold">${short(ROUTE.value)} CR</span><span class="sub">${ROUTE.bodies} corpi</span></div>`
+    const extra = ROUTE.predicted ? `<div class="kv"><span>Valore previsto</span><span class="gold">${short(ROUTE.value_min)}–${short(ROUTE.value)} CR</span><span class="sub">${ROUTE.bodies} corpi · ×5 possibile</span></div>`
+      : ROUTE.value ? `<div class="kv"><span>Valore stimato</span><span class="gold">${short(ROUTE.value)} CR</span><span class="sub">${ROUTE.bodies} corpi</span></div>`
       : ROUTE.tritium ? `<div class="kv"><span>Trizio necessario</span><span class="gold">${num(ROUTE.tritium)} t</span></div>` : "";
     const left = st.here >= 0 && ROUTE.jumps[st.here].distance_left != null ? ROUTE.jumps[st.here].distance_left : null;
     active = `<div class="grid even" style="gap:12px"><div>

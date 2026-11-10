@@ -2,6 +2,7 @@
 
 import http.client
 import json
+import math
 import time
 import urllib.error
 import urllib.parse
@@ -139,7 +140,71 @@ def riches(q, ctx):
 
 
 def exobio(q, ctx):
+    if q.get("mode") == "predict":
+        return exobio_predict(q, ctx)
     return _riches("exobiology/route", "exobio", q, ctx)
+
+
+def exobio_predict(q, ctx):
+    """Pianeti con segnali biologici di cui nessuno ha registrato le specie (niente landmarks su Spansh), con la
+    previsione delle specie di app/bio_predict.py; tappe raggruppate per sistema in ordine di vicinanza."""
+    from . import bio_predict
+    rng = float(q.get("range") or ctx["jump_range"] or 30)
+    radius, max_ls = int(q.get("area") or 100), int(q.get("max_distance") or 5000)
+    # Predefiniti uguali a quelli mostrati nel modulo (web/js/views/rotte.js): il modulo manda solo i campi toccati.
+    min_value, max_systems = int(q.get("min_value") or 5_000_000), int(q.get("max_results") or 50)
+    filters = {"is_landable": {"value": True}, "signals": [{"comparison": "<=>", "count": [1, 99], "name": "Biological"}],
+               "distance": {"min": "0", "max": str(radius)},
+               "distance_to_arrival": {"comparison": "<=>", "value": [0, max_ls]}}
+    systems, start = {}, None
+    for page in range(4):  # 500 pianeti per pagina, dai più vicini: quasi tutti sono già campionati
+        try:
+            res = http_json(BASE + "bodies/search", {"filters": filters, "sort": [{"distance": {"direction": "asc"}}],
+                                                     "size": 500, "page": page, "reference_system": q["from"]}, timeout=60)
+        except urllib.error.HTTPError as e:  # sistema sconosciuto: 400 "Invalid request"
+            raise ValueError(pick(f"Il servizio di ricerca ha risposto con errore {e.code}: controlla il sistema di partenza",
+                                  f"The search service returned error {e.code}: check the starting system"))
+        ref = res.get("search", {}).get("reference_system_details") or {}
+        start = start or [ref.get("x"), ref.get("y"), ref.get("z")]
+        for b in res.get("results") or []:
+            if any(l.get("subtype") in bio_predict.SPECIES_NAMES for l in b.get("landmarks") or []):
+                continue
+            p, sy = bio_predict.from_spansh(b)
+            pred = bio_predict.predict_body(p, sy)
+            if pred["max"] < min_value or not sy["pos"]:
+                continue
+            s = systems.setdefault(b.get("system_name"), {"system": b.get("system_name"), "pos": sy["pos"],
+                                                          "from_start": b.get("distance") or 0, "bodies": []})
+            s["bodies"].append({"name": b.get("name"), "type": b.get("subtype"), "dist_ls": b.get("distance_to_arrival"),
+                                "predicted": True, "signals": pred["bio"], "dss": pred["dss"], "bio_min": pred["min"],
+                                "bio_max": pred["max"], "genera": [{"genus": g["genus"], "species": [
+                                    {"name": x["name"], "value": x["value"], "sure": x["sure"]} for x in g["species"]]}
+                                    for g in pred["genera"]]})
+        if len(systems) >= max_systems or len(res.get("results") or []) < 500:
+            break
+    if None in (start or [None]):
+        raise ValueError(pick("Sistema di partenza non trovato", "Starting system not found"))
+    left = sorted(systems.values(), key=lambda s: s["from_start"])[:max_systems]
+    if not left:
+        raise ValueError(pick("Nessun pianeta da scoprire sopra il valore minimo: aumenta il raggio o abbassa il valore",
+                              "No undiscovered planet above the minimum value: increase the radius or lower the value"))
+    # Ordine: ogni volta il sistema più vicino a quello attuale.
+    jumps, pos = [{"system": q["from"], "jumps": 0, "distance_jumped": 0, "pos": start, "bodies": []}], start
+    while left:
+        nxt = min(left, key=lambda s: sum((a - b) ** 2 for a, b in zip(s["pos"], pos)))
+        left.remove(nxt)
+        d = sum((a - b) ** 2 for a, b in zip(nxt["pos"], pos)) ** .5
+        jumps.append({"system": nxt["system"], "jumps": max(1, math.ceil(d / rng)), "distance_jumped": d, "pos": nxt["pos"],
+                      "bodies": nxt["bodies"], "value": sum(b["bio_max"] for b in nxt["bodies"]),
+                      "value_min": sum(b["bio_min"] for b in nxt["bodies"])})
+        pos = nxt["pos"]
+    loop = q.get("loop", True)
+    if loop:
+        d = sum((a - b) ** 2 for a, b in zip(start, pos)) ** .5
+        jumps.append({"system": q["from"], "jumps": max(1, math.ceil(d / rng)), "distance_jumped": d, "pos": start, "bodies": []})
+    return _route("exobio", q["from"], q["from"] if loop else jumps[-1]["system"], rng, jumps, predicted=True,
+                  value=sum(j.get("value") or 0 for j in jumps), value_min=sum(j.get("value_min") or 0 for j in jumps),
+                  bodies=sum(len(j["bodies"]) for j in jumps))
 
 
 def ammonia(q, ctx):

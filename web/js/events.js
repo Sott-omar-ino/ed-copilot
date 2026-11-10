@@ -179,6 +179,7 @@ document.addEventListener("click", e => {
   } else if (d.del) { TODOS = TODOS.filter(x => x.id !== d.del); saveTodos(); }
   else if (t.id === "todo-clear") { TODOS = TODOS.filter(x => !x.done); saveTodos(); }
   else if (t.id === "route-clear") { api("/api/route/clear", {}).then(() => { ROUTE = null; renderView(); }); }
+  else if (d.exoMode) { (UI.forms["rt-exobio"] ||= {}).mode = d.exoMode; renderView(); }
   else if (d.tool) { UI.tool = d.tool; renderView(); }
   else if (d.adviceAdd) {
     const a = ADVICE.find(x => x.id === d.adviceAdd);

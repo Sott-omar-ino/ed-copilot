@@ -464,6 +464,93 @@ def status():
     return {"config": load_config(), **predict()}
 
 
+# --- Pianeti da Spansh (rotta esobiologica con previsione, app/spansh.py) -----------------------
+# Spansh (api/bodies/search) scrive i dati con i nomi di EDSM, non con quelli del journal: qui si riportano al formato
+# di build_system. Nomi e unità controllati sulle risposte di Spansh del 10/11/2026 (circa 3500 pianeti con segnali
+# biologici) e verificati con tools/test_bio_spansh.py: gravità già in g, pressione già in atm, temperatura in K,
+# periodo orbitale in giorni (il journal lo dà in secondi), materiali con l'iniziale maiuscola.
+_SP_BODY = {"High metal content world": "High metal content body", "Rocky Ice world": "Rocky ice body",
+            "Metal-rich body": "Metal rich body", "Earth-like world": "Earthlike body",
+            "Gas giant with water-based life": "Gas giant with water based life",
+            "Gas giant with ammonia-based life": "Gas giant with ammonia based life",
+            "Helium-rich gas giant": "Helium rich gas giant"}
+# Classi delle stelle: le lettere semplici ("G (White-Yellow) Star"), poi le altre come StarType del journal.
+_SP_STAR = {"T Tauri Star": "TTS", "Herbig Ae/Be Star": "AeBe", "Neutron Star": "N", "Black Hole": "H",
+            "Supermassive Black Hole": "SupermassiveBlackHole", "MS-type Star": "MS", "S-type Star": "S",
+            "C Star": "C", "CN Star": "CN", "CJ Star": "CJ", "Wolf-Rayet Star": "W", "Wolf-Rayet N Star": "WN",
+            "Wolf-Rayet NC Star": "WNC", "Wolf-Rayet C Star": "WC", "Wolf-Rayet O Star": "WO",
+            "K (Yellow-Orange giant) Star": "K_OrangeGiant", "M (Red giant) Star": "M_RedGiant",
+            "M (Red super giant) Star": "M_RedSuperGiant", "A (Blue-White super giant) Star": "A_BlueWhiteSuperGiant",
+            "B (Blue-White super giant) Star": "B_BlueWhiteSuperGiant", "F (White super giant) Star": "F_WhiteSuperGiant",
+            "G (White-Yellow super giant) Star": "G_WhiteSuperGiant"}
+# Generi rilevati col DSS ("genuses"): Spansh usa la parola dell'identificativo del Codex ($Codex_Ent_Bacterial_...).
+_SP_GENUS = {"Bacterial": "Bacterium", "Fonticulus": "Fonticulua", "Tussocks": "Tussock", "Stratum": "Stratum",
+             "Fungoids": "Fungoida", "Shrubs": "Frutexa", "Osseus": "Osseus", "Tubus": "Tubus", "Cactoids": "Cactoida",
+             "Conchas": "Concha", "Electricae": "Electricae", "Aleoids": "Aleoida", "Brain Trees": "Brain Tree",
+             "Fumerolas": "Fumerola", "Tubers": "Sinuous Tubers", "Clypeus": "Clypeus", "Recepta": "Recepta",
+             "Crystalline Shards": "Crystalline Shards"}
+SPECIES_NAMES = {s["name"] for s in bio_rules.SPECIES} | set(_ALIAS)
+
+
+def _sp_star(subtype):
+    if subtype in _SP_STAR:
+        return _SP_STAR[subtype]
+    m = re.match(r"^White Dwarf \((D[A-Z]*)\) Star$", subtype or "")
+    if m:
+        return m.group(1)
+    m = re.match(r"^([OBAFGKMLTY]) \([^)]*\) Star$", subtype or "")
+    return m.group(1) if m and "giant" not in subtype else None  # sconosciuta: la stella resta "da verificare"
+
+
+def _sp_atmo(text):
+    """'Thin Carbon dioxide-rich' -> 'CarbonDioxideRich', 'No atmosphere' -> 'None' (AtmosphereType del journal)."""
+    if not text or text == "No atmosphere":
+        return "None"
+    words = re.sub(r"^((hot|thin|thick)\s+)+", "", text, flags=re.I).replace("-rich", " rich").split()
+    return "".join(w[:1].upper() + w[1:] for w in words)
+
+
+def from_spansh(b):
+    """(corpo, sistema) nel formato di build_system per un pianeta di api/bodies/search."""
+    pos = [b.get("system_x"), b.get("system_y"), b.get("system_z")]
+    pos = pos if None not in pos else None
+    sy = {"name": b.get("system_name"), "address": b.get("system_id64"), "pos": pos, "population": 0,
+          "all_found": False, "stars": {}, "planets": {}, "classes": {_SP_BODY.get(b.get("subtype"), b.get("subtype"))}}
+    parents = []
+    for par in b.get("parents") or []:
+        if par.get("type") == "Planet":
+            sy["classes"].add(_SP_BODY.get(par.get("subtype"), par.get("subtype")))
+        elif par.get("type") == "Star":
+            star = _sp_star(par.get("subtype"))
+            if star:
+                # La stella principale ha l'id64 del sistema (BodyID 0); delle altre non si sa la distanza.
+                sy["stars"][str(par.get("id64"))] = {"type": star, "lum": "", "dist": 0 if par.get("id64") == b.get("system_id64") else 1}
+            parents.append(str(par.get("id64")))
+    sy["main_star"] = next((s for s in sy["stars"].values() if not s["dist"]), None)
+    if not sy["main_star"]:
+        parents.append("?")  # stella principale non nota: le regole che la guardano restano "da verificare"
+    if pos:
+        from .regionmap import findRegion
+        r = findRegion(*pos)
+        sy["region"] = r[0] if r else None
+    else:
+        sy["region"] = None
+    vol = b.get("volcanism_type")
+    p = {"id": b.get("body_id"), "name": b.get("name"), "short": _short(b.get("name"), sy["name"]),
+         "cls": _SP_BODY.get(b.get("subtype"), b.get("subtype")), "landable": bool(b.get("is_landable")),
+         "atmo": _sp_atmo(b.get("atmosphere")),
+         "gases": {_sp_atmo(g.get("name")): g.get("share") or 0 for g in b.get("atmosphere_composition") or []},
+         "volcanism": "" if not vol or vol == "No volcanism" else vol.lower() + " volcanism",
+         "gravity": b.get("gravity") or 0, "temp": b.get("surface_temperature"), "pressure": b.get("surface_pressure"),
+         "dist": b.get("distance_to_arrival") or 0, "period": (b.get("orbital_period") or 0) * 86400,
+         "materials": {m.get("name", "").lower() for m in b["materials"]} if b.get("materials") else None,
+         "footfall": None, "parents": parents, "found": {},
+         "bio": next((s.get("count") or 0 for s in b.get("signals") or [] if s.get("name") == "Biological"), 0)}
+    genera = [_SP_GENUS.get(g.get("name")) for g in b.get("genuses") or []]
+    p["genera"] = genera if None not in genera else []  # un genere che non riconosco: meglio non restringere
+    return p, sy
+
+
 # --- Annunci -----------------------------------------------------------------------------------
 
 def _mcr(v, dot=False):
