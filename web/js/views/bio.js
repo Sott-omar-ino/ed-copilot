@@ -93,7 +93,8 @@ function bioSpecies(x) {
   const sp = x.species.map(s => `<div style="white-space:nowrap">${esc(s.name)} <span class="mono gold">${short(s.value)}</span>
     ${s.done_here ? '<span class="tag mapped">fatta qui</span>' : s.new ? '<span class="tag new">nuova</span>' : ""}</div>`);
   const unk = x.unknown_genera.map(u => `<div style="white-space:nowrap" class="muted">${esc(u.genus)} <span class="sub">(specie ?)</span>
-    <span class="mono">${bioRange(u.min, u.max)}</span>${u.new_possible ? ' <span class="tag new">forse nuova</span>' : ""}</div>`);
+    <span class="mono">${bioRange(u.min, u.max)}</span>${u.new_possible ? ' <span class="tag new">forse nuova</span>' : ""}</div>
+    ${u.species ? `<div class="sub">${u.species.map(s => `${esc(s.name)}${s.sure ? "" : "?"}`).join(" · ")}</div>` : ""}`);
   if (x.unidentified) unk.push(`<div class="sub">+ ${x.unidentified} segnali non identificati</div>`);
   return sp.concat(unk).join("") || '<span class="sub">Nessuna specie segnalata</span>';
 }
@@ -115,11 +116,13 @@ function bioResults(n) {
       <td>${esc(x.atmosphere)}</td>
       <td class="num"><span class="tag bio">${x.bio ?? "?"}</span>${x.complete ? "" : '<div class="sub">incompleto</div>'}</td>
       <td>${bioSpecies(x)}</td>
-      <td class="num"><b class="gold">${short(x.value)}</b>${x.value_new && x.value_new !== x.value ? `<div class="sub new"><span>nuove</span> ${short(x.value_new)}</div>` : ""}
-        ${x.value_max > x.value ? `<div class="sub"><span>fino a</span> ${short(x.value_max)}</div>` : ""}</td>
+      <td class="num">${x.predicted ? `<b class="gold">${bioRange(x.value, x.value_max)}</b><div class="sub">previsto</div><div><span class="tag new">×5 possibile</span></div>`
+        : `<b class="gold">${short(x.value)}</b>${x.value_new && x.value_new !== x.value ? `<div class="sub new"><span>nuove</span> ${short(x.value_new)}</div>` : ""}
+        ${x.value_max > x.value ? `<div class="sub"><span>fino a</span> ${short(x.value_max)}</div>` : ""}`}</td>
       <td>${todoBtn(LANG.t(`Esobiologia: ${x.body}${x.new_count ? ` (${x.new_count} specie nuove)` : ""} · ${short(x.value)} Cr`), x.system, "Esobiologia")}</td></tr>`;
     }).join("") || '<tr><td colspan="8"><div class="empty">Nessun pianeta trovato: allarga il raggio o abbassa il valore minimo</div></td></tr>'}</tbody></table>
-    <div class="sub" style="margin-top:6px">Valori base (senza bonus prima scoperta), dalle tue vendite o dalla tabella dei valori. Dati segnalati dai giocatori, in cache per 15 minuti.</div>`;
+    <div class="sub" style="margin-top:6px">Valori base (senza bonus prima scoperta), dalle tue vendite o dalla tabella dei valori. Dati segnalati dai giocatori, in cache per 15 minuti.</div>
+    <div class="sub">Corpi "previsto": nessuno ha segnalato le specie, che sono previste dalle condizioni del pianeta ("?" = da verificare). Il bonus prima scoperta ×5 è possibile ma non garantito.</div>`;
 }
 
 // --- Previsione delle specie nel sistema attuale (/api/bio/predict, regole in app/bio_rules.py) ---------------
@@ -239,7 +242,7 @@ VIEWS.exobio = () => {
     ${inp(f, "max_arrival", "Distanza max (ls)", "", 'type="number" min="0" step="500" placeholder="nessuna" style="width:120px"')}
     ${chk(f, "only_new", false, "Solo specie nuove per me")}
     <button class="primary" type="submit">Cerca</button></form>
-    <div class="sub" style="margin-top:6px">Valore = somma dei valori base delle specie segnalate dai giocatori che non hai già analizzato su quel corpo. Con valore minimo 0 si cercano i corpi più vicini, anche senza specie segnalate.</div>`;
+    <div class="sub" style="margin-top:6px">Valore = somma dei valori base delle specie segnalate dai giocatori che non hai già analizzato su quel corpo. Con valore minimo 0 si cercano i corpi più vicini, anche senza specie segnalate. I corpi senza specie segnalate hanno il valore previsto dalle condizioni del pianeta e sono ordinati insieme agli altri.</div>`;
 
   return `${panel("Vita nel sistema", pred.head, { code: "BIO-PREDICT", cls: "holo" })}
     ${pred.settings ? `<div style="margin-top:18px">${panel("Avvisi esobiologia", pred.settings, { code: "VOX" })}</div>` : ""}

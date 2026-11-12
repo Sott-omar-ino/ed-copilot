@@ -194,6 +194,20 @@ def _body(b):
             s["variants"].append(lm["variant"])
     genera = [SPANSH_GENUS.get(g.get("name"), g.get("name")) for g in b.get("genuses") or [] if g.get("name")]
     bio = next((s.get("count") for s in b.get("signals") or [] if s.get("name") == "Biological"), None)
+    # Nessuna specie segnalata: previsione dalle condizioni del pianeta (app/bio_predict.py, stesse regole della rotta
+    # "da scoprire"). Valori base: il bonus prima scoperta dipende dal footfall, che Spansh non dice.
+    pred = None
+    if not species:
+        try:
+            from . import bio_predict
+            pp = bio_predict.predict_body(*bio_predict.from_spansh(b))
+            if pp["genera"]:
+                pred = {"min": pp["min"], "max": pp["max"], "unexplained": pp["unexplained"],
+                        "genera": [{"genus": g["genus"], "min": g["min"], "max": g["max"],
+                                    "species": [{"name": x["name"], "value": x["value"], "sure": x["sure"]} for x in g["species"]]}
+                                   for g in pp["genera"]]}
+        except Exception:
+            pred = None
     return {"system": b.get("system_name"), "system_id64": b.get("system_id64"), "body": b.get("name"),
             "body_id": b.get("body_id"), "distance": round(b.get("distance") or 0, 2),
             "arrival": round(b["distance_to_arrival"]) if b.get("distance_to_arrival") is not None else None,
@@ -201,7 +215,7 @@ def _body(b):
             "atmosphere": b.get("atmosphere") or "No atmosphere", "type": b.get("subtype"),
             "temperature": round(b["surface_temperature"]) if b.get("surface_temperature") is not None else None,
             "bio": bio, "species": list(species.values()), "genera": genera,
-            "updated": b.get("signals_updated_at") or b.get("updated_at")}
+            "updated": b.get("signals_updated_at") or b.get("updated_at"), "pred": pred}
 
 
 def _search(ref, radius, min_value, max_gravity, max_arrival):
@@ -225,6 +239,16 @@ def _search(ref, radius, min_value, max_gravity, max_arrival):
                "size": 200, "page": 0, "reference_system": ref}
     res = http_json(BODIES_URL, payload, timeout=45)  # gli errori salgono: niente cache
     rows = [_body(b) for b in res.get("results", [])]
+    if min_value > 0:
+        # Il filtro landmark_value esclude i pianeti senza specie segnalate: si leggono anche i 500 più vicini
+        # e si tengono quelli la cui previsione massima arriva al valore minimo.
+        near = dict(payload, filters={k: v for k, v in filters.items() if k != "landmark_value"},
+                    sort=[{"distance": {"direction": "asc"}}], size=500)
+        seen = {(r["system_id64"], r["body_id"]) for r in rows}
+        for b in http_json(BODIES_URL, near, timeout=45).get("results", []):
+            r = _body(b)
+            if r["pred"] and r["pred"]["max"] >= min_value and (r["system_id64"], r["body_id"]) not in seen:
+                rows.append(r)
     # Spansh è un po' largo sui limiti: si ricontrolla qui.
     if max_gravity:
         rows = [r for r in rows if r["gravity"] is None or r["gravity"] <= max_gravity]
@@ -276,16 +300,24 @@ def nearby(ref="Sol", radius=50, min_value=0, max_gravity=None, only_new=False, 
         sp.sort(key=lambda s: -s["value"])
         known_genera = {s["genus"] for s in sp}
         unknown = []
-        for g in r["genera"]:
+        pred = r.get("pred")
+        for g in pred["genera"] if pred else []:
+            missing = [s["name"] for s in g["species"] if s["name"] not in species_done]
+            unknown.append({"genus": g["genus"], "min": g["min"], "max": g["max"], "new_possible": bool(missing),
+                            "species": g["species"]})
+        for g in [] if pred else r["genera"]:
             if g in known_genera:
                 continue
             lo, hi = genus_range(g, values)
             missing = [n for n in SPECIES_VALUES if genus_of(n) == g and n not in species_done]
             unknown.append({"genus": g, "min": lo, "max": hi, "new_possible": bool(missing)})
         # Segnali senza specie né generi noti: si sa solo quanti sono.
-        unidentified = max(0, (r["bio"] or 0) - len(sp) - len(unknown))
+        unidentified = pred["unexplained"] if pred else max(0, (r["bio"] or 0) - len(sp) - len(unknown))
+        if pred:  # valore previsto: minimo-massimo per quanti sono i segnali (app/bio_predict.py)
+            value = pred["min"]
         row.update(species=sp, unknown_genera=unknown, unidentified=unidentified, value=value, value_new=value_new,
-                   value_max=value + sum(u["max"] or 0 for u in unknown),
+                   value_max=pred["max"] if pred else value + sum(u["max"] or 0 for u in unknown),
+                   predicted=bool(pred),
                    new_count=sum(1 for s in sp if s["new"] and not s["done_here"]),
                    complete=bool(r["bio"]) and len(sp) >= r["bio"])
         if only_new and not (row["new_count"] or any(u["new_possible"] for u in unknown) or unidentified):
