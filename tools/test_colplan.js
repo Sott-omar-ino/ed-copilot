@@ -67,5 +67,28 @@ for (const bad of ["", "VWCOL1.!!!!", "VWCOL1.e30", P.encode({ system: "X", site
   ok(threw, "rifiuta " + bad.slice(0, 20));
 }
 
+// Consigli per obiettivo: solo strutture che alzano l'effetto, in ordine di resa per tonnellata.
+const tonsOf = s => Object.values(s.cargo).reduce((a, b) => a + b, 0);
+let adv = P.advise(plan("no_truss", "asteroid"), "sol", null);
+ok(adv.picks.length > 0 && adv.picks.every(x => x.gain > 0 && x.tons > 0), "consigli: solo effetti positivi con merci note");
+ok(adv.picks.every((x, i) => !i || adv.picks[i - 1].per100k >= x.per100k), "consigli in ordine di resa");
+ok(adv.compare.length > 0 && adv.compare.every(c => c.worse.every(w => w.cls === c.best.cls && w.tier === c.best.tier && w.orbital === c.best.orbital
+  && (w.effects.sol || 0) > 0 && w.effects.sol < c.best.effects.sol && tonsOf(w) >= tonsOf(c.best))), "confronti: stesso posto, di più con meno merci");
+ok(adv.lowers.length === 1 && adv.lowers[0].site.key === "asteroid", "segnala nel piano chi abbassa l'effetto");
+adv = P.advise(plan("no_truss"), "tech", false);
+ok(adv.picks.every(x => x.site.orbital), "niente superficie senza corpi atterrabili");
+
+// Strada al T3: aggiungendo i passi al piano e poi l'Orbis, nessuna struttura parte senza punti.
+for (const [base, surf] of [[["no_truss"], null], [["no_truss"], false], [["plutus", "vesta"], null]]) {
+  const path3 = P.pathToT3(plan(...base), "apollo", surf);
+  ok(path3.need > 0 && path3.steps?.length, `strada al T3 trovata (${base}, ${surf})`);
+  const full = plan(...base, ...path3.steps.flatMap(st => Array(st.n).fill(st.site.key)), "apollo");
+  const fe = P.evaluate(full);
+  ok(fe.short === 0, `strada al T3 senza punti mancanti (${base}, ${surf}): ${JSON.stringify(fe.points)}`);
+  ok(path3.tons === path3.steps.reduce((a, st) => a + st.n * tonsOf(st.site), 0), "tonnellate della strada");
+  if (surf === false) ok(path3.steps.every(st => st.site.orbital), "strada solo orbitale");
+}
+ok(P.pathToT3(plan(), "apollo", null).free, "a piano vuoto l'Orbis è il primary port");
+
 console.log(`${passed} ok, ${failed} falliti`);
 process.exit(failed ? 1 : 0);

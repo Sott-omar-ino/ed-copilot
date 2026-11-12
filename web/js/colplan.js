@@ -57,6 +57,75 @@
       cargoTotal: Object.values(cargo).reduce((a, b) => a + b, 0), short: rows.filter(r => r.short).length };
   }
 
+  // --- consigli: solo conti sui dati di Raven Colonial (effetti, punti, merci medie), nessun peso inventato ---
+  const tonsOf = s => Object.values(s.cargo || {}).reduce((a, b) => a + b, 0);
+  // surfaceOk: false se il sistema non ha corpi atterrabili (allora niente strutture di superficie), null se non si sa.
+  const fits = (s, surfaceOk) => s.orbital || surfaceOk !== false;
+  const nextRow = (plan, key) => evaluate({ sites: [...(plan.sites || []), { type: key, status: "plan" }] }).rows.slice(-1)[0];
+
+  // Strutture che alzano l'effetto `goal`, dalla più conveniente: punti di effetto ogni 100.000 t di merci da portare.
+  // Strutture senza merci note (cargo vuoto nei dati) restano fuori: non si può dire quanto costano.
+  function advise(plan, goal, surfaceOk) {
+    const picks = [];
+    for (const s of sites()) {
+      const gain = s.effects[goal] || 0, tons = tonsOf(s);
+      if (gain <= 0 || !tons || !fits(s, surfaceOk)) continue;
+      const row = nextRow(plan, s.key);
+      picks.push({ site: s, gain, tons, per100k: gain * 100000 / tons, cost: row.cost, short: row.short, primary: row.primary });
+    }
+    picks.sort((a, b) => b.per100k - a.per100k || a.tons - b.tons);
+    // "Meglio X che Y": stesso tipo di posto (classe, tier, orbitale o superficie), Y alza anche lui l'effetto ma X dà di
+    // più e non chiede più merci.
+    const groups = {};
+    for (const s of sites()) {
+      if (!tonsOf(s) || !fits(s, surfaceOk)) continue;
+      (groups[`${s.cls}|${s.tier}|${s.orbital}`] ||= []).push(s);
+    }
+    const compare = [];
+    for (const list of Object.values(groups)) {
+      const best = list.slice().sort((a, b) => (b.effects[goal] || 0) - (a.effects[goal] || 0) || tonsOf(a) - tonsOf(b))[0];
+      const gain = best.effects[goal] || 0;
+      const worse = list.filter(s => (s.effects[goal] || 0) > 0 && (s.effects[goal] || 0) < gain && tonsOf(s) >= tonsOf(best))
+        .sort((a, b) => (a.effects[goal] || 0) - (b.effects[goal] || 0));
+      if (gain > 0 && worse.length) compare.push({ best, worse });
+    }
+    compare.sort((a, b) => (b.best.effects[goal] || 0) - (a.best.effects[goal] || 0));
+    const lowers = (plan.sites || []).map((x, i) => ({ index: i, site: site(x.type) }))
+      .filter(x => x.site && (x.site.effects[goal] || 0) < 0);
+    return { picks, compare, lowers };
+  }
+
+  // Strada con meno merci per avere i punti T3 di uno starport T3 aggiunto in fondo al piano. Fonti di punti T3: strutture
+  // non starport che costano punti T2 e ne danno T3 (gli starport T2 alzano la tassa e danno 1 solo punto); fonti di punti T2:
+  // strutture che non costano punti. Fuori quelle con prerequisiti e quelle senza merci note.
+  function pathToT3(plan, targetKey, surfaceOk) {
+    const target = site(targetKey);
+    const last = nextRow(plan, target.key);
+    if (!last.cost) return { target, free: true, steps: [], tons: 0, need: 0 };
+    const before = evaluate(plan).points;
+    const need = last.cost.count - before[3];
+    if (need <= 0) return { target, cost: last.cost, steps: [], tons: 0, need: 0 };
+    const usable = s => s.cls !== "starport" && !s.preReq && tonsOf(s) > 0 && fits(s, surfaceOk);
+    const cheapest = list => list.sort((a, b) => tonsOf(a) - tonsOf(b))[0] || null;
+    const t2 = cheapest(sites().filter(s => usable(s) && s.needs[1] === 0 && s.gives[0] === 2 && s.gives[1] > 0));
+    const by = g => cheapest(sites().filter(s => usable(s) && s.needs[0] === 2 && s.needs[1] > 0 && s.gives[0] === 3 && s.gives[1] === g));
+    const g2 = by(2), g1 = by(1);
+    let best = null;
+    for (let a = 0; a <= Math.ceil(need / 2); a++) {
+      if (a && !g2) break;
+      const b = Math.max(0, need - 2 * a);
+      if (b && !g1) continue;
+      const pts2 = (a ? a * g2.needs[1] : 0) + (b ? b * g1.needs[1] : 0);
+      const extra = Math.max(0, pts2 - before[2]);
+      if (extra && !t2) continue;
+      const tons = (a ? a * tonsOf(g2) : 0) + (b ? b * tonsOf(g1) : 0) + (extra ? Math.ceil(extra / t2.gives[1]) * tonsOf(t2) : 0);
+      if (!best || tons < best.tons) {
+        best = { tons, steps: [extra && { site: t2, n: Math.ceil(extra / t2.gives[1]) }, a && { site: g2, n: a }, b && { site: g1, n: b }].filter(Boolean) };
+      }
+    }
+    return best ? { target, cost: last.cost, need, ...best } : { target, cost: last.cost, need, steps: null, tons: 0 };
+  }
+
   // Codice da copiare: prefisso + base64 URL-safe di JSON {s: sistema, x: [[corpo, tipo, stato], ...]}.
   function b64enc(str) {
     const bytes = new TextEncoder().encode(str);
@@ -86,7 +155,7 @@
     return { system: o.s.trim(), sites: out };
   }
 
-  const api = { EFFECTS, STATUSES, sites, site, applyTax, evaluate, encode, decode };
+  const api = { EFFECTS, STATUSES, sites, site, applyTax, evaluate, encode, decode, advise, pathToT3 };
   root.ColPlan = api;
   if (typeof module !== "undefined") module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis);

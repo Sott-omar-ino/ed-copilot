@@ -57,6 +57,51 @@ function colLoadSiteData() {
     .finally(() => { if (currentTab() === "coriolis_station" && UI.colMode === "plan") renderView(); });
 }
 
+// Consigli: cosa costruire per un obiettivo (resa per tonnellata) e strada con meno merci per uno starport T3.
+// Conti in ColPlan.advise / ColPlan.pathToT3 (web/js/colplan.js), solo sui dati di Raven Colonial.
+function colAdvicePanel(plan, surfaceOk) {
+  const goal = UI.colGoal || "t3";
+  const tabs = `<div class="seg-choice">${["t3", ...ColPlan.EFFECTS].map(k =>
+    `<button class="small ${k === goal ? "primary" : ""}" data-colp-goal="${k}">${k === "t3" ? LANG.t("Strada al T3") : COLP_EFFECT[k]}</button>`).join("")}</div>`;
+  const kind = s => `${COLP_CLASS[s.cls]} T${s.tier} · ${LANG.t(s.orbital ? "orbitale" : "superficie")}`;
+  const note = `<p class="sub">Merci: medie raccolte dai giocatori (Raven Colonial), quindi una stima.${surfaceOk === false ? " Il sistema non ha corpi atterrabili: strutture di superficie escluse." : ""} I posti liberi su ogni corpo qui non si vedono: controllali nella vista Architect.</p>`;
+  let body;
+  if (goal === "t3") {
+    const t3 = ColPlan.sites().filter(s => s.cls === "starport" && s.tier === 3 && (s.orbital || surfaceOk !== false));
+    const key = t3.some(s => s.key === UI.colT3) ? UI.colT3 : "apollo";
+    const r = ColPlan.pathToT3(plan, key, surfaceOk);
+    const pick = `<div class="form"><label class="grow-1">Starport da raggiungere<select id="col-plan-t3">${t3.map(s => opt(s.key, s.name2, key)).join("")}</select></label></div>`;
+    body = pick + (r.free ? `<p>La prima struttura del piano è il primary port e non costa construction points: puoi mettere subito ${esc(r.target.name2)} come primary port.</p>`
+      : !r.need ? `<p class="ok">Il piano dà già i punti T3 per ${esc(r.target.name2)} (${r.cost.count} T3): aggiungilo in fondo.</p>`
+      : !r.steps ? `<p class="bad">Con le strutture possibili in questo sistema non si arriva ai punti T3 che servono.</p>`
+      : `<p>Per ${esc(r.target.name2)} servono ${r.cost.count} punti T3, al piano ne mancano ${r.need}. La strada con meno merci:</p>
+        <table><thead><tr><th>Struttura</th><th class="num">Quante</th><th class="num">Costo</th><th class="num">Dà</th><th class="num">Merci (t)</th></tr></thead><tbody>${r.steps.map(st =>
+          `<tr><td><b class="gold">${esc(st.site.name2)}</b><div class="sub">${esc(kind(st.site))}</div></td><td class="num">${st.n}</td>
+            <td class="num">${st.site.needs[1] ? `${st.n * st.site.needs[1]} T${st.site.needs[0]}` : "—"}</td>
+            <td class="num ok">${st.n * st.site.gives[1]} T${st.site.gives[0]}</td><td class="num">${num(st.n * colpCargoSum(st.site))}</td></tr>`).join("")}
+          <tr><td><b>Totale</b></td><td></td><td></td><td></td><td class="num gold">${num(r.tons)}</td></tr></tbody></table>
+        <p class="sub">Le strutture che danno punti T2 vanno costruite prima di quelle che li spendono. Escluse quelle con prerequisiti e gli starport T2, che danno 1 solo punto T3 e alzano il costo degli starport successivi.</p>
+        <button class="primary" data-colp-addpath="${esc(key)}">Aggiungi al piano, con ${esc(r.target.name2)} in fondo</button>`);
+  } else {
+    const { picks, compare: cmp, lowers } = ColPlan.advise(plan, goal, surfaceOk);
+    const neg = s => ColPlan.EFFECTS.filter(k => k !== goal && s.effects[k] < 0).map(k => `<span class="tag bad">${COLP_EFFECT[k]} ${s.effects[k]}</span>`).join("");
+    const cost = p => p.primary ? `<span class="ok">${LANG.t("gratis")}</span>` : p.cost ? `<span class="${p.short ? "bad" : ""}">${p.cost.count} T${p.cost.tier}</span>` : "—";
+    const top = picks.slice(0, 6);
+    const eff = s => colpSigned(s.effects[goal] || 0);
+    const compare = cmp.map(c => `<li><span class="sub">${esc(kind(c.best))}</span><div><b class="gold">${esc(c.best.name2)}</b> ${eff(c.best)} · ${num(colpCargoSum(c.best))} t${c.best.preReq ? ` <span class="sub">· ${LANG.t("richiede")} <span data-no-translate>${esc(c.best.preReq)}</span></span>` : ""}</div>
+      <div class="sub">${esc(LANG.t("piuttosto che"))} ${c.worse.map(w => `${esc(w.name2)} ${eff(w)} · ${num(colpCargoSum(w))} t`).join(" — ")}</div></li>`).join("");
+    body = !picks.length ? `<div class="empty">Nessuna struttura possibile alza ${esc(COLP_EFFECT[goal])}</div>`
+      : `<table><thead><tr><th>Struttura</th><th class="num">${COLP_EFFECT[goal]}</th><th class="num">Merci (t)</th><th class="num">Ogni 100.000 t</th><th class="num">Costo</th><th>Abbassa</th></tr></thead><tbody>${top.map(p =>
+          `<tr><td><b class="gold">${esc(p.site.name2)}</b><div class="sub">${esc(kind(p.site))}${p.site.preReq ? ` · ${LANG.t("richiede")} <span data-no-translate>${esc(p.site.preReq)}</span>` : ""}</div></td>
+            <td class="num ok">+${p.gain}</td><td class="num">${num(p.tons)}</td><td class="num gold">${num(p.per100k)}</td><td class="num">${cost(p)}</td><td>${neg(p.site)}</td></tr>`).join("")}</tbody></table>
+        ${top.some(p => p.short) ? `<p class="sub"><span class="bad">Costo in rosso</span>: aggiunta in fondo al piano partirebbe senza construction points sufficienti.</p>` : ""}
+        ${compare ? `<div class="subpanel colp-gap"><h3>Ti consiglio</h3><p class="sub">Stesso tipo di posto: la prima dà di più e non chiede più merci delle altre.</p><ul>${compare}</ul></div>` : ""}
+        ${lowers.length ? `<div class="subpanel colp-gap"><h3>Nel piano abbassano ${COLP_EFFECT[goal]}</h3><ul>${lowers.map(x =>
+          `<li>${x.index + 1}. ${esc(x.site.name2)} <span class="bad">${x.site.effects[goal]}</span></li>`).join("")}</ul></div>` : ""}`;
+  }
+  return panel("Consigli", `${tabs}<div class="colp-gap">${body}</div>${note}`, { code: "ADVICE", aside: "calcoli sui dati di Raven Colonial" });
+}
+
 function colPlanView() {
   if (!window.COLONISATION_DATA?.sites?.length) {
     if (!UI.colSiteData?.error) colLoadSiteData();
@@ -129,7 +174,7 @@ function colPlanView() {
     if (r.short) warn.push(`<span class="tag bad">punti insufficienti</span>`);
     if (s && b && !s.orbital && !b.landable) warn.push(`<span class="tag bad">corpo non atterrabile</span>`);
     const info = s ? [`${COLP_CLASS[s.cls]} T${s.tier}`, s.pad !== "none" ? `pad ${s.pad}` : "", COLP_ECO[s.fixed || s.inf] || "",
-      s.preReq ? `${LANG.t("richiede")} ${s.preReq}` : ""].filter(Boolean).join(" · ") : "";
+      s.preReq ? LANG.t("richiede") : ""].filter(Boolean).join(" · ") : "";
     return `<tbody><tr class="${r.status === "build" ? "hot" : ""}">
         <td class="num">${r.index + 1}</td>
         <td><select data-colp-field="type" data-i="${r.index}">${typeOptions(r.type)}</select></td>
@@ -141,7 +186,7 @@ function colPlanView() {
         <td class="num"><button class="small ghost" data-colp-move="-1" data-i="${r.index}" ${r.index ? "" : "disabled"} title="Sposta su">↑</button>
           <button class="small ghost" data-colp-move="1" data-i="${r.index}" ${last ? "disabled" : ""} title="Sposta giù">↓</button>
           <button class="small ghost" data-colp-del="${r.index}" title="Togli dal piano">✕</button></td></tr>
-      <tr><td></td><td colspan="7" class="sub">${r.primary ? `<span class="tag">Primary port</span> ` : ""}${esc(info)} ${warn.join("")}${s?.unlocks.length ? `<div>${s.unlocks.map(esc).join(" · ")}</div>` : ""}</td></tr></tbody>`;
+      <tr><td></td><td colspan="7" class="sub">${r.primary ? `<span class="tag">Primary port</span> ` : ""}${esc(info)}${s?.preReq ? ` <span data-no-translate>${esc(s.preReq)}</span>` : ""} ${warn.join("")}${s?.unlocks.length ? `<div>${s.unlocks.map(esc).join(" · ")}</div>` : ""}</td></tr></tbody>`;
   };
   const nw = UI.colPlanNew || {};
   const addForm = `<div class="form colp-gap">
@@ -173,7 +218,8 @@ function colPlanView() {
         <td class="num"><button class="small" data-colp-depot="${esc(d.market_id)}">Apri</button></td></tr>`;
     }).join("")}</tbody></table>`, { code: "DEPOTS", aside: "dal journal" }) : "";
 
-  return `${head}${balance}${sitesPanel}${depotsPanel}${cargoPanel}`;
+  const advice = colAdvicePanel(plan, br?.data && !br.data.error && bodies.length ? bodies.some(b => b.landable) : null);
+  return `${head}${balance}${sitesPanel}${advice}${depotsPanel}${cargoPanel}`;
 }
 
 // --- scelta tra cantiere e piano ---
@@ -196,10 +242,22 @@ function colEditPlan(fn) {
   renderView();
 }
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-col-mode], [data-colp-open], [data-colp-pick], [data-colp-add], [data-colp-move], [data-colp-del], [data-colp-import], [data-colp-clear], [data-colp-depot], [data-colp-retry]");
+  const t = e.target.closest("[data-col-mode], [data-colp-open], [data-colp-pick], [data-colp-add], [data-colp-move], [data-colp-del], [data-colp-import], [data-colp-clear], [data-colp-depot], [data-colp-retry], [data-colp-goal], [data-colp-addpath]");
   if (!t || t.disabled) return;
   const d = t.dataset;
-  if (d.colMode) {
+  if (d.colpGoal) {
+    UI.colGoal = d.colpGoal;
+    renderView();
+  } else if (d.colpAddpath) {
+    const plan = colPlanGet(colPlanSystem());
+    const bodies = UI.colBodies[plan.system.toLowerCase()]?.data?.bodies || [];
+    const r = ColPlan.pathToT3(plan, d.colpAddpath, bodies.length ? bodies.some(b => b.landable) : null);
+    if (!r.steps) return;
+    colEditPlan(s => {
+      for (const st of r.steps) for (let i = 0; i < st.n; i++) s.push({ body: "", type: st.site.key, status: "plan" });
+      s.push({ body: "", type: r.target.key, status: "plan" });
+    });
+  } else if (d.colMode) {
     UI.colMode = d.colMode;
     renderView();
   } else if (d.colpOpen != null || d.colpPick != null) {
@@ -241,7 +299,10 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => {
   const t = e.target;
-  if (t.id === "col-plan-type" || t.id === "col-plan-body") {
+  if (t.id === "col-plan-t3") {
+    UI.colT3 = t.value;
+    renderView();
+  } else if (t.id === "col-plan-type" || t.id === "col-plan-body") {
     UI.colPlanNew = { ...(UI.colPlanNew || {}), [t.id === "col-plan-type" ? "type" : "body"]: t.value };
   } else if (t.dataset?.colpField) {
     const i = +t.dataset.i, f = t.dataset.colpField;
