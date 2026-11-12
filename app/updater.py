@@ -156,7 +156,10 @@ def _install(latest):
         os.replace(exe, old)  # l'exe in esecuzione si può rinominare, non cancellare
         os.replace(new, exe)
         print(f"[Aggiornamento] Installata la versione {latest['version']}: riavvio.")
-        subprocess.Popen([exe, "--wait-pid", str(os.getpid())], close_fds=True,
+        # Ambiente ripulito dalle variabili di PyInstaller di questo processo, altrimenti il nuovo exe usa la nostra
+        # cartella temporanea, che sparisce quando usciamo (vedi run.py).
+        env = dict(os.environ, PYINSTALLER_RESET_ENVIRONMENT="1", VOIDWATCH_CLEAN_ENV="1")
+        subprocess.Popen([exe, "--wait-pid", str(os.getpid())], close_fds=True, env=env,
                          creationflags=0x00000008 | 0x00000200)  # DETACHED_PROCESS | NEW_PROCESS_GROUP
         time.sleep(0.5)
         os._exit(0)
