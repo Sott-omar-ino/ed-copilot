@@ -132,7 +132,7 @@ function colPlanView() {
       s.preReq ? `${LANG.t("richiede")} ${s.preReq}` : ""].filter(Boolean).join(" · ") : "";
     return `<tbody><tr class="${r.status === "build" ? "hot" : ""}">
         <td class="num">${r.index + 1}</td>
-        <td>${r.primary ? `<div class="eyebrow">Primary port</div>` : ""}<select data-colp-field="type" data-i="${r.index}">${typeOptions(r.type)}</select></td>
+        <td><select data-colp-field="type" data-i="${r.index}">${typeOptions(r.type)}</select></td>
         <td>${bodies.length ? `<select data-colp-field="body" data-i="${r.index}">${bodyOptions(r.body)}</select>` : esc(r.body || "—")}</td>
         <td><select data-colp-field="status" data-i="${r.index}">${ColPlan.STATUSES.map(k => opt(k, LANG.t(COLP_STATUS[k]), r.status)).join("")}</select></td>
         <td class="num ${r.short ? "bad" : ""}">${r.cost ? `${r.cost.count} T${r.cost.tier}` : "—"}</td>
@@ -141,7 +141,7 @@ function colPlanView() {
         <td class="num"><button class="small ghost" data-colp-move="-1" data-i="${r.index}" ${r.index ? "" : "disabled"} title="Sposta su">↑</button>
           <button class="small ghost" data-colp-move="1" data-i="${r.index}" ${last ? "disabled" : ""} title="Sposta giù">↓</button>
           <button class="small ghost" data-colp-del="${r.index}" title="Togli dal piano">✕</button></td></tr>
-      <tr><td></td><td colspan="7" class="sub">${esc(info)} ${warn.join("")}${s?.unlocks.length ? `<div>${s.unlocks.map(esc).join(" · ")}</div>` : ""}</td></tr></tbody>`;
+      <tr><td></td><td colspan="7" class="sub">${r.primary ? `<span class="tag">Primary port</span> ` : ""}${esc(info)} ${warn.join("")}${s?.unlocks.length ? `<div>${s.unlocks.map(esc).join(" · ")}</div>` : ""}</td></tr></tbody>`;
   };
   const nw = UI.colPlanNew || {};
   const addForm = `<div class="form colp-gap">
