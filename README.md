@@ -38,7 +38,7 @@ Each release lists the SHA-256 of the exe and a VirusTotal scan.
 **Activities**
 - Routes with a route-safety check (non-scoopable chains, fuel, neutron/white dwarf warnings)
 - Trade with price alerts, mining (core/motherlode detection, profit per hour), combat and AX tracking
-- Exploration values, exobiology species prediction, Powerplay, colonisation (real construction-site data),
+- Exploration values, exobiology species prediction, Powerplay, colonisation (real construction-site data, system plan with construction points and a shareable code),
   Bubble ↔ Colonia travel, on-foot missions, out-of-fuel help following the Fuel Rats' guidance
 
 **Database**

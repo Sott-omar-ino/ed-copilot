@@ -189,3 +189,41 @@ def suppliers(ref="Sol", commodities=None, min_qty=50):
                 _store(_suppliers_cache, (ref.lower(), comm.lower()), item, 900)
                 results[comm] = item
     return results
+
+
+DUMP_URL = "https://spansh.co.uk/api/dump/{}"
+_bodies_cache = {}
+
+
+def system_bodies(name):
+    """Corpi di un sistema per il piano di colonizzazione (Spansh: ricerca del sistema, poi /api/dump/<id64>).
+    Campi del dump (bodyId, name, type, subType, isLandable, distanceToArrival, rings, stations) verificati su una
+    risposta reale il 12/11/2026."""
+    name = (name or "").strip()
+    if not name:
+        return {"error": pick("Indica il sistema", "Enter the system")}
+    hit = _cached(_bodies_cache, name.lower())
+    if hit:
+        return hit
+    try:
+        res = http_json(SYSTEMS_URL, {"filters": {"name": {"value": name}}, "size": 1}, timeout=30)
+        found = (res.get("results") or [None])[0]
+        if not found or found.get("name", "").lower() != name.lower():
+            return {"system": name, "bodies": [], "error": pick(f"Sistema «{name}» non trovato su Spansh", f"System «{name}» not found on Spansh")}
+        dump = http_json(DUMP_URL.format(found["id64"]), timeout=40).get("system") or {}
+    except Exception:
+        return {"system": name, "bodies": [], "error": pick("Spansh non raggiungibile: riprova tra poco", "Spansh unreachable: try again shortly")}
+    sys_name = dump.get("name") or found.get("name")
+    bodies = []
+    for b in dump.get("bodies") or []:
+        if b.get("type") == "Barycentre":
+            continue
+        full = b.get("name") or ""
+        short = full[len(sys_name):].strip() if full.lower().startswith(sys_name.lower()) else full
+        bodies.append({"id": b.get("bodyId"), "name": short or full, "type": b.get("type"), "subtype": b.get("subType"),
+                       "landable": bool(b.get("isLandable")), "dist_ls": b.get("distanceToArrival"),
+                       "rings": len(b.get("rings") or []), "stations": len(b.get("stations") or [])})
+    data = {"system": sys_name, "id64": found["id64"], "population": dump.get("population") or 0,
+            "stations": [{"name": s.get("name"), "type": s.get("type")} for s in dump.get("stations") or []], "bodies": bodies}
+    _store(_bodies_cache, name.lower(), data, 600)
+    return data

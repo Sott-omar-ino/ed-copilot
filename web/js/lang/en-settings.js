@@ -243,6 +243,7 @@ LANG.add({
     "Ship and module data: Coriolis project (EDCD, MIT licence). Online searches use the community's public services; the links are in Useful places.",
   "Previsione delle specie in Esobiologia: regole del plugin EDMC-BioScan e dati di EDMC-ExploData di Jeremy Rimpo (Silarn, licenza GNU GPL v2), basate sulle ricerche della community (Deep Space Network, Canonn); regioni galattiche dalla mappa EliteDangerousRegionMap di Ben Peddell (klightspeed, licenza MIT).":
     "Species prediction in Exobiology: rules from the EDMC-BioScan plugin and data from EDMC-ExploData by Jeremy Rimpo (Silarn, GNU GPL v2 licence), based on community research (Deep Space Network, Canonn); galactic regions from the EliteDangerousRegionMap by Ben Peddell (klightspeed, MIT licence).",
+  "Piano del sistema in Colonizzazione: tipi di struttura, construction points e merci medie dal progetto Raven Colonial (njthomson, licenza GNU GPL v3), scaricati alla prima apertura e non inclusi nell'app.": "Colonisation system plan: structure types, construction points and average commodities from the Raven Colonial project (njthomson, GNU GPL v3 licence), downloaded on first use and not included in the app.",
   "Domande frequenti": "Frequently asked questions",
   "La panoramica è vuota o i dati non si aggiornano.": "The overview is empty or the data doesn't update.",
   "L'app legge i journal che Elite Dangerous scrive mentre giochi. Avvia il gioco almeno una volta ed entra in partita: i dati arrivano da soli. Qui sotto vedi la cartella dei journal che l'app sta usando.":

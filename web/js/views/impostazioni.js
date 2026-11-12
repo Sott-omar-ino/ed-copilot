@@ -350,7 +350,9 @@ VIEWS.info = () => {
         pubblici della community; i collegamenti sono in Luoghi utili.</p>
       <p class="sub">Previsione delle specie in Esobiologia: regole del plugin EDMC-BioScan e dati di EDMC-ExploData di Jeremy Rimpo
         (Silarn, licenza GNU GPL v2), basate sulle ricerche della community (Deep Space Network, Canonn); regioni galattiche dalla mappa
-        EliteDangerousRegionMap di Ben Peddell (klightspeed, licenza MIT).</p>`, { code: "CREDITS" })}
+        EliteDangerousRegionMap di Ben Peddell (klightspeed, licenza MIT).</p>
+      <p class="sub">Piano del sistema in Colonizzazione: tipi di struttura, construction points e merci medie dal progetto Raven Colonial
+        (njthomson, licenza GNU GPL v3), scaricati alla prima apertura e non inclusi nell'app.</p>`, { code: "CREDITS" })}
   </div><div class="col">
     ${panel("Domande frequenti", faq, { code: "FAQ" })}
   </div></div>`;

@@ -101,6 +101,7 @@ app/                    server Python
   tls.py, remote_voice.py HTTPS del companion e comandi vocali dal telefono
   updater.py              aggiornamento automatico dalle release di GitHub
   colonisation.py         pianificatore di colonizzazione
+  colonisation_data.py    dati delle strutture per il piano del sistema (scaricati da Raven Colonial)
   voice.py, keys.py       copilota vocale e comandi alla nave
   advisor.py              consigli del copilota
   coriolis.py, ships.py   catalogo navi e allestimenti

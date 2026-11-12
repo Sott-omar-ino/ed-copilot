@@ -25,6 +25,16 @@ Data is fetched from public community services (Spansh, EDSM, Inara with the use
 community goals feed, Microsoft neural voices for speech). Uploads to EDDN, EDSM and Inara happen only if the user
 enables them. Links to these services are in the app's "Luoghi utili" (Useful places) tab.
 
+## Data downloaded at runtime, not included
+
+| Component | Used by | Source | License |
+|---|---|---|---|
+| Colonisation structure types (tier, construction points, effects, prerequisites, unlocks) and average construction commodities | Colonisation > System plan (`app/colonisation_data.py`, rules ported in `web/js/colplan.js`) | [RavenColonialWeb](https://github.com/njthomson/RavenColonialWeb) by njthomson (Raven Colonial), pinned commit | GPL-3.0 |
+
+These files are not shipped with Voidwatch ED: the app downloads them from GitHub the first time the system plan is
+opened and keeps a converted copy in the user's data folder (`cache/colonisation_sites.json`). They are not bundled
+because GPL-3.0 material cannot be combined with the GPL-2.0-only data listed above.
+
 ## Trademarks
 
 Elite Dangerous is a trademark of Frontier Developments plc. Voidwatch ED is an unofficial fan project, not affiliated

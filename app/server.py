@@ -40,6 +40,9 @@ FEATURES += (voice, ptt)
 from . import bio_predict  # noqa: E402
 FEATURES += (bio_predict,)
 FEATURES += (mining,)
+# Dati delle strutture per il piano di colonizzazione (scaricati da Raven Colonial alla prima apertura).
+from . import colonisation_data  # noqa: E402
+FEATURES += (colonisation_data,)
 
 # Risposta di /api/ping: main.py la usa per non aprire l'app due volte (riconosce anche "ed-copilot", il vecchio nome).
 APP_ID = "voidwatch-ed"
@@ -400,6 +403,7 @@ GET = {
     "/api/community_goals": lambda q: search.community_goals(),
     "/api/colonisation/candidate_systems": lambda q: colonisation.candidates(q.get("ref") or search.current_system(), q.get("type", "coriolis")),
     "/api/colonisation/verify_system": lambda q: colonisation.verify(q.get("system", ""), q.get("ref") or search.current_system(), q.get("type", "coriolis")),
+    "/api/colonisation/system_bodies": lambda q: colonisation.system_bodies(q.get("system", "")),
     "/api/colonisation/nearest_materials": lambda q: colonisation.suppliers(
         q.get("ref") or search.current_system(), [c for c in q.get("commodities", "").split(",") if c.strip()]),
     "/api/voice/config": lambda q: voice.load_config(),

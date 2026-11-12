@@ -835,6 +835,10 @@ nav#nav .nav-scroll a { margin: 1px 12px; padding: 4px 12px; font-size: 13px; }
 .fr-steps li { margin: 0 0 10px; }
 .fr-steps li b { color: var(--hud-hi); }
 .fr-tips { margin: 0; padding-left: 18px; }
+
+/* ---- Colonizzazione: piano del sistema (colpiano.js) ---- */
+.colp-gap { margin-top: 12px; }
+.colp-plan td select { max-width: 260px; }
 .fr-tips li { margin-bottom: 6px; }
 .risk-list { list-style: none; margin: 0; padding: 0; }
 .risk-list li { padding: 6px 10px; margin-bottom: 6px; border-left: 3px solid var(--hud-line); background: var(--row); }
